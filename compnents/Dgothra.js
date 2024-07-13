@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -13,9 +14,33 @@ const data = [
   { label: 'Item 8', value: '8' },
 ];
 
-const Dgothra = ({dplable,lable,setGothra}) => {
+const Dgothra = ({dplable,lable,setGothra,gothra}) => {
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("");
+  const [GothraData, setGothraData] = useState([]);
+  useEffect(() => {
+    const testFetch = async () => {
+      try {
+        const response = await axios.get('http://192.168.1.27:4000/api/gothra');
+        const data = response.data;
+        // console.log(data.data, "data");
+        // Ensure data.SANNIDHIres is an array before setting it
+        if (Array.isArray(data.data)) {
+          setGothraData(data.data.map(item => ({
+            label: `${item.GOTHRANAME} ${item.GOTHRAID}`,
+            value: item.GOTHRANAME
+          })));
+        } else {
+          console.error('Expected data.SANNIDHIres to be an array but got:', typeof data.SANNIDHIres);
+        }
+      } catch (error) {
+        console.error('Test fetch error:', error);
+      }
+    };
+  
+    testFetch();
+  }, []);
+
   const renderLabel = () => {
     if (value || isFocus) {
       return (
@@ -26,7 +51,7 @@ const Dgothra = ({dplable,lable,setGothra}) => {
     }
     return null;
   };
-
+ 
   return (
     <View style={styles.container}>
       {renderLabel()}
@@ -36,18 +61,18 @@ const Dgothra = ({dplable,lable,setGothra}) => {
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={data}
+        data={GothraData}
         search
         maxHeight={200}
         labelField="label"
         valueField="value"
         placeholder={!isFocus ? lable : '...'}
         searchPlaceholder="Search..."
-        value={value}
+        value={gothra}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
-          console.log(item,"hkhkjhkhj");
+          // console.log(item,"hkhkjhkhj");
           setGothra(item.value);
           setIsFocus(false);
         }}

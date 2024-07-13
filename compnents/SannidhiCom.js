@@ -1,7 +1,8 @@
-import React, { useState } from 'react';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
-import { fetchDataFromUrl } from '../utils/fetchDataFromUrl';
+import axios from 'axios';
+
 
 const data = [
   { label: 'Item 1', value: '1' },
@@ -11,13 +12,34 @@ const data = [
   { label: 'Item 5', value: '5' },
   { label: 'Item 6', value: '6' },
   { label: 'Item 7', value: '7' },
-  { label: 'Item 8', value: '8' },
+  { label: 'Item 8', value: '8' }, 
 ];
 
 const SannidhiCom = ({dplable,lable,setSannidhi,value,requred}) => {
   const [isFocus, setIsFocus] = useState(false);
-const [sannidhi, setSannidhi] = useState();
-const data = fetchDataFromUrl()
+  const [sannidhiData, setSannidhiData] = useState([]);
+useEffect(() => {
+  const testFetch = async () => {
+    try {
+      const response = await axios.get('http://192.168.1.27:4000/api/sannidhi');
+      const data = response.data;
+      // console.log(data.SANNIDHIres[0], "data");
+      // Ensure data.SANNIDHIres is an array before setting it
+      if (Array.isArray(data.SANNIDHIres)) {
+        setSannidhiData(data.SANNIDHIres.map(item => ({
+          label: `${item.SANNIDHINAME} ${item.SANNIDHIID}`,
+          value: item.SANNIDHINAME
+        })));
+      } else {
+        console.error('Expected data.SANNIDHIres to be an array but got:', typeof data.SANNIDHIres);
+      }
+    } catch (error) {
+      console.error('Test fetch error:', error);
+    }
+  };
+
+  testFetch();
+}, []);
   const renderLabel = () => {
     if (value || isFocus) {
       return (
@@ -37,7 +59,7 @@ const data = fetchDataFromUrl()
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={data}
+        data={sannidhiData}
         search
         maxHeight={300}
         labelField="label"
@@ -48,7 +70,7 @@ const data = fetchDataFromUrl()
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
-          console.log(item,"hkhkjhkhj");
+          // console.log(item,"hkhkjhkhj");
           setSannidhi(item.value);
           setIsFocus(false);
         }}

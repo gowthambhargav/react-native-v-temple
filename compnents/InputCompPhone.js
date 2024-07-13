@@ -1,7 +1,7 @@
 import React,{useState} from 'react';
 import { View, TextInput, Text, StyleSheet } from 'react-native';
 
-const LabeledTextInputPhone = ({ label, setPhone,...rest }) => {
+const LabeledTextInputPhone = ({ label, setPhone,phone,...rest }) => {
   const phoneNumberRegex = /^(?!(\d)\1+$)\d{10}$/;
     const [isValid, setIsValid] = useState(true);
 
@@ -24,6 +24,7 @@ const LabeledTextInputPhone = ({ label, setPhone,...rest }) => {
 
         }
           style={styles.input}
+          value={phone}
           placeholderTextColor="gray"
           {...rest}
         />

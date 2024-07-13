@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -13,9 +14,32 @@ const data = [
   { label: 'Item 8', value: '8' },
 ];
 
-const Drashi = ({dplable,lable,setRashi}) => {
+const Drashi = ({dplable,lable,rashi,setRashi}) => {
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("");
+  const [rashiData, setrashiData] = useState([]);
+  useEffect(() => {
+    const testFetch = async () => {
+      try {
+        const response = await axios.get('http://192.168.1.27:4000/api/rashi');
+        const data = response.data;
+        // console.log(data.data, "data");
+        // Ensure data.SANNIDHIres is an array before setting it
+        if (Array.isArray(data.data)) {
+          setrashiData(data.data.map(item => ({
+            label: `${item.RASHINAME} ${item.RASHIID}`,
+            value: item.RASHINAME
+          })));
+        } else {
+          console.error('Expected data.SANNIDHIres to be an array but got:', typeof data.SANNIDHIres);
+        }
+      } catch (error) {
+        console.error('Test fetch error:', error);
+      }
+    };
+  
+    testFetch();
+  }, []);
   const renderLabel = () => {
     if (value || isFocus) {
       return (
@@ -36,18 +60,18 @@ const Drashi = ({dplable,lable,setRashi}) => {
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={data}
+        data={rashiData}
         search
         maxHeight={200}
         labelField="label"
         valueField="value"
         placeholder={!isFocus ? lable : '...'}
         searchPlaceholder="Search..."
-        value={value}
+        value={rashi}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
-          console.log(item,"hkhkjhkhj");
+          // console.log(item,"hkhkjhkhj");
           setRashi(item.value);
           setIsFocus(false);
         }}

@@ -1,21 +1,35 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
-const data = [
-  { label: 'Item 1', value: '1' },
-  { label: 'Item 2', value: '2' },
-  { label: 'Item 3', value: '3' },
-  { label: 'Item 4', value: '4' },
-  { label: 'Item 5', value: '5' },
-  { label: 'Item 6', value: '6' },
-  { label: 'Item 7', value: '7' },
-  { label: 'Item 8', value: '8' },
-];
 
-const Dnakshara = ({dplable,lable,setNakshatra}) => {
+const Dnakshara = ({dplable,lable,setNakshatra,nakshatra}) => {
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("");
+  const [naksharaData, setnaksharaData] = useState([]);
+  useEffect(() => {
+    const testFetch = async () => {
+      try {
+        const response = await axios.get('http://192.168.1.27:4000/api/nakshatra');
+        const data = response.data;
+        // console.log(data.data, "data");
+        // Ensure data.SANNIDHIres is an array before setting it
+        if (Array.isArray(data.data)) {
+          setnaksharaData(data.data.map(item => ({
+            label: `${item.NAKSHATRANAME} ${item.NAKSHATRAID}`,
+            value: item.NAKSHATRANAME
+          })));
+        } else {
+          console.error('Expected data.SANNIDHIres to be an array but got:', typeof data.SANNIDHIres);
+        }
+      } catch (error) {
+        console.error('Test fetch error:', error);
+      }
+    };
+  
+    testFetch();
+  }, []);
   const renderLabel = () => {
     if (value || isFocus) {
       return (
@@ -36,18 +50,18 @@ const Dnakshara = ({dplable,lable,setNakshatra}) => {
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={data}
+        data={naksharaData}
         search
         maxHeight={200}
         labelField="label"
         valueField="value"
         placeholder={!isFocus ? lable : '...'}
         searchPlaceholder="Search..."
-        value={value}
+        value={nakshatra}
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
-          console.log(item,"hkhkjhkhj");
+          // console.log(item,"hkhkjhkhj");
           setNakshatra(item.value);
           setIsFocus(false);
         }}

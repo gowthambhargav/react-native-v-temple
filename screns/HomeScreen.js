@@ -1,4 +1,4 @@
-import React, { useState, useRef } from "react";
+import React, { useState, useRef, useEffect } from "react";
 import {
   View,
   Button,
@@ -20,6 +20,7 @@ import SevaCom from "../compnents/SevaCom";
 import Dgothra from "../compnents/Dgothra";
 import Dnakshara from "../compnents/Dnakshara";
 import Drashi from "../compnents/Drashi";
+import axios from "axios";
 
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
@@ -31,7 +32,17 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [gothra, setGothra] = useState("");
   const [nakshatra, setNakshatra] = useState("");
   const [rashi, setRashi] = useState("");
+  const [SeralNo, setSeralNo] = useState(0);
 const [translateMenu, setTranslateMenu] = useState(-250);
+useEffect(() => {
+  const date = new Date();
+  const count = "0001";
+  const deviceID = "01";
+  const currentDate = date.getDate();
+  const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
+  setSeralNo(`${yearLastTwoDigits}${currentDate}${deviceID}${count}`);
+}, []);
+
   const handleSubmit = () => {
     let hasError = false;
     
@@ -53,7 +64,25 @@ const [translateMenu, setTranslateMenu] = useState(-250);
       hasError = true;
     }
     // If there are errors, disable the button and set the errors
-    console.log(sannidhi,seva,name,phone,gothra,nakshatra,rashi);
+    console.log(sannidhi,seva,name,phone,gothra,nakshatra,rashi,"from HomeScreen");
+    if (hasError) {
+      return;
+    }
+    // If there are no errors, submit the form
+    const url = "http://192.168.1.27:4000/api/sevaReceipt"
+    axios.post(url,
+      {seva,sannidhi,name,phoneNo:phone,gothra,nakshatra,rashi,sevaReceiptID:SeralNo}
+    ).then((res)=>{
+      setError({ type: "", msg: "" });
+      setName();
+      setSannidhi("");
+      setSeva("");
+      setPhone("");
+      setGothra("");
+      setNakshatra("");
+      setRashi("");
+      setSeralNo(Number(SeralNo)+1);
+      console.log(res)}).catch((err)=>console.log(err));
   };
   console.log(error,"error");
   const scrollViewRef = useRef();
@@ -63,7 +92,7 @@ const [translateMenu, setTranslateMenu] = useState(-250);
       <ScrollView ref={scrollViewRef} contentContainerStyle={styles.container}>
         {/* borderBottomColor: "#000", borderBottomWidth:1 */}
       <View style={{ left:-20, height: 50,width:500,justifyContent:"space-around",alignItems:"baseline"}}>
-      <Text onPress={()=>{console.log("khkhjjg"); setTranslateMenu(0)}} style={{ color: "#000", textAlign: "center", fontSize: 27 }}>
+      <Text onPress={()=>{setTranslateMenu(0)}} style={{ color: "#000", textAlign: "center", fontSize: 27 }}>
       ☰
         </Text> 
        <Text style={{fontWeight:"bold",fontSize:20,left:100,top:-28}}>
@@ -73,7 +102,7 @@ const [translateMenu, setTranslateMenu] = useState(-250);
 
         <View style={{  flex: 1, flexDirection: "row",top:-40 }}>
           <CurrentDateComponent />
-          <SerialNo />
+          <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
         </View>
 
         <SafeAreaView
@@ -123,17 +152,18 @@ const [translateMenu, setTranslateMenu] = useState(-250);
           ) : null}
           <LabeledTextInputPhone
           setPhone={setPhone}
+          phone={phone}
             label={"phone no"}
             // placeholder={"Phone No"}
             keyboardType="numeric"
             key={"hy97975"}
           />
-          <Dgothra setGothra={setGothra}  dplable={"Gothra"} lable={"Gothra"} />
-          <Dnakshara setNakshatra={setNakshatra} dplable={"Nakshara"} lable={"Nakshara"} />
-          <Drashi setRashi={setRashi} dplable={"Rashi"} lable={"Rashi"} />
+          <Dgothra gothra={gothra} setGothra={setGothra}  dplable={"Gothra"} lable={"Gothra"} />
+          <Dnakshara nakshatra={nakshatra} setNakshatra={setNakshatra} dplable={"Nakshara"} lable={"Nakshara"} />
+          <Drashi rashi={rashi}  setRashi={setRashi} dplable={"Rashi"} lable={"Rashi"} />
         </SafeAreaView>
         {/* <Button  onPress={handleSubmit} title="Submit"/> */}
-        <TouchableOpacity style={{top:-150}}>
+        <TouchableOpacity onPress={handleSubmit} style={{top:-150}}>
           <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Submit</Text>
         </TouchableOpacity>
         {/* <TouchableOpacity style={{top:-150}}>

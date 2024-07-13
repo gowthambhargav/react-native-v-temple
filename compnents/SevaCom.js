@@ -1,4 +1,5 @@
-import React, { useState } from 'react';
+import axios from 'axios';
+import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
@@ -15,7 +16,29 @@ const data = [
 
 const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
   const [isFocus, setIsFocus] = useState(false);
-
+  const [SevaData, setSevaData] = useState([]);
+  useEffect(() => {
+    const testFetch = async () => {
+      try {
+        const response = await axios.get('http://192.168.1.27:4000/api/seva');
+        const data = response.data;
+        // console.log(data.data, "data");
+        // Ensure data.SANNIDHIres is an array before setting it
+        if (Array.isArray(data.data)) {
+          setSevaData(data.data.map(item => ({
+            label: `${item.SVANAME} ${item.SVAID}`,
+            value: item.SVANAME
+          })));
+        } else {
+          console.error('Expected data.SANNIDHIres to be an array but got:', typeof data.SANNIDHIres);
+        }
+      } catch (error) {
+        console.error('Test fetch error:', error);
+      }
+    };
+  
+    testFetch();
+  }, []);
   const renderLabel = () => {
     if (value || isFocus) {
       return (
@@ -36,7 +59,7 @@ const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
-        data={data}
+        data={SevaData}
         search
         maxHeight={300}
         labelField="label"
@@ -47,7 +70,7 @@ const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
-          console.log(item,"hkhkjhkhj");
+          // console.log(item,"hkhkjhkhj");
           setSeva(item.value);
           setIsFocus(false);
         }}

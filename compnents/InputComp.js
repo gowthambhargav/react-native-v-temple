@@ -9,7 +9,7 @@ const LabeledTextInput = ({ label,setName,name, ...rest }) => {
     <View style={styles.container}>
       <Text style={styles.label}>{label}<Text style={{color:"red",fontSize:20}}> *</Text></Text>
       <View style={[styles.inputContainer]}>
-        <TextInput onChangeText={handleChangeText}
+        <TextInput value={name} onChangeText={handleChangeText}
           style={styles.input}
           placeholderTextColor="gray"
           {...rest}

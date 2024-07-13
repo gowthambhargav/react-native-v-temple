@@ -1,15 +1,11 @@
 import React, { useState } from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
-const SerialNo = () => {
-  const date = new Date();
-const [SeralNo, setSeralNo] = useState(0);
-const count = "0001";
-  const currentDate = date.getDate()
-  const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
+const SerialNo = ({SeralNo, setSeralNo}) => {
+
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{yearLastTwoDigits}{currentDate}{"01"}{SeralNo}{count}</Text>
+      <Text style={styles.text}>{SeralNo}</Text>
     </View>
   );
 };
