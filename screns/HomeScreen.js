@@ -84,7 +84,7 @@ useEffect(() => {
       setRashi("");
       setSeralNo(Number(SeralNo)+1);
       console.log(res)}).catch((err)=>{
-        
+        setSubmissionError(true)
         console.log(err)});
   };
   console.log(error,"error");
