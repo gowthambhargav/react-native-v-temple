@@ -33,6 +33,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [nakshatra, setNakshatra] = useState("");
   const [rashi, setRashi] = useState("");
   const [SeralNo, setSeralNo] = useState(0);
+  const [submissionError, setSubmissionError] = useState(false);
 const [translateMenu, setTranslateMenu] = useState(-250);
 useEffect(() => {
   const date = new Date();
@@ -82,7 +83,9 @@ useEffect(() => {
       setNakshatra("");
       setRashi("");
       setSeralNo(Number(SeralNo)+1);
-      console.log(res)}).catch((err)=>console.log(err));
+      console.log(res)}).catch((err)=>{
+        
+        console.log(err)});
   };
   console.log(error,"error");
   const scrollViewRef = useRef();
@@ -166,6 +169,11 @@ useEffect(() => {
         <TouchableOpacity onPress={handleSubmit} style={{top:-150}}>
           <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Submit</Text>
         </TouchableOpacity>
+        {submissionError ? (
+          <Text style={{ color: "red", textAlign: "center" }}>
+            There was an error submitting the form. Please try again.
+          </Text>
+        ) : null}
         {/* <TouchableOpacity style={{top:-150}}>
           <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Submit</Text>
         </TouchableOpacity> */}
