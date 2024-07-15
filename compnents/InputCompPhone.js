@@ -2,7 +2,7 @@ import React,{useState} from 'react';
 import { View, TextInput, Text, StyleSheet } from 'react-native';
 
 const LabeledTextInputPhone = ({ label, setPhone,phone,...rest }) => {
-  const phoneNumberRegex = /^(?!(\d)\1+$)\d{10}$/;
+  const phoneNumberRegex =/^(?!(\d)\1+$)\d{10}(?:\d{2})?$/;
     const [isValid, setIsValid] = useState(true);
 
   return (
@@ -17,10 +17,10 @@ const LabeledTextInputPhone = ({ label, setPhone,phone,...rest }) => {
             
               } else {
                 setIsValid(false); // Phone number is invalid
-                setPhone(text)
-               
+                
               }
-        }
+              setPhone(text)
+            }
 
         }
           style={styles.input}

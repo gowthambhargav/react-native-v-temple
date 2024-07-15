@@ -69,6 +69,7 @@ useEffect(() => {
     if (hasError) {
       return;
     }
+
     // If there are no errors, submit the form
     const url = "http://192.168.1.27:4000/api/sevaReceipt"
     axios.post(url,
@@ -89,7 +90,14 @@ useEffect(() => {
   };
   console.log(error,"error");
   const scrollViewRef = useRef();
-
+  const HandelClear =()=>{
+    setName("");
+    setSannidhi("");
+    setSeva("");
+    setPhone("");
+    setGothra("");
+    setNakshatra("");
+  }
   return (
     <SafeAreaView>
       <ScrollView ref={scrollViewRef} contentContainerStyle={styles.container}>
@@ -167,6 +175,9 @@ useEffect(() => {
         </SafeAreaView>
         <TouchableOpacity onPress={handleSubmit} style={{top:-150}}>
           <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Submit</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={HandelClear} style={{top:-110}}>
+          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Clear</Text>
         </TouchableOpacity>
         {submissionError ? (
           <Text style={{ color: "red", textAlign: "center" }}>
