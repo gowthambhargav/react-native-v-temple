@@ -99,6 +99,7 @@ useEffect(() => {
     setPhone("");
     setGothra("");
     setNakshatra("");
+    setRashi("");
   }
   return (
     <SafeAreaView>
