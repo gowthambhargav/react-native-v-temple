@@ -84,11 +84,11 @@ export default SannidhiCom;
 const styles = StyleSheet.create({
   container: {
     marginBottom:0,
-    marginTop:-15,
+    // marginTop:-20,
     backgroundColor: 'white',
     padding: 16,
     width:320,
-    // top: -15,
+    top: 15,
     
   },
   dropdown: {

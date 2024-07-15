@@ -9,6 +9,7 @@ import {
   StatusBar,
   Image,
   TouchableOpacity,
+  Alert,
 } from "react-native";
 // import DropdownComponent from "../compnents/dropdown";
 import CurrentDateComponent from "../compnents/Date";
@@ -84,6 +85,7 @@ useEffect(() => {
       setNakshatra("");
       setRashi("");
       setSeralNo(Number(SeralNo)+1);
+      Alert.alert("Seva Receipt","Seva Receipt is submitted successfully")
       console.log(res)}).catch((err)=>{
         setSubmissionError(true)
         console.log(err)});
@@ -124,7 +126,7 @@ useEffect(() => {
             alignItems: "center",
             alignContent: "center",
             height: 600,
-            top:-100
+            top:-130
           }}
         >
           <SannidhiCom
@@ -173,10 +175,10 @@ useEffect(() => {
           <Dnakshara nakshatra={nakshatra} setNakshatra={setNakshatra} dplable={"Nakshara"} lable={"Nakshara"} />
           <Drashi rashi={rashi}  setRashi={setRashi} dplable={"Rashi"} lable={"Rashi"} />
         </SafeAreaView>
-        <TouchableOpacity onPress={handleSubmit} style={{top:-150}}>
-          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Submit</Text>
+        <TouchableOpacity onPress={handleSubmit} style={{top:-170}}>
+          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Save</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={HandelClear} style={{top:-110}}>
+        <TouchableOpacity onPress={HandelClear} style={{top:-150}}>
           <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Clear</Text>
         </TouchableOpacity>
         {submissionError ? (
