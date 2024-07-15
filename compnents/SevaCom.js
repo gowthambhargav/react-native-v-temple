@@ -61,7 +61,7 @@ const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
         iconStyle={styles.iconStyle}
         data={SevaData}
         search
-        maxHeight={300}
+        maxHeight={600}
         labelField="label"
         valueField="value"
         placeholder={!isFocus ?<Text>{lable}{requred?<Text style={{color:"red",fontSize:20}}> *</Text>:null}</Text> : '...'}

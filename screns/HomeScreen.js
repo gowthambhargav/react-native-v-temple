@@ -165,7 +165,6 @@ useEffect(() => {
           <Dnakshara nakshatra={nakshatra} setNakshatra={setNakshatra} dplable={"Nakshara"} lable={"Nakshara"} />
           <Drashi rashi={rashi}  setRashi={setRashi} dplable={"Rashi"} lable={"Rashi"} />
         </SafeAreaView>
-        {/* <Button  onPress={handleSubmit} title="Submit"/> */}
         <TouchableOpacity onPress={handleSubmit} style={{top:-150}}>
           <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Submit</Text>
         </TouchableOpacity>
@@ -174,9 +173,6 @@ useEffect(() => {
             There was an error submitting the form. Please try again.
           </Text>
         ) : null}
-        {/* <TouchableOpacity style={{top:-150}}>
-          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Submit</Text>
-        </TouchableOpacity> */}
       </ScrollView>
        <View  style={{ position: "absolute",
     top: 0,
@@ -214,7 +210,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     paddingTop: StatusBar.currentHeight,
     padding: 20,
-    // height: 1000,
+    // height: 700,
     // backgroundColor: "#000",
     // flex:1,
     // justifyContent:'center',
