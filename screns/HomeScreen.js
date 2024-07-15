@@ -88,6 +88,7 @@ useEffect(() => {
       Alert.alert("Seva Receipt","Seva Receipt is submitted successfully")
       console.log(res)}).catch((err)=>{
         setSubmissionError(true)
+        Alert.alert("Seva Receipt","Seva Receipt is not submitted successfully")
         console.log(err)});
   };
   console.log(error,"error");
@@ -127,7 +128,7 @@ useEffect(() => {
             alignItems: "center",
             alignContent: "center",
             height: 600,
-            top:-130
+            top:-100
           }}
         >
           <SannidhiCom
@@ -176,10 +177,10 @@ useEffect(() => {
           <Dnakshara nakshatra={nakshatra} setNakshatra={setNakshatra} dplable={"Nakshara"} lable={"Nakshara"} />
           <Drashi rashi={rashi}  setRashi={setRashi} dplable={"Rashi"} lable={"Rashi"} />
         </SafeAreaView>
-        <TouchableOpacity onPress={handleSubmit} style={{top:-170}}>
+        <TouchableOpacity onPress={handleSubmit} style={{top:-150}}>
           <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Save</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={HandelClear} style={{top:-150}}>
+        <TouchableOpacity onPress={HandelClear} style={{top:-140}}>
           <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Clear</Text>
         </TouchableOpacity>
         {submissionError ? (
