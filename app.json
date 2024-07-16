@@ -17,7 +17,7 @@
     },
     "android": {
       "adaptiveIcon": {
-        "foregroundImage": "./assets/adaptive-icon.png",
+        "foregroundImage": "./assets/Temple_Icon.png",
         "backgroundColor": "#ffffff"
       },
       "package": "com.gowtham213.myapp"
