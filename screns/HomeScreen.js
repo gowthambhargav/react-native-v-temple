@@ -108,6 +108,16 @@ useEffect(() => {
   }
   return (
     <SafeAreaView>
+      <SafeAreaView style={{top:50,flex:1,marginBottom:10}}>
+        <Image style={{
+          // left: -30,
+           width: '100%', // Ensures the image takes up the entire width of its container
+          //  height: '100%', // Ensures the image takes up the entire height of its container
+           resizeMode: 'contain', // Maintains aspect ratio and fits within the container
+        }} source={require('../assets/Strip.png')}/>
+          </SafeAreaView>
+      <SafeAreaView>
+   
    {showResipt &&  
    
    <TouchableOpacity style={{
@@ -129,6 +139,7 @@ useEffect(() => {
       
       }
       <ScrollView ref={scrollViewRef} contentContainerStyle={styles.container}>
+      
         {/* borderBottomColor: "#000", borderBottomWidth:1 */}
       <View style={{ left:-20, height: 50,width:500,justifyContent:"space-around",alignItems:"baseline"}}>
       <Text onPress={()=>{setTranslateMenu(0)}} style={{ color: "#000", textAlign: "center", fontSize: 27 }}>
@@ -143,7 +154,8 @@ useEffect(() => {
           <CurrentDateComponent />
           <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
         </View>
-
+  
+   
         <SafeAreaView
           style={{
             flex: 1,
@@ -241,8 +253,11 @@ useEffect(() => {
       <Button  title="Close" onPress={()=>{setTranslateMenu(-250)}}/>
       <Text  onPress={()=>{setLoggedIn(false);setUserName("");setUserPassword("")}} style={styles.buttonStyle}>Logout</Text>
         </View>
+
      </SafeAreaView>
           </View>
+
+    </SafeAreaView>
     </SafeAreaView>
   );
 };
@@ -252,6 +267,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     paddingTop: StatusBar.currentHeight,
     padding: 20,
+    top: 50,
     // height: 700,
     // backgroundColor: "#000",
     // flex:1,
