@@ -108,7 +108,7 @@ useEffect(() => {
   }
   return (
     <SafeAreaView>
-      <SafeAreaView style={{top:50,flex:1,marginBottom:10}}>
+      <SafeAreaView style={{top:30,flex:1,marginBottom:10}}>
         <Image style={{
           // left: -30,
            width: '100%', // Ensures the image takes up the entire width of its container
@@ -150,7 +150,7 @@ useEffect(() => {
        </Text>
       </View>
 
-        <View style={{  flex: 1, flexDirection: "row",top:-40 }}>
+        <View style={{  flex: 1, flexDirection: "row",top:-40, width:300 }}>
           <CurrentDateComponent />
           <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
         </View>

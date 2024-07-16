@@ -5,7 +5,7 @@ const SerialNo = ({SeralNo, setSeralNo}) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.text}>{SeralNo}</Text>
+      <Text style={styles.text}>No:{SeralNo}</Text>
     </View>
   );
 };

@@ -18,7 +18,7 @@ const CurrentDateComponent = () => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.dateText}>{currentDate}
+      <Text style={styles.dateText}>Dt:{currentDate}
       </Text>
     </View>
   );
