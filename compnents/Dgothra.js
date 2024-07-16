@@ -10,15 +10,13 @@ const Dgothra = ({dplable,lable,setGothra,gothra}) => {
   useEffect(() => {
     const testFetch = async () => {
       try {
-        const response = await axios.get('http://192.168.1.27:4000/api/gothra');
-        const data = response.data;
-        // console.log(data.data, "data");
-        // Ensure data.SANNIDHIres is an array before setting it
-        if (Array.isArray(data.data)) {
-          setGothraData(data.data.map(item => ({
-            label: `${item.GOTHRANAME} ${item.GOTHRAID}`,
-            value: item.GOTHRANAME
-          })));
+        const {data} = await axios.get('http://192.168.1.27:4000/api/gothra');
+        if (Array.isArray(data?.data)) {
+          const gothraData = data.data.map(({ GOTHRANAME, GOTHRAID }) => ({
+            label: `${GOTHRANAME} ${GOTHRAID}`,
+            value: GOTHRANAME,
+          }));
+          setGothraData(gothraData);
         } else {
           console.error('Expected data.SANNIDHIres to be an array but got:', typeof data.SANNIDHIres);
         }
