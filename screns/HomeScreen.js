@@ -108,21 +108,26 @@ useEffect(() => {
   }
   return (
     <SafeAreaView>
-   {showResipt &&   <View style={{
-        position: "absolute",
-        zIndex: 999,
-        flex: 1,
-        justifyContent: "center",
-        alignItems: "center",
-        top: 0,
-        right: 0,
-        left: 0,
-        bottom: 0,
-      }}>
-       <TouchableOpacity onPress={HandleSavePrint}>
+   {showResipt &&  
+   
+   <TouchableOpacity style={{
+    position: "absolute",
+    zIndex: 999,
+    flex: 1,
+    justifyContent: "center",
+    alignItems: "center",
+    top: 0,
+    right: 0,
+    left: 0,
+    bottom: 0,
+    backgroundColor: "rgba(0,0,0,0.8)",
+  }} onPress={HandleSavePrint}>
+   <View >
        <Image source={require('../assets/temple.png')}/>
+      </View>
        </TouchableOpacity>
-      </View>}
+      
+      }
       <ScrollView ref={scrollViewRef} contentContainerStyle={styles.container}>
         {/* borderBottomColor: "#000", borderBottomWidth:1 */}
       <View style={{ left:-20, height: 50,width:500,justifyContent:"space-around",alignItems:"baseline"}}>
