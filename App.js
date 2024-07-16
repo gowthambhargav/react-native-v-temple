@@ -11,6 +11,7 @@ import {
   Image,
   KeyboardAvoidingView,
   ScrollView,
+  TouchableOpacity,
 } from "react-native";
 import Home from "./screns/HomeScreen.js";
 
@@ -18,7 +19,10 @@ export default function App() {
   const [userName, setUserName] = useState("");
   const [userPassword, setUserPassword] = useState("");
   const [loggedIn, setLoggedIn] = useState(false);
-
+  const [passwordVisible, setPasswordVisible] = useState(true);
+  const togglePasswordVisibility = () => {
+    setPasswordVisible(!passwordVisible);
+  };
   const validateUserNameAndPassword = () => {
     if (userName !== "admin" || userPassword !== "svt123") {
       Alert.alert("Invalid Credentials");
@@ -79,8 +83,14 @@ export default function App() {
             placeholder="Password"
             autoCapitalize="none"
             onChangeText={setUserPassword}
-            secureTextEntry={true}
-          />
+            secureTextEntry={passwordVisible}
+          /> 
+                <TouchableOpacity onPress={togglePasswordVisibility} style={styles.icon}>
+        {/* Replace "eye" with the name of your eye icon */}
+        {/* <Icon name={passwordVisible ? 'eye-slash' : 'eye'} size={20} color="#000" /> */}
+        {/* For demonstration, using text. Replace this with your Icon component */}
+        <Text style={{position:"absolute",top:-60,height:37,left:60}}>{passwordVisible ? <Image style={styles.icon}  source={require('./assets/eye1.png')}/> : <Image style={styles.icon}  source={require('./assets/eye2.png')}/> }</Text>
+      </TouchableOpacity>
 
           <View style={styles.buttonCss}>
             <Button
@@ -120,6 +130,7 @@ const styles = StyleSheet.create({
     justifyContent: "center",
     alignContent: "center",
   },
+  
   input: {
     // backgroundColor: '#ffffff',
     fontSize: 20,
@@ -154,5 +165,8 @@ const styles = StyleSheet.create({
     marginLeft: '-40%', // Adjust for centering (negative half of width)
     
     
+  },
+  icon: {
+   
   },
 });
