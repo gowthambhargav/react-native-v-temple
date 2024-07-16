@@ -35,6 +35,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [rashi, setRashi] = useState("");
   const [SeralNo, setSeralNo] = useState(0);
   const [submissionError, setSubmissionError] = useState(false);
+  const [showResipt, setShowResipt] = useState(false);
 const [translateMenu, setTranslateMenu] = useState(-250);
 useEffect(() => {
   const date = new Date();
@@ -102,8 +103,26 @@ useEffect(() => {
     setNakshatra("");
     setRashi("");
   }
+  const HandleSavePrint =()=>{
+    setShowResipt(!showResipt);
+  }
   return (
     <SafeAreaView>
+   {showResipt &&   <View style={{
+        position: "absolute",
+        zIndex: 999,
+        flex: 1,
+        justifyContent: "center",
+        alignItems: "center",
+        top: 0,
+        right: 0,
+        left: 0,
+        bottom: 0,
+      }}>
+       <TouchableOpacity onPress={HandleSavePrint}>
+       <Image source={require('../assets/temple.png')}/>
+       </TouchableOpacity>
+      </View>}
       <ScrollView ref={scrollViewRef} contentContainerStyle={styles.container}>
         {/* borderBottomColor: "#000", borderBottomWidth:1 */}
       <View style={{ left:-20, height: 50,width:500,justifyContent:"space-around",alignItems:"baseline"}}>
@@ -178,9 +197,12 @@ useEffect(() => {
           <Drashi rashi={rashi}  setRashi={setRashi} dplable={"Rashi"} lable={"Rashi"} />
         </SafeAreaView>
         <TouchableOpacity onPress={handleSubmit} style={{top:-150}}>
-          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Save</Text>
+          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}}>Save</Text>
         </TouchableOpacity>
-        <TouchableOpacity onPress={HandelClear} style={{top:-140}}>
+        <TouchableOpacity onPress={HandleSavePrint} style={{top:-140}}>
+          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}}>Save & Print</Text>
+        </TouchableOpacity>
+        <TouchableOpacity onPress={HandelClear} style={{top:-130}}>
           <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Clear</Text>
         </TouchableOpacity>
         {submissionError ? (
