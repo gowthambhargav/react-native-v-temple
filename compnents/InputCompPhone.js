@@ -24,6 +24,7 @@ const LabeledTextInputPhone = ({ label, setPhone,phone,...rest }) => {
 
         }
           style={styles.input}
+          maxLength={10}
           value={phone}
           placeholderTextColor="gray"
           {...rest}

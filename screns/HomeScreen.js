@@ -12,6 +12,9 @@ import {
   Alert,
 } from "react-native";
 // import DropdownComponent from "../compnents/dropdown";
+import { FontAwesome6 } from '@expo/vector-icons';
+// import { MaterialIcons } from '@expo/vector-icons';
+import { Feather } from '@expo/vector-icons';
 import CurrentDateComponent from "../compnents/Date";
 import LabeledTextInput from "../compnents/InputComp";
 import SerialNo from "../compnents/SeralNo";
@@ -140,8 +143,8 @@ useEffect(() => {
       }
       <ScrollView ref={scrollViewRef} contentContainerStyle={styles.container}>
       
-        {/* borderBottomColor: "#000", borderBottomWidth:1 */}
-      <View style={{ left:-20, height: 50,width:500,justifyContent:"space-around",alignItems:"baseline"}}>
+<View style={{position:"static",top:0,bottom:0}}>
+<View style={{ left:-20, height: 50,width:500,justifyContent:"space-around",alignItems:"baseline"}}>
       <Text onPress={()=>{setTranslateMenu(0)}} style={{ color: "#000", textAlign: "center", fontSize: 27 }}>
       ☰
         </Text> 
@@ -154,6 +157,8 @@ useEffect(() => {
           <CurrentDateComponent />
           <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
         </View>
+</View>
+        {/* borderBottomColor: "#000", borderBottomWidth:1 */}
   
    
         <SafeAreaView
@@ -214,13 +219,17 @@ useEffect(() => {
           <Drashi rashi={rashi}  setRashi={setRashi} dplable={"Rashi"} lable={"Rashi"} />
         </SafeAreaView>
         <TouchableOpacity onPress={handleSubmit} style={{top:-150}}>
-          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}}>Save</Text>
+          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}}><FontAwesome6 name="save" size={24} color="white"  /> Save</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={HandleSavePrint} style={{top:-140}}>
-          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}}>Save & Print</Text>
+          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}}><FontAwesome6 name="print" size={24} color="white" /> Save & Print</Text>
         </TouchableOpacity>
         <TouchableOpacity onPress={HandelClear} style={{top:-130}}>
-          <Text style={{ color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,}} >Clear</Text>
+          <Text 
+          style={
+            { color: "white" ,fontSize:18, textAlign: "center",backgroundColor:"#4287f5" ,paddingBottom:10,paddingTop:10,alignContent:"center",alignItems:"center",justifyContent:"center"}} >           
+          <Feather name="minus-circle" size={24} color="white" /> <Text></Text>
+          Clear</Text>
         </TouchableOpacity>
         {submissionError ? (
           <Text style={{ color: "red", textAlign: "center" }}>
