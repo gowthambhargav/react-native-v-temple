@@ -20,7 +20,7 @@ const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
   useEffect(() => {
     const testFetch = async () => {
       try {
-        const response = await axios.get('http://192.168.1.27:4000/api/seva');
+        const response = await axios.get('https://react-native-v-temple-b.onrender.com/api/seva');
         const data = response.data;
         // console.log(data.data, "data");
         // Ensure data.SANNIDHIres is an array before setting it

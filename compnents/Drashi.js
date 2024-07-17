@@ -21,7 +21,7 @@ const Drashi = ({dplable,lable,rashi,setRashi}) => {
   useEffect(() => {
     const testFetch = async () => {
       try {
-        const response = await axios.get('http://192.168.1.27:4000/api/rashi');
+        const response = await axios.get('https://react-native-v-temple-b.onrender.com/api/rashi');
         const data = response.data;
         // console.log(data.data, "data");
         // Ensure data.SANNIDHIres is an array before setting it

@@ -10,7 +10,7 @@ const Dgothra = ({dplable,lable,setGothra,gothra}) => {
   useEffect(() => {
     const testFetch = async () => {
       try {
-        const {data} = await axios.get('http://192.168.1.27:4000/api/gothra');
+        const {data} = await axios.get('https://react-native-v-temple-b.onrender.com/api/gothra');
         if (Array.isArray(data?.data)) {
           const gothraData = data.data.map(({ GOTHRANAME, GOTHRAID }) => ({
             label: `${GOTHRANAME} ${GOTHRAID}`,
