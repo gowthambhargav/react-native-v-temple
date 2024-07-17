@@ -31,7 +31,7 @@ const styles = StyleSheet.create({
     alignItems: 'center',
   },
   dateText: {
-    fontSize: 20,
+    fontSize: 16,
     fontWeight: 'bold',
   },
 });

@@ -150,7 +150,7 @@ useEffect(() => {
        </Text>
       </View>
 
-        <View style={{  flex: 1, flexDirection: "row",top:-40, width:300 }}>
+        <View style={{  flex: 1, flexDirection: "row",top:-40, width:290 }}>
           <CurrentDateComponent />
           <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
         </View>
