@@ -108,7 +108,7 @@ useEffect(() => {
   }
   return (
     <SafeAreaView>
-      <SafeAreaView style={{top:30,flex:1,marginBottom:10}}>
+      <SafeAreaView style={{top:10,flex:1,}}>
         <Image style={{
           // left: -30,
            width: '100%', // Ensures the image takes up the entire width of its container
@@ -267,7 +267,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     paddingTop: StatusBar.currentHeight,
     padding: 20,
-    top: 50,
+    top: 30,
     // height: 700,
     // backgroundColor: "#000",
     // flex:1,
