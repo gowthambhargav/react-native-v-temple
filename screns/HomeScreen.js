@@ -141,10 +141,12 @@ useEffect(() => {
        </TouchableOpacity>
       
       }
-      <ScrollView ref={scrollViewRef} contentContainerStyle={styles.container}>
+
       
-<View style={{position:"static",top:0,bottom:0}}>
-<View style={{ left:-20, height: 50,width:500,justifyContent:"space-around",alignItems:"baseline"}}>
+<SafeAreaView>
+<View style={{position:"static",top:40,bottom:0}}>
+
+<View style={{justifyContent:"space-around",alignItems:"baseline",left:10,top:10}}>
       <Text onPress={()=>{setTranslateMenu(0)}} style={{ color: "#000", textAlign: "center", fontSize: 27 }}>
       ☰
         </Text> 
@@ -152,15 +154,19 @@ useEffect(() => {
         Seva Receipt
        </Text>
       </View>
+    
+        
+ 
 
-        <View style={{  flex: 1, flexDirection: "row",top:-40, width:290 }}>
-          <CurrentDateComponent />
-          <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
-        </View>
 </View>
+      <View style={{flexDirection:"row",left:-10}}>
+      <CurrentDateComponent />
+      <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
+      </View>
+</SafeAreaView>
         {/* borderBottomColor: "#000", borderBottomWidth:1 */}
   
-   
+        <ScrollView ref={scrollViewRef} contentContainerStyle={styles.container}>
         <SafeAreaView
           style={{
             flex: 1,
@@ -168,7 +174,7 @@ useEffect(() => {
             justifyContent: "center",
             alignItems: "center",
             alignContent: "center",
-            height: 600,
+            height: 590,
             top:-100
           }}
         >
@@ -276,7 +282,7 @@ const styles = StyleSheet.create({
     marginHorizontal: 20,
     paddingTop: StatusBar.currentHeight,
     padding: 20,
-    top: 30,
+    top: 10,
     // height: 700,
     // backgroundColor: "#000",
     // flex:1,
