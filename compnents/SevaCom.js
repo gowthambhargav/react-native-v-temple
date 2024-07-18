@@ -3,17 +3,6 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 
-const data = [
-  { label: 'Item 1', value: '1' },
-  { label: 'Item 2', value: '2' },
-  { label: 'Item 3', value: '3' },
-  { label: 'Item 4', value: '4' },
-  { label: 'Item 5', value: '5' },
-  { label: 'Item 6', value: '6' },
-  { label: 'Item 7', value: '7' },
-  { label: 'Item 8', value: '8' },
-];
-
 const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
   const [isFocus, setIsFocus] = useState(false);
   const [SevaData, setSevaData] = useState([]);
@@ -22,8 +11,6 @@ const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
       try {
         const response = await axios.get('https://react-native-v-temple-b.onrender.com/api/seva');
         const data = response.data;
-        // console.log(data.data, "data");
-        // Ensure data.SANNIDHIres is an array before setting it
         if (Array.isArray(data.data)) {
           setSevaData(data.data.map(item => ({
             label: `${item.SVANAME} ${item.SVAID}`,

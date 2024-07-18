@@ -153,6 +153,9 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
       setError({ type: "seva", msg: "Seva is required" });
       hasError = true;
     }
+    if (hasError) {
+      return;
+    }
     // If there are no errors, submit the form
     const url = "https://react-native-v-temple-b.onrender.com/api/sevaReceipt";
     axios

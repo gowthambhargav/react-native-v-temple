@@ -1,11 +1,23 @@
 import React, { useEffect, useState } from "react";
 import { Image, StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import CurrentDateComponent from "./Date";
+import axios from "axios";
 
 function SevaReciept({ HandleSavePrint ,sevaDetails,setShowResipt}) {
 const date = new Date();
 const [currentDate, setCurrentDate] = useState('');
+const [sevaAmount, setSevaAmount] = useState(0);
 
+const HandleFetchSevaAmount = async () => {
+  const response = await axios.post("https://react-native-v-temple-b.onrender.com/api/seva/",{SVANAME:sevaDetails && sevaDetails.seva});
+  console.log('====================================');
+  console.log(response.data.data[0].AMT);
+  setSevaAmount(response.data.data[0].AMT);
+  console.log('====================================');
+}
+
+
+HandleFetchSevaAmount();
 useEffect(() => {
   const interval = setInterval(() => {
     const date = new Date();
@@ -76,7 +88,7 @@ HandleSavePrint()
 
         </View>
         {/* Seva Details */}
-        <View style={{ flexDirection: "row", alignItems: "flex-end",marginBottom:10,marginTop:10 ,borderBottomWidth:1,paddingBottom:10}}>
+        <View style={{ flexDirection: "row", alignItems: "flex-end",marginBottom:10,marginTop:10 ,paddingBottom:10}}>
   <View style={{ flex: 1 }}>
     {/* Each label and value pair wrapped in its own View */}
     <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
@@ -106,10 +118,10 @@ HandleSavePrint()
   </View>
 </View>
         {/* Seva Date and amount */}
-        {/* <View style={{ borderBottomWidth: 1, borderTopWidth: 1 }}>
-          <Text>Seva Date: 12-12-2021</Text>
-          <Text>Amount: 100</Text>
-        </View> */}
+        <View style={{ borderBottomWidth: 1, borderTopWidth: 1 }}>
+          {/* <Text>Seva Date: 12-12-2021</Text> */}
+          <Text>Amount: {sevaAmount}</Text>
+        </View>
       </View>
     </TouchableOpacity>
   );
