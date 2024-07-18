@@ -203,7 +203,7 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
 const styles = StyleSheet.create({
   popupContainer: {
     width: "80%",
-    height: "50%",
+    height: "40%",
     backgroundColor: "white",
     borderRadius: 20,
     // justifyContent: "center",
