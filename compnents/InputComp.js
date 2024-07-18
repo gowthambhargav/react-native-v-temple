@@ -3,6 +3,9 @@ import { View, TextInput, Text, StyleSheet,requred } from 'react-native';
 
 const LabeledTextInput = ({ label,setName,name, ...rest }) => {
   const handleChangeText = (text) => {
+    console.log('====================================');
+    console.log(text,"text");
+    console.log('====================================');
     setName(text); // Call setName with the updated text value
   };
   return (
