@@ -6,18 +6,25 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
   const date = new Date();
   const [currentDate, setCurrentDate] = useState("");
   const [sevaAmount, setSevaAmount] = useState(0);
+  const [addressData,setaddressData] =useState()
 
   const HandleFetchSevaAmount = async () => {
     const response = await axios.post(
       "https://react-native-v-temple-b.onrender.com/api/seva/",
       { SVANAME: sevaDetails && sevaDetails.seva }
     );
-
     setSevaAmount(response.data.data[0].AMT);
   };
 
   HandleFetchSevaAmount();
+  const HandleFetchCompanyAddress = async () => {
+    const addresResponse = await axios.get("https://react-native-v-temple-b.onrender.com/api/mstcomp/");
+    console.log(addresResponse.data.data[0].CompName);
+    setaddressData(addresResponse.data.data[0]);
+
+  };
   useEffect(() => {
+    HandleFetchCompanyAddress();
     const interval = setInterval(() => {
       const date = new Date();
       const monthNames = [
@@ -71,7 +78,7 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
               textAlign: "center",
             }}
           >
-            shre Varadanjaneya Swamy devasthana
+           {addressData && addressData.CompName}
           </Text>
           <Text
             style={{
@@ -81,8 +88,10 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
               marginBottom: 5,
             }}
           >
-            7th Main Rd, Nagarabavi, RBI Layout, JP Nagar 7th Phase, J. P.
-            Nagar, Bengaluru, Kothnur, Karnataka 560078
+         {addressData && addressData.Address1}
+         <Text>{addressData && addressData.Address2}</Text>
+         <Text>{addressData && addressData.Address3}</Text>
+         <Text>{addressData && addressData.Address5}</Text>
           </Text>
         </View>
         {/* Date Reciept no */}
