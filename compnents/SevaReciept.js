@@ -1,7 +1,7 @@
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import axios from "axios";
-
+import { FontAwesome } from '@expo/vector-icons';
 function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
   const date = new Date();
   const [currentDate, setCurrentDate] = useState("");
@@ -74,6 +74,7 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
           <Text
             style={{
               fontSize: 18,
+              fontWeight: "bold",
               textTransform: "uppercase",
               textAlign: "center",
             }}
@@ -85,14 +86,14 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
               textAlign: "center",
               textTransform: "capitalize",
               width: "60%",
-              marginBottom: 5,
             }}
           >
          {addressData && addressData.Address1}
-         <Text>{addressData && addressData.Address2}</Text>
-         <Text>{addressData && addressData.Address3}</Text>
-         <Text>{addressData && addressData.Address5}</Text>
           </Text>
+          <Text>{addressData && addressData.Address2}</Text>
+         <Text>{addressData && addressData.Address3}</Text>
+         {addressData && addressData.Address5 ? <Text>{addressData.Address5}</Text> : null}
+         <Text>Ph:{addressData && addressData.MOBNO}</Text>
         </View>
         {/* Date Reciept no */}
         <View
@@ -105,15 +106,15 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
             borderTopWidth: 1,
           }}
         >
-          <Text>Date: {currentDate}</Text>
-          <Text>Reciept No: {sevaDetails && sevaDetails.sevaReceiptID}</Text>
+          <Text>Date: <Text style={{fontWeight:"bold",fontSize:14}}>{currentDate}</Text></Text>
+          <Text>Reciept No: <Text style={{fontWeight:"bold",fontSize:14}}>{sevaDetails && sevaDetails.sevaReceiptID}</Text> </Text>
         </View>
         {/* Seva Details */}
         <View
           style={{
             flexDirection: "row",
             alignItems: "flex-end",
-            marginBottom: 10,
+            // marginBottom: 10,
             marginTop: 10,
             paddingBottom: 10,
           }}
@@ -142,7 +143,7 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
               }}
             >
               <Text style={styles.SevaRecieptDetails}>Seva:</Text>
-              <Text style={{ paddingLeft: 10 }}>
+              <Text style={{ paddingLeft: 10 ,fontWeight:"bold",fontSize:16}}>
                 {sevaDetails && sevaDetails.seva}
               </Text>
             </View>
@@ -201,9 +202,14 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
           </View>
         </View>
         {/* Seva Date and amount */}
-        <View style={{ borderBottomWidth: 1, borderTopWidth: 1 }}>
-          {/* <Text>Seva Date: 12-12-2021</Text> */}
-          <Text>Amount: {sevaAmount}</Text>
+        <View style={{ borderBottomWidth: 1, borderTopWidth: 1,paddingBottom:10,paddingTop:5}}>
+          <Text style={{fontWeight:"bold",fontSize:16}}>Seva Date:{currentDate}</Text>
+          
+        <View style={{borderWidth:1,width:100,flexDirection:"row",alignItems:"center",padding:10,borderRadius:10}}>
+        <FontAwesome name="rupee" size={20} color="black" />
+          <Text style={{fontSize:20,marginLeft:5,marginTop:-4,fontWeight:"bold"}}>
+            {sevaAmount}</Text>
+        </View>
         </View>
       </View>
     </TouchableOpacity>
@@ -212,9 +218,8 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
 const styles = StyleSheet.create({
   popupContainer: {
     width: "80%",
-    height: "40%",
+    height: "47%",
     backgroundColor: "white",
-    borderRadius: 20,
     // justifyContent: "center",
     // alignItems: "center",
     padding: 10,
@@ -227,6 +232,7 @@ const styles = StyleSheet.create({
   },
   SevaRecieptDetails: {
     fontSize: 16,
+    fontWeight: "bold",
   },
 });
 export default SevaReciept;

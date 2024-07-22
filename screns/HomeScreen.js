@@ -38,12 +38,12 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [rashi, setRashi] = useState("");
   const [SeralNo, setSeralNo] = useState(0);
   const [submissionError, setSubmissionError] = useState(false);
-  const [showResipt, setShowResipt] = useState(false);
+  const [showResipt, setShowResipt] = useState(true);
   const [ReceiptDetails, setReceiptDetails] = useState();
   const [translateMenu, setTranslateMenu] = useState(-250);
   useEffect(() => {
     const date = new Date();
-    const count = "0001";
+    const count = "00001";
     const deviceID = "01";
     const currentDate = date.getDate();
     const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
