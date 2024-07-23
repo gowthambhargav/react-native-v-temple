@@ -38,7 +38,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [rashi, setRashi] = useState("");
   const [SeralNo, setSeralNo] = useState(0);
   const [submissionError, setSubmissionError] = useState(false);
-  const [showResipt, setShowResipt] = useState(true);
+  const [showResipt, setShowResipt] = useState(false);
   const [ReceiptDetails, setReceiptDetails] = useState();
   const [translateMenu, setTranslateMenu] = useState(-250);
   useEffect(() => {
@@ -192,7 +192,7 @@ setShowResipt(true);
   };
   return (
     <SafeAreaView>
-      <SafeAreaView style={{ top: 10, flex: 1 }}>
+      <SafeAreaView style={{ top: 5, flex: 1 }}>
         <Image
           style={{
             // left: -30,
@@ -213,7 +213,7 @@ setShowResipt(true);
         )}
 
         <SafeAreaView>
-          <View style={{ position: "static", top: 40, bottom: 0 }}>
+          <View style={{ position: "static", top: 35, bottom: 0 }}>
             <View
               style={{
                 justifyContent: "space-around",

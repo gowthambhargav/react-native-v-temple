@@ -2,6 +2,7 @@ import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import axios from "axios";
 import { FontAwesome } from '@expo/vector-icons';
+import { SafeAreaView } from "react-native-safe-area-context";
 function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
   const date = new Date();
   const [currentDate, setCurrentDate] = useState("");
@@ -68,7 +69,8 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
         HandleSavePrint();
       }}
     >
-      <View style={styles.popupContainer}>
+     <SafeAreaView>
+     <View style={styles.popupContainer}>
         {/* <Image source={require('../assets/temple.png')}/> */}
         <View style={{ flexDirection: "column", alignItems: "center" }}>
           <Text
@@ -212,6 +214,7 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
         </View>
         </View>
       </View>
+     </SafeAreaView>
     </TouchableOpacity>
   );
 }
@@ -220,8 +223,9 @@ const styles = StyleSheet.create({
     width: "80%",
     height: "auto",
     backgroundColor: "white",
-    // justifyContent: "center",
+    // justifyContent: "",
     // alignItems: "center",
+    top:-30,
     padding: 10,
     elevation: 10,
     shadowColor: "#000",
