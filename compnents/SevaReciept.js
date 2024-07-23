@@ -106,8 +106,8 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
             borderTopWidth: 1,
           }}
         >
-          <Text>Date: <Text style={{fontWeight:"bold",fontSize:14}}>{currentDate}</Text></Text>
-          <Text>Reciept No: <Text style={{fontWeight:"bold",fontSize:14}}>{sevaDetails && sevaDetails.sevaReceiptID}</Text> </Text>
+          <Text>Date: <Text style={{fontWeight:"bold",fontSize:13}}>{currentDate}</Text></Text>
+          <Text>Reciept No: <Text style={{fontWeight:"bold",fontSize:13}}>{sevaDetails && sevaDetails.sevaReceiptID}</Text> </Text>
         </View>
         {/* Seva Details */}
         <View
@@ -143,7 +143,7 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
               }}
             >
               <Text style={styles.SevaRecieptDetails}>Seva:</Text>
-              <Text style={{ paddingLeft: 10 ,fontWeight:"bold",fontSize:16}}>
+              <Text style={{ paddingLeft: 10 ,fontWeight:"bold",fontSize:15}}>
                 {sevaDetails && sevaDetails.seva}
               </Text>
             </View>
@@ -202,10 +202,10 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
           </View>
         </View>
         {/* Seva Date and amount */}
-        <View style={{ borderBottomWidth: 1, borderTopWidth: 1,paddingBottom:10,paddingTop:5}}>
-          <Text style={{fontWeight:"bold",fontSize:16}}>Seva Date:{currentDate}</Text>
+        <View style={{ borderBottomWidth: 1, borderTopWidth: 1,paddingBottom:10,paddingTop:5,}}>
+          <Text style={{fontWeight:"bold",fontSize:14}}>Seva Date:{currentDate}</Text>
           
-        <View style={{borderWidth:1,width:100,flexDirection:"row",alignItems:"center",padding:10,borderRadius:10}}>
+        <View style={{borderWidth:1,width:"auto",flexDirection:"row",alignItems:"center",padding:10,borderRadius:10}}>
         <FontAwesome name="rupee" size={20} color="black" />
           <Text style={{fontSize:20,marginLeft:5,marginTop:-4,fontWeight:"bold"}}>
             {sevaAmount}</Text>
@@ -218,7 +218,7 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
 const styles = StyleSheet.create({
   popupContainer: {
     width: "80%",
-    height: "47%",
+    height: "auto",
     backgroundColor: "white",
     // justifyContent: "center",
     // alignItems: "center",
@@ -231,7 +231,7 @@ const styles = StyleSheet.create({
     },
   },
   SevaRecieptDetails: {
-    fontSize: 16,
+    fontSize: 14,
     fontWeight: "bold",
   },
 });

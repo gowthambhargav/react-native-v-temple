@@ -261,7 +261,7 @@ setShowResipt(true);
               alignItems: "center",
               alignContent: "center",
               height: 590,
-              top: -100,
+              top: -85,
             }}
           >
             <SannidhiCom
@@ -326,7 +326,7 @@ setShowResipt(true);
               lable={"Rashi"}
             />
           </SafeAreaView>
-          <TouchableOpacity onPress={handleSubmit} style={{ top: -150 }}>
+          <TouchableOpacity onPress={handleSubmit} style={{ top: -140 }}>
             <Text
               style={{
                 color: "white",
@@ -340,7 +340,7 @@ setShowResipt(true);
               <FontAwesome6 name="save" size={24} color="white" /> Save
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={HandleSavePrint} style={{ top: -140 }}>
+          <TouchableOpacity onPress={HandleSavePrint} style={{ top: -130 }}>
             <Text
               style={{
                 color: "white",
@@ -354,7 +354,7 @@ setShowResipt(true);
               <FontAwesome6 name="print" size={24} color="white" /> Save & Print
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={HandelClear} style={{ top: -130 }}>
+          <TouchableOpacity onPress={HandelClear} style={{ top: -120 }}>
             <Text
               style={{
                 color: "white",
