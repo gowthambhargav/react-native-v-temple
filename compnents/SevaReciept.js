@@ -3,6 +3,9 @@ import { StyleSheet, Text, TouchableOpacity, View } from "react-native";
 import axios from "axios";
 import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
+import { AntDesign } from '@expo/vector-icons';
+import { Button } from "react-native-paper";
+import { FontAwesome6 } from "@expo/vector-icons";
 function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
   const date = new Date();
   const [currentDate, setCurrentDate] = useState("");
@@ -65,11 +68,25 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
         backgroundColor: "rgba(0,0,0,0.8)",
       }}
       onPress={() => {
-        setShowResipt(false);
-        HandleSavePrint();
+
       }}
     >
      <SafeAreaView>
+     <TouchableOpacity
+      style={{
+        position:"absolute",
+top:-60,
+right:0,
+
+      }}
+      onPress={()=>{
+        setShowResipt(false); // Assuming setShowResipt is defined elsewhere
+    HandleSavePrint(); // Assuming HandleSavePrint is defined elsewhere
+      }}
+    >
+      <AntDesign name="closecircle" size={28} color="red" />
+    </TouchableOpacity>
+     
      <View style={styles.popupContainer}>
         {/* <Image source={require('../assets/temple.png')}/> */}
         <View style={{ flexDirection: "column", alignItems: "center" }}>
@@ -204,7 +221,7 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
           </View>
         </View>
         {/* Seva Date and amount */}
-        <View style={{ borderBottomWidth: 1, borderTopWidth: 1,paddingBottom:10,paddingTop:5,}}>
+        <View style={{ borderBottomWidth: 1, borderTopWidth: 1,paddingBottom:10,paddingTop:5,marginBottom:5}}>
           <Text style={{fontWeight:"bold",fontSize:14}}>Seva Date:{currentDate}</Text>
           
         <View style={{borderWidth:1,width:"auto",flexDirection:"row",alignItems:"center",padding:10,borderRadius:10}}>
@@ -213,7 +230,25 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
             {sevaAmount}</Text>
         </View>
         </View>
+        <View style={{justifyContent:"space-between",flexDirection:"row"}}>
+        <TouchableOpacity
+      style={styles.button}
+      onPress={()=>{console.log("khkh");}}
+    >
+      <FontAwesome name="share-square-o" size={24} color="white" />
+      <Text style={styles.buttonText}>Share</Text>
+    </TouchableOpacity>
+    <TouchableOpacity
+      style={styles.button}
+      onPress={()=>{console.log("khkh");}}
+    >
+       <FontAwesome6 name="print" size={24} color="white" />
+      <Text style={styles.buttonText}>Print</Text>
+    </TouchableOpacity>
+        </View>
       </View>
+
+
      </SafeAreaView>
     </TouchableOpacity>
   );
@@ -237,6 +272,19 @@ const styles = StyleSheet.create({
   SevaRecieptDetails: {
     fontSize: 14,
     fontWeight: "bold",
+  },
+  button: {
+    flexDirection: 'row',
+    alignItems: 'center',
+    justifyContent: 'center',
+    backgroundColor: 'blue',
+    padding: 10,
+    borderRadius: 5,
+    width: "auto",
+  },
+  buttonText: {
+    color: 'white',
+    marginLeft: 10,
   },
 });
 export default SevaReciept;
