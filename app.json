@@ -11,23 +11,19 @@
       "resizeMode": "contain",
       "backgroundColor": "#ffffff"
     },
-    "ios": {
-      "supportsTablet": true,
-      "bundleIdentifier": "com.gowtham213.myapp"
-    },
     "android": {
       "adaptiveIcon": {
         "foregroundImage": "./assets/Android.png",
         "backgroundColor": "#ffffff"
       },
-      "package": "com.gowtham213.myapp"
+      "package": "com.affsr45gdfg.myapp"
     },
     "web": {
       "favicon": "./assets/favicon.png"
     },
     "extra": {
       "eas": {
-        "projectId": "f3b5c69f-a37a-474f-8d7b-229f0fb931e8"
+        "projectId": "19c4e3dc-bc57-4748-af0a-7c4ce37facc7"
       }
     }
   }
