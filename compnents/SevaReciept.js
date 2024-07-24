@@ -4,7 +4,7 @@ import axios from "axios";
 import { FontAwesome } from '@expo/vector-icons';
 import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from '@expo/vector-icons';
-import { Button } from "react-native-paper";
+// import { Button } from "react-native-paper";
 import { FontAwesome6 } from "@expo/vector-icons";
 function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
   const date = new Date();
