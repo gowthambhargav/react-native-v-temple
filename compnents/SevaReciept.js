@@ -13,11 +13,24 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
   const [addressData,setaddressData] =useState()
 
   const HandleFetchSevaAmount = async () => {
-    const response = await axios.post(
-      "https://react-native-v-temple-b.onrender.com/api/seva/",
-      { SVANAME: sevaDetails && sevaDetails.seva }
-    );
-    setSevaAmount(response.data.data[0].AMT);
+    try {
+      const response = await axios.post(
+        "https://react-native-v-temple-b.onrender.com/api/seva/",
+        { SVANAME: sevaDetails && sevaDetails.seva }
+      );
+      if (response.data && response.data.data && response.data.data.length > 0) {
+        setSevaAmount(response.data.data[0].AMT);
+      } else {
+        // Handle the case where no data is returned or response structure is unexpected
+        console.error("No valid data received from API");
+        // Optionally set a default or error state for sevaAmount
+        setSevaAmount(0);
+      }
+    } catch (error) {
+      console.error("Error fetching seva amount:", error);
+      // Optionally handle specific errors or set an appropriate state
+      setSevaAmount(0); // Set a default or error state for sevaAmount
+    }
   };
 
   HandleFetchSevaAmount();
