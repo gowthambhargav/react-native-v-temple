@@ -13,6 +13,7 @@ import {
 } from "react-native";
 // import DropdownComponent from "../compnents/dropdown";
 import { FontAwesome6 } from "@expo/vector-icons";
+import { AntDesign } from '@expo/vector-icons';
 // import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from "@expo/vector-icons";
 import CurrentDateComponent from "../compnents/Date";
@@ -26,6 +27,8 @@ import Dnakshara from "../compnents/Dnakshara";
 import Drashi from "../compnents/Drashi";
 import axios from "axios";
 import SevaReciept from "../compnents/SevaReciept";
+import Showrreciept from "../compnents/Showrreciept";
+import AsyncStorage from '@react-native-async-storage/async-storage';
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [error, setError] = useState({ type: "", msg: "" });
@@ -41,13 +44,36 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [showResipt, setShowResipt] = useState(false);
   const [ReceiptDetails, setReceiptDetails] = useState();
   const [translateMenu, setTranslateMenu] = useState(-250);
+  // const [loggedIn, setLoggedIn] = useState(false);
+  const [showReceiptDetails, setShowReceiptDetails] = useState(false);
+  const [sqlDetails, setSqlDetails] = useState();
   useEffect(() => {
-    const date = new Date();
-    const count = "00001";
-    const deviceID = "01";
-    const currentDate = date.getDate();
-    const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
-    setSeralNo(`${yearLastTwoDigits}${currentDate}${deviceID}${count}`);
+    const initializeSerialNo = async () => {
+      const date = new Date();
+      const currentDate = date.getDate();
+      const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
+      const deviceID = "01";
+
+      const storedData = await AsyncStorage.getItem('storedData');
+      let storedDate, storedCount;
+
+      if (storedData) {
+        [storedDate, storedCount] = storedData.split('-').map(Number);
+      }
+
+      if (storedDate === currentDate) {
+        // Same day, use the current count without incrementing
+        const currentCount = storedCount.toString().padStart(5, '0');
+        setSeralNo(`${yearLastTwoDigits}${currentDate}${deviceID}${currentCount}`);
+      } else {
+        // New day, reset the count
+        const newCount = "00001";
+        setSeralNo(`${yearLastTwoDigits}${currentDate}${deviceID}${newCount}`);
+        await AsyncStorage.setItem('storedData', `${currentDate}-1`);
+      }
+    };
+
+    initializeSerialNo();
   }, []);
 
   const handleSubmit = () => {
@@ -87,6 +113,18 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
 
     // If there are no errors, submit the form
     const url = "https://react-native-v-temple-b.onrender.com/api/sevaReceipt";
+    const url2 = "https://react-native-v-temple-b.onrender.com/api/sevareceiptsql";
+    // Get Seva Receipt ID from the server using the url and then submit the form on url2 with the data
+    // whine submitting the form with the url use the patch to get the sevaId and rashiiId and gothraId ...so on
+    // then submit the form with the data on url2
+
+
+console.log('====================================');
+console.log(sqlDetails, "sqlDetails");
+console.log('====================================');
+
+
+    // submit the form with the data on url first time
     axios
       .post(url, {
         seva,
@@ -98,7 +136,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
         rashi,
         sevaReceiptID: SeralNo,
       })
-      .then((res) => {
+      .then( async (res) => {
         setError({ type: "", msg: "" });
         setName();
         setSannidhi("");
@@ -107,7 +145,70 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
         setGothra("");
         setNakshatra("");
         setRashi("");
-        setSeralNo(Number(SeralNo) + 1);
+        // update the serial number in the state and AsyncStorage
+        const storedSerialNo = await AsyncStorage.getItem('serialNo');
+const newSerialNo = (parseInt(storedSerialNo) + 1).toString().padStart(5, '0');
+setSeralNo(newSerialNo);
+await AsyncStorage.setItem('serialNo', newSerialNo);
+        // submit the form with the data on url2
+        axios.patch(url, {
+          sevaID:  seva,
+          sannidhiID:sannidhi,
+          gothraID: gothra,
+          nakshatraId: nakshatra,
+          rashiID: rashi,
+        }).then((res) => {
+          const {
+            findSevaId,
+            findSannidhiId,
+            findSevaAmt,
+            findNakshatraId,
+            findGothraId,
+            findRashiId,
+          } = res.data.data;
+          console.log(res.data.data, "ldsjflslfj", "data from patch");
+          setSqlDetails(res.data.data);
+          console.log('====================================');
+          console.log( 
+          {
+            SEVAID: findSevaId,
+            SEVANO: SeralNo,
+            PrintSEVANO: SeralNo,
+            SANNIDHIID: findSannidhiId,
+            SevaRate: findSevaAmt,
+            TotalAmt: findSevaAmt,
+            NAKSHATRAID: res.data.data.findNakshatraId ,
+            GOTHRAID: res.data.data.findGothraId ,
+            SVAID: findSevaId ,
+            MOBNUM: "9876543210",
+            RASHIID: res.data.data.findRashiId ,
+          },
+          "data from patch");
+          console.log('====================================');
+          axios
+            .post(url2, {
+              SEVAID: res.data.data.findSevaId,
+              SEVANO: SeralNo,
+              PrintSEVANO: SeralNo,
+              SANNIDHIID: res.data.data.findSannidhiId,
+              SevaRate: res.data.data.findSevaAmt,
+              TotalAmt:res.data.data.findSevaAmt,
+              NAKSHATRAID:res.data.data.findNakshatraId,
+              GOTHRAID: res.data.data.findGothraId,
+              SVAID: findSevaId ,
+              MOBNUM: phone,
+              RASHIID: res.data.data.findRashiId,
+              KNAME: name,
+            })
+            .then((res) => {
+              console.log(res.data.data, "data from post");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }).catch((err) => {
+          console.log(err);
+        })
         Alert.alert("Seva Receipt", "Seva Receipt is submitted successfully");
 
         setReceiptDetails(res.data.data);
@@ -121,7 +222,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
         console.log(err);
       });
   };
-  console.log(error, "error");
+
   const scrollViewRef = useRef();
   const HandelClear = () => {
     setName("");
@@ -158,6 +259,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     }
     // If there are no errors, submit the form
     const url = "https://react-native-v-temple-b.onrender.com/api/sevaReceipt";
+    const url2 = "https://react-native-v-temple-b.onrender.com/api/sevareceiptsql";
     axios
       .post(url, {
         seva,
@@ -169,7 +271,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
         rashi,
         sevaReceiptID: SeralNo,
       })
-      .then((res) => {
+      .then( async (res) => {
         setError({ type: "", msg: "" });
         setName("");
         setSannidhi("");
@@ -178,9 +280,54 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
         setGothra("");
         setNakshatra("");
         setRashi("");
-        setSeralNo(Number(SeralNo) + 1);
+        // update the serial number in the state and AsyncStorage;
+        const storedSerialNo = await AsyncStorage.getItem('serialNo');
+const newSerialNo = (parseInt(storedSerialNo) + 1).toString().padStart(5, '0');
+setSeralNo(newSerialNo);
+await AsyncStorage.setItem('serialNo', newSerialNo);
 setShowResipt(true);
         setReceiptDetails(res.data.data);
+        axios.patch(url, {
+          sevaID:  seva,
+          sannidhiID:sannidhi,
+          gothraID: gothra,
+          nakshatraId: nakshatra,
+          rashiID: rashi,
+        }).then((res) => {
+          const {
+            findSevaId,
+            findSannidhiId,
+            findSevaAmt,
+            findNakshatraId,
+            findGothraId,
+            findRashiId,
+          } = res.data.data;
+          console.log(res.data.data, "ldsjflslfj", "data from patch");
+          setSqlDetails(res.data.data);
+          axios
+            .post(url2, {
+              SEVAID: res.data.data.findSevaId,
+              SEVANO: SeralNo,
+              PrintSEVANO: SeralNo,
+              SANNIDHIID: res.data.data.findSannidhiId,
+              SevaRate: res.data.data.findSevaAmt,
+              TotalAmt:res.data.data.findSevaAmt,
+              NAKSHATRAID:res.data.data.findNakshatraId,
+              GOTHRAID: res.data.data.findGothraId,
+              SVAID: findSevaId ,
+              MOBNUM: phone,
+              RASHIID: res.data.data.findRashiId,
+              KNAME: name,
+            })
+            .then((res) => {
+              console.log(res.data.data, "data from post");
+            })
+            .catch((err) => {
+              console.log(err);
+            });
+        }).catch((err) => {
+          console.log(err);
+        })
       })
       .catch((err) => {
         setSubmissionError(true);
@@ -190,6 +337,22 @@ setShowResipt(true);
         return;
       }
   };
+
+  const HandelSyncClick =()=>{
+    console.log("Sync button pressed")
+    axios.post("https://react-native-v-temple-b.onrender.com/api/sevareceiptsql/sync ").then((res) => {
+      console.log("data from sync");
+      Alert.alert("Sync", "Sync is done successfully");
+    }).catch((err) => {
+      console.log(err);
+      Alert.alert("Sync", "Sync is not done successfully");
+    })
+  }
+
+
+
+
+
   return (
     <SafeAreaView>
       <SafeAreaView style={{ top: 5, flex: 1 }}>
@@ -213,6 +376,7 @@ setShowResipt(true);
         )}
 
         <SafeAreaView>
+     
           <View style={{ position: "static", top: 35, bottom: 0 }}>
             <View
               style={{
@@ -222,6 +386,7 @@ setShowResipt(true);
                 top: 10,
               }}
             >
+        
               <Text
                 onPress={() => {
                   setTranslateMenu(0);
@@ -245,7 +410,13 @@ setShowResipt(true);
           <View style={{ flexDirection: "row", left: -10 }}>
             <CurrentDateComponent />
             <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
+
           </View>
+          <View style={{ justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 20 }}>
+      <View style={{ width: "30%" , borderRadius: 10,}}>
+        <Button color="#4287f5" title="Sync" onPress={HandelSyncClick}/>
+      </View>
+    </View>
         </SafeAreaView>
         {/* borderBottomColor: "#000", borderBottomWidth:1 */}
 
@@ -253,7 +424,7 @@ setShowResipt(true);
           ref={scrollViewRef}
           contentContainerStyle={styles.container}
         >
-          <SafeAreaView
+   <SafeAreaView
             style={{
               flex: 1,
               flexDirection: "column",
@@ -264,6 +435,12 @@ setShowResipt(true);
               top: -85,
             }}
           >
+            <View style={{flex: 1,
+              flexDirection: "column",
+              justifyContent: "center",
+              alignItems: "center",
+              alignContent: "center",}}>
+          
             <SannidhiCom
               requred={true}
               setSannidhi={setSannidhi}
@@ -325,6 +502,7 @@ setShowResipt(true);
               dplable={"Rashi"}
               lable={"Rashi"}
             />
+              </View>
           </SafeAreaView>
           <TouchableOpacity onPress={handleSubmit} style={{ top: -140 }}>
             <Text
@@ -407,12 +585,17 @@ setShowResipt(true);
               >
                 Admin
               </Text>
+              <TouchableOpacity style={{left:70}} onPress={()=>{setTranslateMenu(-250);}}>
+              <AntDesign name="closecircle" size={28} color="red" />
+              </TouchableOpacity>
             </View>
             <View style={{ marginTop: 50 }}>
               <Button
-                title="Close"
+                title="Show Receipt"
                 onPress={() => {
-                  setTranslateMenu(-250);
+                  setShowReceiptDetails(true);
+                  setTranslateMenu(-250); 
+console.log("close button pressed");
                 }}
               />
               <Text
@@ -429,6 +612,7 @@ setShowResipt(true);
           </SafeAreaView>
         </View>
       </SafeAreaView>
+     {showReceiptDetails&& <Showrreciept setShowReceiptDetails={setShowReceiptDetails}/>}
     </SafeAreaView>
   );
 };
