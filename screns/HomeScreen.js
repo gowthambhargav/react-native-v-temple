@@ -29,6 +29,8 @@ import axios from "axios";
 import SevaReciept from "../compnents/SevaReciept";
 import Showrreciept from "../compnents/Showrreciept";
 import AsyncStorage from '@react-native-async-storage/async-storage';
+import DatabaseExample from "./DatabaseExample";
+import { fetchUsers } from "../db/queries";
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [error, setError] = useState({ type: "", msg: "" });
@@ -74,6 +76,14 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     };
 
     initializeSerialNo();
+    const sqldata = async () => {
+      await fetchUsers().then((res) => {
+        console.log(res, "data from db");
+      }).catch((err) => {
+        console.log(err);
+      });
+    };
+    sqldata();
   }, []);
 
   const handleSubmit = () => {
@@ -613,6 +623,7 @@ console.log("close button pressed");
         </View>
       </SafeAreaView>
      {showReceiptDetails&& <Showrreciept setShowReceiptDetails={setShowReceiptDetails}/>}
+     {/* <DatabaseExample/> */}
     </SafeAreaView>
   );
 };
