@@ -384,7 +384,6 @@ setShowResipt(true);
             HandleSavePrint={HandleSavePrint}
           />
         )}
-
         <SafeAreaView>
      
           <View style={{ position: "static", top: 35, bottom: 0 }}>
@@ -428,8 +427,6 @@ setShowResipt(true);
       </View>
     </View>
         </SafeAreaView>
-        {/* borderBottomColor: "#000", borderBottomWidth:1 */}
-
         <ScrollView
           ref={scrollViewRef}
           contentContainerStyle={styles.container}
@@ -623,7 +620,6 @@ console.log("close button pressed");
         </View>
       </SafeAreaView>
      {showReceiptDetails&& <Showrreciept setShowReceiptDetails={setShowReceiptDetails}/>}
-     {/* <DatabaseExample/> */}
     </SafeAreaView>
   );
 };

@@ -86,9 +86,6 @@ export default function App() {
             secureTextEntry={passwordVisible}
           /> 
                 <TouchableOpacity onPress={togglePasswordVisibility} style={styles.icon}>
-        {/* Replace "eye" with the name of your eye icon */}
-        {/* <Icon name={passwordVisible ? 'eye-slash' : 'eye'} size={20} color="#000" /> */}
-        {/* For demonstration, using text. Replace this with your Icon component */}
         <Text style={{position:"absolute",top:-60,height:37,left:90}}>{passwordVisible ? <Image style={styles.icon}  source={require('./assets/eye1.png')}/> : <Image style={styles.icon}  source={require('./assets/eye2.png')}/> }</Text>
       </TouchableOpacity>
 
