@@ -15,3 +15,10 @@ export const fetchUsers = async () => {
   const allRows = await db.getAllAsync('SELECT * FROM users');
   return allRows;
 };
+
+
+export const getAllRashiDetails = async () => {
+  const db = await openDatabase();
+  const result = await db.runAsync('SELECT * FROM MstRASHI');
+  return result;
+};
