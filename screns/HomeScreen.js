@@ -11,10 +11,8 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-// import DropdownComponent from "../compnents/dropdown";
 import { FontAwesome6 } from "@expo/vector-icons";
 import { AntDesign } from '@expo/vector-icons';
-// import { MaterialIcons } from '@expo/vector-icons';
 import { Feather } from "@expo/vector-icons";
 import CurrentDateComponent from "../compnents/Date";
 import LabeledTextInput from "../compnents/InputComp";
@@ -31,6 +29,9 @@ import Showrreciept from "../compnents/Showrreciept";
 import AsyncStorage from '@react-native-async-storage/async-storage';
 import DatabaseExample from "./DatabaseExample";
 import { fetchUsers } from "../db/queries";
+import Getseva from "../compnents/Getseva";
+import Getsevalist from "../compnents/Getsevalist";
+import LoadingComponent from "../compnents/Loading";
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [error, setError] = useState({ type: "", msg: "" });
@@ -45,10 +46,13 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [submissionError, setSubmissionError] = useState(false);
   const [showResipt, setShowResipt] = useState(false);
   const [ReceiptDetails, setReceiptDetails] = useState();
-  const [translateMenu, setTranslateMenu] = useState(-250);
-  // const [loggedIn, setLoggedIn] = useState(false);
+  const [translateMenu, setTranslateMenu] = useState(-290);
   const [showReceiptDetails, setShowReceiptDetails] = useState(false);
   const [sqlDetails, setSqlDetails] = useState();
+  const [showGetSeva, setShowGetSeva] = useState(false);
+  const [showSevaList, setShowSevaList] = useState(false);
+  const [loading, setLoading] = useState(false);
+  const [loadingContent, setLoadingContent] = useState("Loading");
   useEffect(() => {
     const initializeSerialNo = async () => {
       const date = new Date();
@@ -122,6 +126,8 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     }
 
     // If there are no errors, submit the form
+    setLoading(true);
+    setLoadingContent("Saving");
     const url = "https://react-native-v-temple-b.onrender.com/api/sevaReceipt";
     const url2 = "https://react-native-v-temple-b.onrender.com/api/sevareceiptsql";
     // Get Seva Receipt ID from the server using the url and then submit the form on url2 with the data
@@ -157,9 +163,9 @@ console.log('====================================');
         setRashi("");
         // update the serial number in the state and AsyncStorage
         const storedSerialNo = await AsyncStorage.getItem('serialNo');
-const newSerialNo = (parseInt(storedSerialNo) + 1).toString().padStart(5, '0');
-setSeralNo(newSerialNo);
-await AsyncStorage.setItem('serialNo', newSerialNo);
+        const newSerialNo = (parseInt(storedSerialNo) + 1).toString().padStart(5, '0');
+        setSeralNo(newSerialNo);
+        await AsyncStorage.setItem('serialNo', newSerialNo);
         // submit the form with the data on url2
         axios.patch(url, {
           sevaID:  seva,
@@ -217,9 +223,12 @@ await AsyncStorage.setItem('serialNo', newSerialNo);
               console.log(err);
             });
         }).catch((err) => {
+          setLoading(false);
           console.log(err);
         })
         Alert.alert("Seva Receipt", "Seva Receipt is submitted successfully");
+        setLoading(false);
+        setLoadingContent("Loading");
 
         setReceiptDetails(res.data.data);
       })
@@ -268,6 +277,8 @@ await AsyncStorage.setItem('serialNo', newSerialNo);
       return;
     }
     // If there are no errors, submit the form
+    setLoading(true);
+    setLoadingContent("Saving");
     const url = "https://react-native-v-temple-b.onrender.com/api/sevaReceipt";
     const url2 = "https://react-native-v-temple-b.onrender.com/api/sevareceiptsql";
     axios
@@ -330,6 +341,8 @@ setShowResipt(true);
               KNAME: name,
             })
             .then((res) => {
+              setLoading(false);
+              setLoadingContent("Loading");
               console.log(res.data.data, "data from post");
             })
             .catch((err) => {
@@ -349,10 +362,12 @@ setShowResipt(true);
   };
 
   const HandelSyncClick =()=>{
-    console.log("Sync button pressed")
+    console.log("Sync button pressed");
+setLoading(true);
     axios.post("https://react-native-v-temple-b.onrender.com/api/sevareceiptsql/sync ").then((res) => {
       console.log("data from sync");
       Alert.alert("Sync", "Sync is done successfully");
+      setLoading(false);
     }).catch((err) => {
       console.log(err);
       Alert.alert("Sync", "Sync is not done successfully");
@@ -365,7 +380,7 @@ setShowResipt(true);
 
   return (
     <SafeAreaView>
-      <SafeAreaView style={{ top: 5, flex: 1 }}>
+      <SafeAreaView style={{ top: -1, flex: 1 }}>
         <Image
           style={{
             // left: -30,
@@ -567,7 +582,7 @@ setShowResipt(true);
             bottom: 0,
             left: 0,
             backgroundColor: "#fafbfc",
-            height: 580,
+            height: "100%",
             width: 250,
             transform: [{ translateX: translateMenu }],
             zIndex: 999,
@@ -592,19 +607,38 @@ setShowResipt(true);
               >
                 Admin
               </Text>
-              <TouchableOpacity style={{left:70}} onPress={()=>{setTranslateMenu(-250);}}>
+              <TouchableOpacity style={{left:70}} onPress={()=>{setTranslateMenu(-290);}}>
               <AntDesign name="closecircle" size={28} color="red" />
               </TouchableOpacity>
             </View>
             <View style={{ marginTop: 50 }}>
+            <Button
+                title="Seva List"
+                onPress={() => {
+                  setShowSevaList(true);
+                  setTranslateMenu(-290) 
+console.log("Seva list button pressed");
+                }}
+              />
+              <TouchableOpacity style={{marginTop:10,marginBottom:10}}>
+                    <Button
+                title="Getseva"
+                onPress={() => {
+                  setShowGetSeva(true);
+                  setTranslateMenu(-290) 
+console.log("Getseva button pressed");
+                }}
+              />
+              </TouchableOpacity>
               <Button
                 title="Show Receipt"
                 onPress={() => {
                   setShowReceiptDetails(true);
-                  setTranslateMenu(-250); 
+                  setTranslateMenu(-290) 
 console.log("close button pressed");
                 }}
               />
+                
               <Text
                 onPress={() => {
                   setLoggedIn(false);
@@ -620,6 +654,9 @@ console.log("close button pressed");
         </View>
       </SafeAreaView>
      {showReceiptDetails&& <Showrreciept setShowReceiptDetails={setShowReceiptDetails}/>}
+     {showGetSeva&& <Getseva setShowGetSeva={setShowGetSeva}/>}
+     {showSevaList&& <Getsevalist setShowSevaList={setShowSevaList}/>}
+    {loading && <LoadingComponent name={loadingContent}/>}
     </SafeAreaView>
   );
 };
