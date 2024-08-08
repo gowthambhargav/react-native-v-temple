@@ -1,5 +1,6 @@
 import React from 'react';
 import { View, TextInput, Text, StyleSheet,requred } from 'react-native';
+import fontStyles from '../utils/fontStyles';
 
 const LabeledTextInput = ({ label,setName,name, ...rest }) => {
   const handleChangeText = (text) => {
@@ -10,7 +11,7 @@ const LabeledTextInput = ({ label,setName,name, ...rest }) => {
   };
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}<Text style={{color:"red",fontSize:20}}> *</Text></Text>
+      <Text style={[styles.label,fontStyles.robotoRegular]}>{label}<Text style={{color:"red",fontSize:20}}> *</Text></Text>
       <View style={[styles.inputContainer]}>
         <TextInput value={name} onChangeText={handleChangeText}
           style={styles.input}

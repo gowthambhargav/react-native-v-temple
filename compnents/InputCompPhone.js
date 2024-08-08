@@ -1,5 +1,6 @@
 import React,{useState} from 'react';
 import { View, TextInput, Text, StyleSheet } from 'react-native';
+import fontStyles from '../utils/fontStyles';
 
 const LabeledTextInputPhone = ({ label, setPhone,phone,...rest }) => {
   const phoneNumberRegex =/^(?!(\d)\1+$)\d{10}(?:\d{2})?$/;
@@ -7,7 +8,7 @@ const LabeledTextInputPhone = ({ label, setPhone,phone,...rest }) => {
 
   return (
     <View style={styles.container}>
-      <Text style={styles.label}>{label}</Text>
+      <Text style={[styles.label,fontStyles.robotoRegular]}>{label}</Text>
       <View style={styles.inputContainer}>
         <TextInput
         onChangeText={(text) => {

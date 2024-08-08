@@ -2,11 +2,17 @@ import axios from "axios";
 import React, { useEffect, useState } from "react";
 import { StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
+import fontStyles from "../utils/fontStyles";
+import { useFonts } from "expo-font";
 
 const Dgothra = ({ dplable, lable, setGothra, gothra }) => {
   const [isFocus, setIsFocus] = useState(false);
   const [value, setValue] = useState("");
   const [GothraData, setGothraData] = useState([]);
+  const [loaded] = useFonts({
+    "Roboto-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
+    "Popins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
+  });
   useEffect(() => {
     const testFetch = async () => {
       try {
@@ -36,7 +42,7 @@ const Dgothra = ({ dplable, lable, setGothra, gothra }) => {
   const renderLabel = () => {
     if (value || isFocus) {
       return (
-        <Text style={[styles.label, isFocus && { color: "blue" }]}>
+        <Text style={[styles.label, fontStyles.robotoRegular,isFocus && { color: "blue" }]}>
           {dplable}
         </Text>
       );
@@ -49,7 +55,7 @@ const Dgothra = ({ dplable, lable, setGothra, gothra }) => {
       {renderLabel()}
       <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: "blue" }]}
-        placeholderStyle={styles.placeholderStyle}
+        placeholderStyle={[styles.placeholderStyle,fontStyles.robotoRegular]}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
@@ -85,6 +91,7 @@ const styles = StyleSheet.create({
     // top: -15,
   },
   dropdown: {
+    fontFamily:"Popins-Bold",
     height: 50,
     borderColor: "gray",
     borderWidth: 0.5,
@@ -102,6 +109,7 @@ const styles = StyleSheet.create({
     zIndex: 999,
     paddingHorizontal: 8,
     fontSize: 14,
+
   },
   placeholderStyle: {
     fontSize: 16,

@@ -2,18 +2,8 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
+import fontStyles from '../utils/fontStyles';
 
-
-const data = [
-  { label: 'Item 1', value: '1' },
-  { label: 'Item 2', value: '2' },
-  { label: 'Item 3', value: '3' },
-  { label: 'Item 4', value: '4' },
-  { label: 'Item 5', value: '5' },
-  { label: 'Item 6', value: '6' },
-  { label: 'Item 7', value: '7' },
-  { label: 'Item 8', value: '8' }, 
-];
 
 const SannidhiCom = ({dplable,lable,setSannidhi,value,requred}) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -43,7 +33,7 @@ useEffect(() => {
   const renderLabel = () => {
     if (value || isFocus) {
       return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
+        <Text style={[styles.label,fontStyles.robotoRegular, isFocus && { color: 'blue' }]}>
           {dplable}
         </Text>
       );
@@ -55,7 +45,7 @@ useEffect(() => {
       {renderLabel()}
       <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-        placeholderStyle={styles.placeholderStyle}
+        placeholderStyle={[styles.placeholderStyle,fontStyles.robotoRegular]}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}
@@ -97,11 +87,13 @@ const styles = StyleSheet.create({
     borderWidth: 0.5,
     borderRadius: 8,
     paddingHorizontal: 8,
+   
   },
   icon: {
     marginRight: 5,
   },
   label: {
+     fontFamily:"Roboto-Regular",
     position: 'absolute',
     backgroundColor: 'white',
     left: 22,

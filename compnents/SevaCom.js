@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import fontStyles from '../utils/fontStyles';
 
 const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -29,7 +30,7 @@ const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
   const renderLabel = () => {
     if (value || isFocus) {
       return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
+        <Text style={[styles.label, fontStyles.robotoRegular,isFocus && { color: 'blue' }]}>
           {dplable}
         </Text>
       );
@@ -42,7 +43,7 @@ const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
       {renderLabel()}
       <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-        placeholderStyle={styles.placeholderStyle}
+        placeholderStyle={[styles.placeholderStyle,fontStyles.robotoRegular]}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}

@@ -6,6 +6,7 @@ import { SafeAreaView } from "react-native-safe-area-context";
 import { AntDesign } from '@expo/vector-icons';
 // import { Button } from "react-native-paper";
 import { FontAwesome6 } from "@expo/vector-icons";
+import fontStyles from "../utils/fontStyles";
 function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
   const date = new Date();
   const [currentDate, setCurrentDate] = useState("");
@@ -161,7 +162,7 @@ right:0,
                 alignItems: "center",
               }}
             >
-              <Text style={styles.SevaRecieptDetails}>Sannidhi:</Text>
+              <Text style={[styles.SevaRecieptDetails,fontStyles.robotoBold]}>Sannidhi:</Text>
               <Text style={{ paddingLeft: 10, textAlign: "center" }}>
                 {sevaDetails && sevaDetails.sannidhi}
               </Text>
@@ -174,7 +175,7 @@ right:0,
                 alignItems: "center",
               }}
             >
-              <Text style={styles.SevaRecieptDetails}>Seva:</Text>
+              <Text style={[styles.SevaRecieptDetails,fontStyles.robotoBold]}>Seva:</Text>
               <Text style={{ paddingLeft: 10 ,fontWeight:"bold",fontSize:15}}>
                 {sevaDetails && sevaDetails.seva}
               </Text>
@@ -187,8 +188,8 @@ right:0,
                 alignItems: "center",
               }}
             >
-              <Text style={styles.SevaRecieptDetails}>Name:</Text>
-              <Text style={{ paddingLeft: 10 }}>
+              <Text style={[styles.SevaRecieptDetails,fontStyles.robotoBold]}>Name:</Text>
+              <Text style={[{ paddingLeft: 10 },fontStyles.robotoBold]}>
                 {sevaDetails && sevaDetails.name}
               </Text>
             </View>
@@ -200,8 +201,8 @@ right:0,
                 alignItems: "center",
               }}
             >
-              <Text style={styles.SevaRecieptDetails}>Gothra:</Text>
-              <Text style={{ paddingLeft: 10 }}>
+              <Text style={[styles.SevaRecieptDetails,fontStyles.robotoBold]}>Gothra:</Text>
+              <Text style={[{ paddingLeft: 10 },fontStyles.robotoBold]}>
                 {sevaDetails && sevaDetails.gothra}
               </Text>
             </View>
@@ -213,8 +214,8 @@ right:0,
                 alignItems: "center",
               }}
             >
-              <Text style={styles.SevaRecieptDetails}>Rashi:</Text>
-              <Text style={{ paddingLeft: 10 }}>
+              <Text style={[styles.SevaRecieptDetails,fontStyles.robotoBold]}>Rashi:</Text>
+              <Text style={[{ paddingLeft: 10 },fontStyles.robotoBold]}>
                 {sevaDetails && sevaDetails.rashi}
               </Text>
             </View>
@@ -226,8 +227,8 @@ right:0,
                 alignItems: "center",
               }}
             >
-              <Text style={styles.SevaRecieptDetails}>Mobile:</Text>
-              <Text style={{ paddingLeft: 10 }}>
+              <Text style={[styles.SevaRecieptDetails,fontStyles.robotoBold]}>Mobile:</Text>
+              <Text style={[{ paddingLeft: 10 },fontStyles.robotoBold]}>
                 {sevaDetails && sevaDetails.phoneNo}
               </Text>
             </View>
@@ -235,7 +236,7 @@ right:0,
         </View>
         {/* Seva Date and amount */}
         <View style={{ borderBottomWidth: 1, borderTopWidth: 1,paddingBottom:10,paddingTop:5,marginBottom:5}}>
-          <Text style={{fontWeight:"bold",fontSize:14}}>Seva Date:{currentDate}</Text>
+          <Text style={[{fontSize:14},fontStyles.robotoBold]}>Seva Date:{currentDate}</Text>
           
         <View style={{borderWidth:1,width:"auto",flexDirection:"row",alignItems:"center",padding:10,borderRadius:10}}>
         <FontAwesome name="rupee" size={20} color="black" />
@@ -284,7 +285,7 @@ const styles = StyleSheet.create({
   },
   SevaRecieptDetails: {
     fontSize: 14,
-    fontWeight: "bold",
+    // fontWeight: "bold",
   },
   button: {
     flexDirection: 'row',

@@ -44,8 +44,9 @@ const styles = StyleSheet.create({
     alignItems: "center",
   },
   dateText: {
-    fontSize: 16,
-    fontWeight: "bold",
+    fontSize: 15,
+    // fontWeight: "bold",
+    fontFamily: 'Poppins-Medium',
   },
 });
 

@@ -32,6 +32,10 @@ import { fetchUsers } from "../db/queries";
 import Getseva from "../compnents/Getseva";
 import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
+import { useFonts } from "expo-font";
+import fontStyles from "../utils/fontStyles";
+
+
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [error, setError] = useState({ type: "", msg: "" });
@@ -53,33 +57,73 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [showSevaList, setShowSevaList] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingContent, setLoadingContent] = useState("Loading");
+  // loading fonts
+  const [loaded] = useFonts({
+    "Roboto-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
+    "Popins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
+  });
+
+
+
+
+  const initializeSerialNo = async () => {
+    const date = new Date();
+    const currentDate = date.getDate().toString().padStart(2, '0'); // Ensure date is in 'dd' format
+    const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
+    const deviceID = "01";
+
+    const storedData = await AsyncStorage.getItem('storedData');
+    let storedDate, storedCount;
+
+    if (storedData) {
+      [storedDate, storedCount] = storedData.split('-').map(Number);
+    }
+
+    if (storedDate === parseInt(currentDate)) {
+      // Same day, use the stored count
+      const currentCount = storedCount.toString().padStart(5, '0');
+      const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${currentCount}`;
+      setSeralNo(newSerialNo);
+    } else {
+      // New day, reset the count
+      const newCount = "00001";
+      const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${newCount}`;
+      setSeralNo(newSerialNo);
+      await AsyncStorage.setItem('storedData', `${currentDate}-1`);
+    }
+  };
+
+  const updateSerialNo = async () => {
+    const date = new Date();
+    const currentDate = date.getDate().toString().padStart(2, '0'); // Ensure date is in 'dd' format
+    const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
+    const deviceID = "01";
+
+    const storedData = await AsyncStorage.getItem('storedData');
+    let storedDate, storedCount;
+
+    if (storedData) {
+      [storedDate, storedCount] = storedData.split('-').map(Number);
+    }
+
+    if (storedDate === parseInt(currentDate)) {
+      // Same day, increment the count
+      const currentCount = (storedCount + 1).toString().padStart(5, '0');
+      const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${currentCount}`;
+      setSeralNo(newSerialNo);
+      await AsyncStorage.setItem('storedData', `${currentDate}-${storedCount + 1}`);
+    } else {
+      // New day, reset the count
+      const newCount = "00001";
+      const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${newCount}`;
+      setSeralNo(newSerialNo);
+      await AsyncStorage.setItem('storedData', `${currentDate}-1`);
+    }
+  };
+
   useEffect(() => {
-    const initializeSerialNo = async () => {
-      const date = new Date();
-      const currentDate = date.getDate();
-      const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
-      const deviceID = "01";
-
-      const storedData = await AsyncStorage.getItem('storedData');
-      let storedDate, storedCount;
-
-      if (storedData) {
-        [storedDate, storedCount] = storedData.split('-').map(Number);
-      }
-
-      if (storedDate === currentDate) {
-        // Same day, use the current count without incrementing
-        const currentCount = storedCount.toString().padStart(5, '0');
-        setSeralNo(`${yearLastTwoDigits}${currentDate}${deviceID}${currentCount}`);
-      } else {
-        // New day, reset the count
-        const newCount = "00001";
-        setSeralNo(`${yearLastTwoDigits}${currentDate}${deviceID}${newCount}`);
-        await AsyncStorage.setItem('storedData', `${currentDate}-1`);
-      }
-    };
-
     initializeSerialNo();
+   
     const sqldata = async () => {
       await fetchUsers().then((res) => {
         console.log(res, "data from db");
@@ -89,6 +133,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     };
     sqldata();
   }, []);
+ 
 
   const handleSubmit = () => {
     let hasError = false;
@@ -162,10 +207,7 @@ console.log('====================================');
         setNakshatra("");
         setRashi("");
         // update the serial number in the state and AsyncStorage
-        const storedSerialNo = await AsyncStorage.getItem('serialNo');
-        const newSerialNo = (parseInt(storedSerialNo) + 1).toString().padStart(5, '0');
-        setSeralNo(newSerialNo);
-        await AsyncStorage.setItem('serialNo', newSerialNo);
+        updateSerialNo();
         // submit the form with the data on url2
         axios.patch(url, {
           sevaID:  seva,
@@ -178,9 +220,9 @@ console.log('====================================');
             findSevaId,
             findSannidhiId,
             findSevaAmt,
-            findNakshatraId,
-            findGothraId,
-            findRashiId,
+            // findNakshatraId,
+            // findGothraId,
+            // findRashiId,
           } = res.data.data;
           console.log(res.data.data, "ldsjflslfj", "data from patch");
           setSqlDetails(res.data.data);
@@ -302,11 +344,9 @@ console.log('====================================');
         setNakshatra("");
         setRashi("");
         // update the serial number in the state and AsyncStorage;
-        const storedSerialNo = await AsyncStorage.getItem('serialNo');
-const newSerialNo = (parseInt(storedSerialNo) + 1).toString().padStart(5, '0');
-setSeralNo(newSerialNo);
-await AsyncStorage.setItem('serialNo', newSerialNo);
+        updateSerialNo();
 setShowResipt(true);
+setLoading(false);
         setReceiptDetails(res.data.data);
         axios.patch(url, {
           sevaID:  seva,
@@ -346,14 +386,17 @@ setShowResipt(true);
               console.log(res.data.data, "data from post");
             })
             .catch((err) => {
+              setLoading(false);
               console.log(err);
             });
         }).catch((err) => {
+          setLoading(false);
           console.log(err);
         })
       })
       .catch((err) => {
         setSubmissionError(true);
+        setLoading(false);
         console.log(err);
       });
       if (hasError) {
@@ -370,17 +413,20 @@ setLoading(true);
       setLoading(false);
     }).catch((err) => {
       console.log(err);
+      setLoading(false);
       Alert.alert("Sync", "Sync is not done successfully");
     })
   }
 
 
-
+if (!loaded) {
+  return <LoadingComponent name="Loading" />;
+}
 
 
   return (
     <SafeAreaView>
-      <SafeAreaView style={{ top: -1, flex: 1 }}>
+      <SafeAreaView style={{ top: 0, flex: 1 }}>
         <Image
           style={{
             // left: -30,
@@ -420,12 +466,14 @@ setLoading(true);
                 ☰
               </Text>
               <Text
-                style={{
-                  fontWeight: "bold",
+                style={[{
+                  // fontWeight: "500",
                   fontSize: 20,
                   left: 100,
                   top: -28,
-                }}
+                  alignContent: "center",
+                 textAlign: "center",
+                },styles.fontBold]}
               >
                 Seva Receipt
               </Text>
@@ -437,9 +485,22 @@ setLoading(true);
 
           </View>
           <View style={{ justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 20 }}>
-      <View style={{ width: "30%" , borderRadius: 10,}}>
-        <Button color="#4287f5" title="Sync" onPress={HandelSyncClick}/>
-      </View>
+          <TouchableOpacity 
+  style={{ 
+    width: "25%", 
+    borderRadius: 10, 
+    alignItems: 'center', 
+    padding: 10 ,
+    flexDirection: "row",
+    backgroundColor: "#f2f2f2",
+    // justifyContent: "center",
+    alignContent: "center",
+  }} 
+  onPress={HandelSyncClick}
+>
+  <AntDesign name="cloud" size={19} color="#333333" />
+  <Text style={[{ color: "#333333", marginLeft:5,textTransform:"uppercase"},styles.font]}>Sync</Text>
+</TouchableOpacity>
     </View>
         </SafeAreaView>
         <ScrollView
@@ -535,6 +596,8 @@ setLoading(true);
                 backgroundColor: "#4287f5",
                 paddingBottom: 10,
                 paddingTop: 10,
+                fontFamily: 'Roboto-Regular',
+                
               }}
             >
               <FontAwesome6 name="save" size={24} color="white" /> Save
@@ -549,6 +612,7 @@ setLoading(true);
                 backgroundColor: "#4287f5",
                 paddingBottom: 10,
                 paddingTop: 10,
+                fontFamily: 'Roboto-Regular',
               }}
             >
               <FontAwesome6 name="print" size={24} color="white" /> Save & Print
@@ -566,6 +630,7 @@ setLoading(true);
                 alignContent: "center",
                 alignItems: "center",
                 justifyContent: "center",
+                fontFamily: 'Roboto-Regular',
               }}
             >
               <Feather name="minus-circle" size={24} color="white" />{" "}
@@ -603,11 +668,11 @@ setLoading(true);
                 source={require("../assets/account.png")}
               />
               <Text
-                style={{ fontSize: 20, fontWeight: "bold", marginLeft: 10 }}
+                style={{ fontSize: 20, marginLeft: 10,fontFamily: 'Popins-Bold', }}
               >
                 Admin
               </Text>
-              <TouchableOpacity style={{left:70}} onPress={()=>{setTranslateMenu(-290);}}>
+              <TouchableOpacity style={{left:60}} onPress={()=>{setTranslateMenu(-290);}}>
               <AntDesign name="closecircle" size={28} color="red" />
               </TouchableOpacity>
             </View>
@@ -615,12 +680,13 @@ setLoading(true);
             <Button
                 title="Seva List"
                 onPress={() => {
+           
                   setShowSevaList(true);
                   setTranslateMenu(-290) 
 console.log("Seva list button pressed");
                 }}
               />
-              <TouchableOpacity style={{marginTop:10,marginBottom:10}}>
+              <TouchableOpacity style={[{marginTop:10,marginBottom:10},styles.font]}>
                     <Button
                 title="Getseva"
                 onPress={() => {
@@ -631,8 +697,13 @@ console.log("Getseva button pressed");
               />
               </TouchableOpacity>
               <Button
+              
                 title="Show Receipt"
                 onPress={() => {
+                  setLoading(true);
+                  setTimeout(() => {
+                    setLoading(false);
+                  }, 1000);
                   setShowReceiptDetails(true);
                   setTranslateMenu(-290) 
 console.log("close button pressed");
@@ -645,7 +716,7 @@ console.log("close button pressed");
                   setUserName("");
                   setUserPassword("");
                 }}
-                style={styles.buttonStyle}
+                style={[styles.buttonStyle,{fontFamily: 'Roboto-Regular',}]}
               >
                 Logout
               </Text>
@@ -660,13 +731,13 @@ console.log("close button pressed");
     </SafeAreaView>
   );
 };
-
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 20,
     paddingTop: StatusBar.currentHeight,
     padding: 20,
     top: 10,
+    fontFamily: 'Roboto-Regular',
     // height: 700,
     // backgroundColor: "#000",
     // flex:1,
@@ -713,6 +784,12 @@ const styles = StyleSheet.create({
     color: "#fff",
     fontSize: 18,
     textAlign: "center",
+  },
+  font: {
+    fontFamily: 'Roboto-Regular',
+  },
+  fontBold: {
+    fontFamily: 'Popins-Bold',
   },
 });
 

@@ -2,6 +2,7 @@ import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
+import fontStyles from '../utils/fontStyles';
 
 const data = [
   { label: 'Item 1', value: '1' },
@@ -43,7 +44,7 @@ const Drashi = ({dplable,lable,rashi,setRashi}) => {
   const renderLabel = () => {
     if (value || isFocus) {
       return (
-        <Text style={[styles.label, isFocus && { color: 'blue' }]}>
+        <Text style={[styles.label, fontStyles.robotoRegular,isFocus && { color: 'blue' }]}>
           {dplable}
         </Text>
       );
@@ -56,7 +57,7 @@ const Drashi = ({dplable,lable,rashi,setRashi}) => {
       {renderLabel()}
       <Dropdown
         style={[styles.dropdown, isFocus && { borderColor: 'blue' }]}
-        placeholderStyle={styles.placeholderStyle}
+        placeholderStyle={[styles.placeholderStyle,fontStyles.robotoRegular]}
         selectedTextStyle={styles.selectedTextStyle}
         inputSearchStyle={styles.inputSearchStyle}
         iconStyle={styles.iconStyle}

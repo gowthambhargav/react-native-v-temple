@@ -1,6 +1,7 @@
 
 import React from 'react';
 import { StyleSheet, Text, TextInput,SafeAreaView,Button,Alert,ImageBackground, View, Image } from 'react-native';
+import fontStyles from '../utils/fontStyles';
 
 export default function Login() {
   const [userName, onUserNameChange] = React.useState('');
@@ -30,7 +31,7 @@ console.log(userName,userPassward);
     color: '#ffffff',}}>Login</Text>
       <TextInput style={styles.input} autoCapitalize="none" placeholder='User name' onChangeText={onUserNameChange} />
       <TextInput   style={styles.input} placeholder='Passward' onChangeText={onUserPasswardChange} />
-<View style={styles.buttonCss}>
+<View style={[styles.buttonCss]}>
 <Button title='Login' disabled={btn}  onPress={validateUserNameAndPassword} />
 </View>
       </ImageBackground>

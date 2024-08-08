@@ -1,13 +1,14 @@
 import React from 'react';
 import { View, Text, StyleSheet, ScrollView } from 'react-native';
+import fontStyles from '../utils/fontStyles';
 
 const Card = ({ data }) => {
   return (
     <View style={styles.card}>
     {Object.keys(data).map((key) => (
       <View style={styles.row} key={key}>
-        <Text style={styles.label}>{key}</Text>
-        <Text style={styles.value}>{data[key]}</Text>
+        <Text style={[styles.label,fontStyles.robotoBold]}>{key}</Text>
+        <Text style={[styles.value,fontStyles.robotoRegular]}>{data[key]}</Text>
       </View>
     ))}
   </View>
@@ -35,7 +36,6 @@ const styles = StyleSheet.create({
   label: {
     fontSize: 14,
     color: '#333333',
-    fontWeight: 'bold',
     flex: 1,
   },
   value: {
