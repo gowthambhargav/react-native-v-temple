@@ -484,9 +484,10 @@ if (!loaded) {
             <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
 
           </View>
-          <View style={{ justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 20 }}>
+          <View style={{ justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 20,paddingBottom:5 }}>
           <TouchableOpacity 
   style={{ 
+    marginTop:-15,
     width: "25%", 
     borderRadius: 10, 
     alignItems: 'center', 
