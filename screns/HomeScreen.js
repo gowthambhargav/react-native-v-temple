@@ -27,13 +27,11 @@ import axios from "axios";
 import SevaReciept from "../compnents/SevaReciept";
 import Showrreciept from "../compnents/Showrreciept";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DatabaseExample from "./DatabaseExample";
 import { fetchUsers } from "../db/queries";
 import Getseva from "../compnents/Getseva";
 import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
-import fontStyles from "../utils/fontStyles";
 
 
 
@@ -62,8 +60,6 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     "Roboto-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
     "Popins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
   });
-
-
 
 
   const initializeSerialNo = async () => {
