@@ -267,7 +267,9 @@ console.log('====================================');
         Alert.alert("Seva Receipt", "Seva Receipt is submitted successfully");
         setLoading(false);
         setLoadingContent("Loading");
-
+console.log('====================================');
+console.log(res.data.data, "data from post");
+console.log('====================================');
         setReceiptDetails(res.data.data);
       })
       .catch((err) => {
