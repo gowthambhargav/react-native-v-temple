@@ -56,55 +56,113 @@ const [seralNo, setSeralNo] = useState();
 
   const handlePrint = async () => {
     const htmlContent = `
-    <div style="position: relative; width: 100%; height: 100%; background-color: white;">
-      <div style="padding: 20px; background: white;">
-        <div style="text-align: center;">
-          <h1 style="font-size: 18px; font-weight: bold; text-transform: uppercase;">${addressData?.CompName}</h1>
-          <p style="text-transform: capitalize; width: 60%; margin: 0 auto;">${addressData?.Address1}</p>
-          <p>${addressData?.Address2}</p>
-          <p>${addressData?.Address3}</p>
-          ${addressData?.Address5 ? `<p>${addressData.Address5}</p>` : ''}
-          <p>Ph: ${addressData?.MOBNO}</p>
+<!DOCTYPE html>
+<html lang="en">
+<head>
+    <meta charset="UTF-8">
+    <meta name="viewport" content="width=device-width, initial-scale=1.0">
+    <title>Document</title>
+    <style>
+        html, body {
+            margin: 0;
+            padding: 0;
+           /* // height: 100%; */
+            font-size: 8px; /* Adjust font size as needed */
+        }
+        .container {
+            position: relative;
+            width: 100%;
+            min-height: 100%;
+            background-color: white;
+            padding: 5px;
+            box-sizing: border-box;
+        }
+        .header, .content, .footer {
+            text-align: center;
+        }
+        .header h1, .content p, .footer p {
+            margin: 2px 0;
+        }
+        .footer {
+            border-bottom: 1px solid;
+            border-top: 1px solid;
+            padding: 5px 0;
+            margin-bottom: 5px;
+        }
+        .footer div {
+            border: 1px solid;
+            display: flex;
+            align-items: center;
+            padding: 5px;
+        }
+        @media print {
+            body {
+                width: 2.91in; /* A7 width */
+                height: 4.13in; /* A7 height */
+            }
+        }
+        @media screen {
+            body {
+                width: 8.27in; /* A4 width */
+                height: 11.69in; /* A4 height */
+            }
+        }
+    </style>
+</head>
+<body>
+    <div class="container">
+        <div class="header">
+            <h1 style="font-size: 11px; font-weight: bold; text-transform: uppercase;">${addressData?.CompName}</h1>
+            <p style="text-transform: capitalize; width: 60%; margin: 2px auto; font-size: 11px;">
+                ${addressData?.Address1} <br> ${addressData?.Address2}<br> ${addressData?.Address3} <br>${addressData?.Address5 ? `${addressData.Address5} ` : ''}Ph: ${addressData?.MOBNO}
+            </p>
         </div>
-        <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid; border-top: 1px solid; padding: 10px 0;">
-          <p>Date: <strong>${currentDate}</strong></p>
-          <p>Receipt No: <strong>${sevaDetails?.sevaReceiptID}</strong></p>
+        <div class="content">
+            <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid; border-top: 1px solid; padding: 5px 0;">
+                <p style="font-size: 9px;">Date: <strong style="font-size: 11px;">${currentDate}</strong></p>
+                <p style="font-size: 9px;">Receipt No: <strong style="font-size: 11px;">${sevaDetails?.sevaReceiptID}</strong></p>
+            </div>
+            <div style="margin-top: 5px; padding-bottom: 5px;">
+                <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
+                    <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Name:</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.name}</p>
+                </div>
+                <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
+                    <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Gothra:</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.gothra}</p>
+                </div>
+                <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
+                    <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Nakshatra:</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.nakshatra}</p>
+                </div>
+                <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
+                    <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Rashi:</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.rashi}</p>
+                </div>
+                <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
+                    <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Sannidhi:</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.sannidhi}</p>
+                </div>
+                <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
+                    <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Seva:</p>
+                    <p style="padding-left: 5px; font-weight: bold; font-size: 14px; margin: 2px 0;">${sevaDetails?.seva}</p>
+                </div>
+                <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
+                    <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Mobile:</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.phoneNo}</p>
+                </div>
+            </div>
         </div>
-        <div style="margin-top: 10px; padding-bottom: 10px;">
-          <div style="display: flex; justify-content: flex-start; padding-right: 10px; align-items: center;">
-            <p style="font-weight: bold;">Sannidhi:</p>
-            <p style="padding-left: 10px;">${sevaDetails?.sannidhi}</p>
-          </div>
-          <div style="display: flex; justify-content: flex-start; padding-right: 10px; align-items: center;">
-            <p style="font-weight: bold;">Seva:</p>
-            <p style="padding-left: 10px; font-weight: bold; font-size: 15px;">${sevaDetails?.seva}</p>
-          </div>
-          <div style="display: flex; justify-content: flex-start; padding-right: 10px; align-items: center;">
-            <p style="font-weight: bold;">Name:</p>
-            <p style="padding-left: 10px; font-weight: bold;">${sevaDetails?.name}</p>
-          </div>
-          <div style="display: flex; justify-content: flex-start; padding-right: 10px; align-items: center;">
-            <p style="font-weight: bold;">Gothra:</p>
-            <p style="padding-left: 10px; font-weight: bold;">${sevaDetails?.gothra}</p>
-          </div>
-          <div style="display: flex; justify-content: flex-start; padding-right: 10px; align-items: center;">
-            <p style="font-weight: bold;">Rashi:</p>
-            <p style="padding-left: 10px; font-weight: bold;">${sevaDetails?.rashi}</p>
-          </div>
-          <div style="display: flex; justify-content: flex-start; padding-right: 10px; align-items: center;">
-            <p style="font-weight: bold;">Mobile:</p>
-            <p style="padding-left: 10px; font-weight: bold;">${sevaDetails?.phoneNo}</p>
-          </div>
+        <div class="footer">
+            <p style="font-size: 12px; font-weight: bold; text-align: left;">Seva Date: ${currentDate}</p>
+            <div style="width: fit-content;">
+                <p style="font-size: 13px; margin-left: 5px; margin-top: -4px; font-weight: bold;">₹${sevaAmount}</p>
+            </div>
         </div>
-        <div style="border-bottom: 1px solid; border-top: 1px solid; padding: 10px 0; margin-bottom: 5px;">
-          <p style="font-size: 14px; font-weight: bold;">Seva Date: ${currentDate}</p>
-          <div style="border: 1px solid; display: flex; align-items: center; padding: 10px;">
-            <p style="font-size: 20px; margin-left: 5px; margin-top: -4px; font-weight: bold;">₹${sevaAmount}</p>
-          </div>
-        </div>
-      </div>
     </div>
-  `;
+</body>
+</html>
+    `;
 
     try {
       await Print.printAsync({ html: htmlContent });
@@ -162,7 +220,7 @@ const [seralNo, setSeralNo] = useState();
             <View style={{ flex: 1 }}>
               <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
                 <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Sannidhi:</Text>
-                <Text style={{ paddingLeft: 10, textAlign: "center" }}>{sevaDetails && sevaDetails.sannidhi}</Text>
+                <Text style={{ paddingLeft: 10, textAlign: "center", fontWeight: "bold", }}>{sevaDetails && sevaDetails.sannidhi}</Text>
               </View>
               <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
                 <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Seva:</Text>
