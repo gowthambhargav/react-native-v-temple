@@ -166,6 +166,29 @@ export const openDatabase = async () => {
         PRASADA VARCHAR(10),
         RASHIID INT
       );
+      CREATE TABLE IF NOT EXISTS MstUser (
+        UserID INTEGER PRIMARY KEY AUTOINCREMENT,
+        UserCode VARCHAR(50),
+        LoginPwd VARCHAR(50),
+        UserName VARCHAR(100),
+        EmailID VARCHAR(150),
+        Remarks VARCHAR(250),
+        UserImg IMAGE,
+        DESIGNATION VARCHAR(250),
+        Mobileno VARCHAR(50),
+        Department VARCHAR(250),
+        ChkDOB CHAR(1),
+        DOB SMALLDATETIME,
+        OTP VARCHAR(15),
+        OTPValidity VARCHAR(50),
+        Inactive CHAR(1),
+        InactiveRmks VARCHAR(250),
+        RoleID INT,
+        Authorised CHAR(1),
+        AuthBy VARCHAR(50),
+        AuthOn SMALLDATETIME,
+        PwdResetDt SMALLDATETIME
+      );
     `);
   }
 };
