@@ -27,7 +27,7 @@ import axios from "axios";
 import SevaReciept from "../compnents/SevaReciept";
 import Showrreciept from "../compnents/Showrreciept";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { fetchUsers } from "../db/queries";
+import { csvDataUpload, fetchUsers } from "../db/queries";
 import Getseva from "../compnents/Getseva";
 import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
@@ -46,7 +46,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [rashi, setRashi] = useState("");
   const [SeralNo, setSeralNo] = useState(0);
   const [submissionError, setSubmissionError] = useState(false);
-  const [showResipt, setShowResipt] = useState(true);
+  const [showResipt, setShowResipt] = useState(false);
   const [ReceiptDetails, setReceiptDetails] = useState();
   const [translateMenu, setTranslateMenu] = useState(-290);
   const [showReceiptDetails, setShowReceiptDetails] = useState(false);
@@ -128,6 +128,13 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
       });
     };
     sqldata();
+
+//
+csvDataUpload().then((data) => {
+  console.log('Uploaded data:', data);
+}).catch((error) => {
+  console.error('Error:', error);
+});
   }, []);
  
 

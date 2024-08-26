@@ -1,6 +1,17 @@
 import { openDatabase } from './database';
+import * as FileSystem from 'expo-file-system';
+import Papa from 'papaparse';
 
-const db = await openDatabase();
+
+
+const db =  openDatabase().then((db) => {
+  db;
+  console.log('====================================');
+  console.log('Database opened successfully',db);
+  console.log('====================================');
+}).catch((error) => {
+  console.error('Error opening database:', error);
+});
 
 export const insertUser = async (user) => {
   const { UserCode, LoginPwd, UserName, EmailID, Remarks, UserImg, DESIGNATION, Mobileno, Department, ChkDOB, DOB, OTP, OTPValidity, Inactive, InactiveRmks, RoleID, Authorised, AuthBy, AuthOn, PwdResetDt } = user;
@@ -189,3 +200,43 @@ export const getSvaById = async (svaID) => {
   `, [svaID]);
   return result;
 };
+
+
+
+
+export const csvDataUpload = async () => {
+  const filePath = "assets/Data-csv/MstRASHI.csv";
+  const db = await openDatabase();
+
+  return new Promise((resolve, reject) => {
+    FileSystem.readAsStringAsync(filePath)
+      .then((data) => {
+        Papa.parse(data, {
+          header: true,
+          complete: async (result) => {
+            try {
+              for (const rashi of result.data) {
+                await insertRashi(db, rashi); // Ensure insertRashi function is available in scope
+              }
+              console.log('CSV data uploaded and inserted into MstRASHI table successfully');
+              resolve(result.data);
+            } catch (error) {
+              console.error('Error inserting CSV data into MstRASHI table:', error);
+              reject(error);
+            }
+          },
+          error: (error) => {
+            console.error('Error parsing CSV data:', error);
+            reject(error);
+          }
+        });
+      })
+      .catch((error) => {
+        console.error('Error reading file:', error);
+        reject(error);
+      });
+  });
+};
+
+
+

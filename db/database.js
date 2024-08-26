@@ -1,6 +1,10 @@
+import * as SQLite from 'expo-sqlite';
+
+let db;
+
 export const openDatabase = async () => {
   if (!db) {
-    db = await SQLite.openDatabaseAsync('vTempleVARADA.db');
+    db = await SQLite.openDatabaseAsync('vTempleVARADA');
     await db.execAsync(`
       PRAGMA journal_mode = WAL;
       CREATE TABLE IF NOT EXISTS MstComp (
@@ -109,7 +113,7 @@ export const openDatabase = async () => {
         ChangedOn DATETIME,
         AMT NUMERIC(19, 2),
         RMKS VARCHAR(250),
-        RMKS_XML VARCHAR(MAX),
+        RMKS_XML VARCHAR(1000),
         SEVAINKAN NVARCHAR(250),
         SVADISPNAME VARCHAR(50)
       );
@@ -186,4 +190,5 @@ export const openDatabase = async () => {
       );
     `);
   }
+  return db;
 };
