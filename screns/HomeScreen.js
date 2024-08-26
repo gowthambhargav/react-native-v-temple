@@ -27,12 +27,13 @@ import axios from "axios";
 import SevaReciept from "../compnents/SevaReciept";
 import Showrreciept from "../compnents/Showrreciept";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import { csvDataUpload, fetchUsers } from "../db/queries";
+import DatabaseService, { csvDataUpload, fetchUsers, getMstComp, getRashis, insertRashi } from "../db/queries";
 import Getseva from "../compnents/Getseva";
 import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
-
+import data from "../assets/csvjson.json"
+import { getAllRashis, getRashi } from "../db/database";
 
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
@@ -55,6 +56,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [showSevaList, setShowSevaList] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingContent, setLoadingContent] = useState("Loading");
+  const [csvData, setCsvData] = useState([]);
   // loading fonts
   const [loaded] = useFonts({
     "Roboto-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
@@ -117,26 +119,38 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     }
   };
 
+
   useEffect(() => {
     initializeSerialNo();
    
-    const sqldata = async () => {
-      await fetchUsers().then((res) => {
-        console.log(res, "data from db");
-      }).catch((err) => {
-        console.log(err);
-      });
-    };
-    sqldata();
+    // const sqldata = async () => {
+    //   await fetchUsers().then((res) => {
+    //     console.log(res, "data from db");
+    //   }).catch((err) => {
+    //     console.log(err);
+    //   });
+    // };
+    // sqldata();
 
-//
-csvDataUpload().then((data) => {
-  console.log('Uploaded data:', data);
-}).catch((error) => {
-  console.error('Error:', error);
-});
+
+// Insert each Rashi object into the database
+
+getAllRashis().then((rashis) => { 
+  console.log('====================================');
+  console.log('Retrieved Rashis:', rashis);
+  console.log('====================================');
+}).catch((err) => {
+  console.log('====================================');
+  console.log('Error retrieving Rashis:', err);
+  console.log('====================================');
+})
+
+
+
   }, []);
  
+
+
 
   const handleSubmit = () => {
     let hasError = false;
