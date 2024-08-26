@@ -187,7 +187,7 @@ const [seralNo, setSeralNo] = useState();
         bottom: 0,
         backgroundColor: "rgba(0,0,0,0.8)",
       }}
-      onPress={() => {}}
+
     >
       <SafeAreaView>
         <TouchableOpacity
