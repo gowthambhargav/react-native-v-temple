@@ -3,11 +3,6 @@ export const openDatabase = async () => {
     db = await SQLite.openDatabaseAsync('vTempleVARADA.db');
     await db.execAsync(`
       PRAGMA journal_mode = WAL;
-      CREATE TABLE IF NOT EXISTS users (
-        id INTEGER PRIMARY KEY AUTOINCREMENT,
-        name TEXT,
-        age INTEGER
-      );
       CREATE TABLE IF NOT EXISTS MstComp (
         CompID INTEGER PRIMARY KEY AUTOINCREMENT,
         CompName VARCHAR(250) NOT NULL,
