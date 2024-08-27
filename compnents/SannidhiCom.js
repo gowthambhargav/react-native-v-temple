@@ -3,6 +3,7 @@ import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import axios from 'axios';
 import fontStyles from '../utils/fontStyles';
+import { GetAllSannidhi, GetAllSVA } from '../db/database';
 
 
 const SannidhiCom = ({dplable,lable,setSannidhi,value,requred}) => {
@@ -11,18 +12,18 @@ const SannidhiCom = ({dplable,lable,setSannidhi,value,requred}) => {
 useEffect(() => {
   const testFetch = async () => {
     try {
-      const response = await axios.get('https://react-native-v-temple-b.onrender.com/api/sannidhi');
-      const data = response.data;
-      // console.log(data.SANNIDHIres[0], "data");
-      // Ensure data.SANNIDHIres is an array before setting it
-      if (Array.isArray(data.SANNIDHIres)) {
-        setSannidhiData(data.SANNIDHIres.map(item => ({
-          label: `${item.SANNIDHINAME} ${item.SANNIDHIID}`,
-          value: item.SANNIDHINAME
-        })));
-      } else {
-        console.error('Expected data.SANNIDHIres to be an array but got:', typeof data.SANNIDHIres);
-      }
+      const SqllitData = await GetAllSannidhi();
+      const filteredDataSql = SqllitData.filter(item => item.SANNIDHIID !== 0); 
+      console.log('====================================');
+      console.log('Sannidhi: From Sannidhicom.js', SqllitData.length);
+      console.log('====================================');
+      
+      const sannidhiData = filteredDataSql.map((item) => ({
+        label: `${item.SANNIDHINAME || 'Unknown Name'} ${item.SANNIDHIID || 'Unknown ID'}`,
+        value: item.SANNIDHIID,
+      }));
+      
+      setSannidhiData(sannidhiData);
     } catch (error) {
       console.error('Test fetch error:', error);
     }

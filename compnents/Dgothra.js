@@ -4,6 +4,7 @@ import { StyleSheet, Text, View } from "react-native";
 import { Dropdown } from "react-native-element-dropdown";
 import fontStyles from "../utils/fontStyles";
 import { useFonts } from "expo-font";
+import { getAllGothras } from "../db/database";
 
 const Dgothra = ({ dplable, lable, setGothra, gothra }) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -16,21 +17,14 @@ const Dgothra = ({ dplable, lable, setGothra, gothra }) => {
   useEffect(() => {
     const testFetch = async () => {
       try {
-        const { data } = await axios.get(
-          "https://react-native-v-temple-b.onrender.com/api/gothra"
-        );
-        if (Array.isArray(data?.data)) {
-          const gothraData = data.data.map(({ GOTHRANAME, GOTHRAID }) => ({
-            label: `${GOTHRANAME} ${GOTHRAID}`,
-            value: GOTHRANAME,
-          }));
-          setGothraData(gothraData);
-        } else {
-          console.error(
-            "Expected data.SANNIDHIres to be an array but got:",
-            typeof data.SANNIDHIres
-          );
-        }
+        const GothraData = await getAllGothras();
+        const filteredData = GothraData.filter(item => item.RASHIID !== 0);
+        const gothraData = filteredData.map((item) => ({
+          label:`${item.GOTHRANAME} ${item.GOTHRAID}` ,
+          value: item.GOTHRAID,
+        }));
+        setGothraData(gothraData);
+      
       } catch (error) {
         console.error("Test fetch error:", error);
       }

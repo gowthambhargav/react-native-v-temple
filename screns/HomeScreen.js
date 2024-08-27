@@ -33,7 +33,7 @@ import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
 import data from "../assets/csvjson.json"
-import { getAllNakshatras, getAllRashis, getRashi, getRashiById } from "../db/database";
+import { getAllGothras, getAllNakshatras, getAllRashis, GetAllSannidhi, GetAllSVA, getRashi, getRashiById } from "../db/database";
 
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
@@ -134,27 +134,11 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     // sqldata();
 
 
-// Insert each Rashi object into the database
+    GetAllSannidhi().then((res) => {
+      console.log(res, "data from db");
+    })
 
 
-
-
-
-// getAllRashis().then((rashis) => {
-//   console.log('====================================');
-//   console.log('Retrieved Rashis:', rashis);
-//   console.log('====================================');
-// }).catch((err) => {
-//   console.log('====================================');
-//   console.log('Error retrieving Rashis:', err);
-//   console.log('====================================');
-// })
-
-getAllNakshatras().then((nakshatras) => {
-  console.log('====================================');
-  console.log('Retrieved Nakshatras:', nakshatras);
-  console.log('====================================');
-})
 
   }, []);
  

@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import fontStyles from '../utils/fontStyles';
+import { GetAllSVA } from '../db/database';
 
 const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -10,16 +11,14 @@ const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
   useEffect(() => {
     const testFetch = async () => {
       try {
-        const response = await axios.get('https://react-native-v-temple-b.onrender.com/api/seva');
-        const data = response.data;
-        if (Array.isArray(data.data)) {
-          setSevaData(data.data.map(item => ({
-            label: `${item.SVANAME} ${item.SVAID}`,
-            value: item.SVANAME
-          })));
-        } else {
-          console.error('Expected data.SANNIDHIres to be an array but got:', typeof data.SANNIDHIres);
-        }
+       const sqlData = await GetAllSVA();
+       const filteredData = sqlData.filter((item) => item.SVAID !== 0);
+        const sevaData = filteredData.map((item) => ({
+          label: `${item.SVANAME} ${item.SVAID}`,
+          value: item.SVAID,
+        }));
+        setSevaData(sevaData);
+       
       } catch (error) {
         console.error('Test fetch error:', error);
       }
