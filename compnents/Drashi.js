@@ -3,17 +3,8 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import fontStyles from '../utils/fontStyles';
+import { getAllRashis } from '../db/database';
 
-const data = [
-  { label: 'Item 1', value: '1' },
-  { label: 'Item 2', value: '2' },
-  { label: 'Item 3', value: '3' },
-  { label: 'Item 4', value: '4' },
-  { label: 'Item 5', value: '5' },
-  { label: 'Item 6', value: '6' },
-  { label: 'Item 7', value: '7' },
-  { label: 'Item 8', value: '8' },
-];
 
 const Drashi = ({dplable,lable,rashi,setRashi}) => {
   const [isFocus, setIsFocus] = useState(false);
@@ -22,18 +13,20 @@ const Drashi = ({dplable,lable,rashi,setRashi}) => {
   useEffect(() => {
     const testFetch = async () => {
       try {
-        const response = await axios.get('https://react-native-v-temple-b.onrender.com/api/rashi');
-        const data = response.data;
-        // console.log(data.data, "data");
-        // Ensure data.SANNIDHIres is an array before setting it
-        if (Array.isArray(data.data)) {
-          setrashiData(data.data.map(item => ({
-            label: `${item.RASHINAME} ${item.RASHIID}`,
-            value: item.RASHINAME
-          })));
-        } else {
-          console.error('Expected data.SANNIDHIres to be an array but got:', typeof data.SANNIDHIres);
-        }
+        const dataFromSqlLite = await getAllRashis();
+
+        // Filter out the item with RASHIID equal to 1
+        const filteredData = dataFromSqlLite.filter(item => item.RASHIID !== 1);
+        
+        // Map the filtered data to the desired format
+        const mappedData = filteredData.map(item => ({
+          label: `${item.RASHINAME} ${item.RASHIID}`,
+          value: item.RASHIID,
+        }));
+        
+        // Set the filtered and mapped data to rashiData
+        setrashiData(mappedData);
+       
       } catch (error) {
         console.error('Test fetch error:', error);
       }

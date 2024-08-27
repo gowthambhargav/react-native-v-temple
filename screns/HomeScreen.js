@@ -33,7 +33,7 @@ import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
 import data from "../assets/csvjson.json"
-import { getAllRashis, getRashi } from "../db/database";
+import { getAllRashis, getRashi, getRashiById } from "../db/database";
 
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
@@ -61,6 +61,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [loaded] = useFonts({
     "Roboto-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
     "Popins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
+    "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
   });
 
 
@@ -135,16 +136,19 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
 
 // Insert each Rashi object into the database
 
-getAllRashis().then((rashis) => { 
-  console.log('====================================');
-  console.log('Retrieved Rashis:', rashis);
-  console.log('====================================');
-}).catch((err) => {
-  console.log('====================================');
-  console.log('Error retrieving Rashis:', err);
-  console.log('====================================');
-})
 
+
+
+
+// getAllRashis().then((rashis) => {
+//   console.log('====================================');
+//   console.log('Retrieved Rashis:', rashis);
+//   console.log('====================================');
+// }).catch((err) => {
+//   console.log('====================================');
+//   console.log('Error retrieving Rashis:', err);
+//   console.log('====================================');
+// })
 
 
   }, []);
