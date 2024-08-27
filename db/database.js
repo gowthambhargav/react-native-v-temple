@@ -4,6 +4,7 @@ import dataRashi from '../assets/csvjson.json';
 import dataGothra from '../assets/gothra.json';
 import dataSVA from '../assets/seva.json';
 import dataSannidhi from '../assets/sannidhi.json';
+import dataComp from '../assets/mstcom.json';
 var db;
 
 const initializeDatabase = async () => {
