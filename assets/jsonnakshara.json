@@ -1,23 +1,5 @@
 [
-  {
-    "NAKSHATRAID": 0,
-    "NAKSHATRACODE": "-",
-    "NAKSHATRANAME": "-",
-    "NAKSHATRACodeClean": "",
-    "NAKSHATRASeries": "",
-    "NAKSHATRANO": 0,
-    "InActiveRmks": "",
-    "InActive": "N",
-    "Authorised": "Y",
-    "AuthBy": "",
-    "AuthOn": "NULL",
-    "AddedBy": "",
-    "AddedOn": "2021-11-11 17:29:02.000",
-    "ChangedBy": "",
-    "ChangedOn": "2021-11-11 17:29:02.000",
-    "RASHIID1": 0,
-    "RASHIID2": 0
-  },
+
   {
     "NAKSHATRAID": 1,
     "NAKSHATRACODE": "Aridra",

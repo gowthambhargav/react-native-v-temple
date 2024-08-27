@@ -3,6 +3,7 @@ import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
 import fontStyles from '../utils/fontStyles';
+import { getAllNakshatras } from '../db/database';
 
 
 const Dnakshara = ({dplable,lable,setNakshatra,nakshatra}) => {
@@ -12,18 +13,13 @@ const Dnakshara = ({dplable,lable,setNakshatra,nakshatra}) => {
   useEffect(() => {
     const testFetch = async () => {
       try {
-        const response = await axios.get('https://react-native-v-temple-b.onrender.com/api/nakshatra');
-        const data = response.data;
-        // console.log(data.data, "data");
-        // Ensure data.SANNIDHIres is an array before setting it
-        if (Array.isArray(data.data)) {
-          setnaksharaData(data.data.map(item => ({
-            label: `${item.NAKSHATRANAME} ${item.NAKSHATRAID}`,
-            value: item.NAKSHATRANAME
-          })));
-        } else {
-          console.error('Expected data.SANNIDHIres to be an array but got:', typeof data.SANNIDHIres);
-        }
+        const dataFromSqlLite = await getAllNakshatras();
+        const filteredData = dataFromSqlLite.filter(item => item.NAKSHATRANO !== 1);
+        const mappedData = filteredData.map(item => ({
+          label: `${item.NAKSHATRANAME} ${item.NAKSHATRAID}`,
+          value: item.NAKSHATRAID,
+        }));
+        setnaksharaData(mappedData);
       } catch (error) {
         console.error('Test fetch error:', error);
       }

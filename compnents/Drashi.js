@@ -16,7 +16,7 @@ const Drashi = ({dplable,lable,rashi,setRashi}) => {
         const dataFromSqlLite = await getAllRashis();
 
         // Filter out the item with RASHIID equal to 1
-        const filteredData = dataFromSqlLite.filter(item => item.RASHIID !== 1);
+        const filteredData = dataFromSqlLite.filter(item => item.RASHIID !== 0);
         
         // Map the filtered data to the desired format
         const mappedData = filteredData.map(item => ({

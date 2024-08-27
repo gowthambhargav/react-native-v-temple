@@ -1,7 +1,6 @@
 import * as SQLite from 'expo-sqlite';
-import data from '../assets/jsonnakshara.json';
-
-
+import dataNakshara from '../assets/jsonnakshara.json';
+import dataRashi from '../assets/csvjson.json';
 var db;
 
 const initializeDatabase = async () => {
@@ -9,6 +8,7 @@ const initializeDatabase = async () => {
     db = await SQLite.openDatabaseAsync('vTempleVARADA');
     await db.execAsync(`
       PRAGMA journal_mode = WAL;
+    
       CREATE TABLE IF NOT EXISTS MstRASHI (
         RASHIID INTEGER PRIMARY KEY AUTOINCREMENT,
         RASHICODE VARCHAR(50),
@@ -27,25 +27,25 @@ const initializeDatabase = async () => {
         RashiCodeClean VARCHAR(50)
       );
 
-      CREATE TABLE IF NOT EXISTS MstNAJSGARA (
-  NAKSHATRAID INTEGER PRIMARY KEY AUTOINCREMENT,
-  NAKSHATRACODE VARCHAR(50) NOT NULL,
-  NAKSHATRANAME VARCHAR(250) NOT NULL,
-  NAKSHATRACodeClean VARCHAR(50) NOT NULL,
-  NAKSHATRASeries VARCHAR(10),
-  NAKSHATRANO NUMERIC(19, 2),
-  InActiveRmks VARCHAR(250),
-  InActive CHAR(1),
-  Authorised CHAR(1),
-  AuthBy VARCHAR(50),
-  AuthOn DATETIME NOT NULL,
-  AddedBy VARCHAR(50),
-  AddedOn DATETIME,
-  ChangedBy VARCHAR(50),
-  ChangedOn DATETIME NOT NULL,
-  RASHIID1 INTEGER NOT NULL,
-  RASHIID2 INTEGER NOT NULL
-);
+      CREATE TABLE IF NOT EXISTS MstNAKSHATRA (
+        NAKSHATRAID INTEGER PRIMARY KEY,
+        NAKSHATRACODE VARCHAR(50) NOT NULL,
+        NAKSHATRANAME VARCHAR(250) NOT NULL,
+        NAKSHATRACodeClean VARCHAR(50) NOT NULL,
+        NAKSHATRASeries VARCHAR(10),
+        NAKSHATRANO NUMERIC(19, 2),
+        InActiveRmks VARCHAR(250),
+        InActive CHAR(1),
+        Authorised CHAR(1),
+        AuthBy VARCHAR(50),
+        AuthOn DATETIME NOT NULL,
+        AddedBy VARCHAR(50),
+        AddedOn DATETIME,
+        ChangedBy VARCHAR(50),
+        ChangedOn DATETIME NOT NULL,
+        RASHIID1 INTEGER NOT NULL,
+        RASHIID2 INTEGER NOT NULL
+      );
     `);
   }
 };
@@ -57,46 +57,10 @@ export const openDatabase = async () => {
   return db;
 };
 
-// export const insertRashi = async (rashi) => {
-//   await openDatabase();
-//   const {
-//     RASHICODE, RASHINAME, RASHISeries, RASHINO, InActiveRmks, InActive,
-//     Authorised, AuthBy, AuthOn, AddedBy, AddedOn, ChangedBy, ChangedOn, RashiCodeClean
-//   } = rashi;
-//   await db.runAsync(`
-//     INSERT INTO MstRASHI (
-//       RASHICODE, RASHINAME, RASHISeries, RASHINO, InActiveRmks, InActive,
-//       Authorised, AuthBy, AuthOn, AddedBy, AddedOn, ChangedBy, ChangedOn, RashiCodeClean
-//     ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
-//   `, [
-//     RASHICODE, RASHINAME, RASHISeries, RASHINO, InActiveRmks, InActive,
-//     Authorised, AuthBy, AuthOn, AddedBy, AddedOn, ChangedBy, ChangedOn, RashiCodeClean
-//   ]);
-// };
-
-
-
-export const getAllRashis = async () => {
-  await openDatabase();
-  const result = await db.getAllAsync('SELECT * FROM MstRASHI;');
-  console.log('====================================');
-  console.log('Retrieved Rashis');
-  console.log('====================================');
-  return result;
-};
-
-
-export const getRashiById = async (id) => {
-  db = await SQLite.openDatabaseAsync('vTempleVARADA');
-  const result = await db.getFirstAsync('SELECT * FROM MstRASHI WHERE RASHIID = ?', [id]);
-  console.log('====================================');
-  console.log('Retrieved Rashi by ID');
-  console.log('====================================');
-  return result;
-}
 export const insertNakshatra = async (nakshatra) => {
   await openDatabase();
   const {
+    NAKSHATRAID,
     NAKSHATRACODE,
     NAKSHATRANAME,
     NAKSHATRACodeClean,
@@ -116,7 +80,8 @@ export const insertNakshatra = async (nakshatra) => {
   } = nakshatra;
 
   const query = `
-    INSERT INTO mstNAJSGARA (
+    INSERT INTO MstNAKSHATRA (
+      NAKSHATRAID,
       NAKSHATRACODE,
       NAKSHATRANAME,
       NAKSHATRACodeClean,
@@ -133,10 +98,11 @@ export const insertNakshatra = async (nakshatra) => {
       ChangedOn,
       RASHIID1,
       RASHIID2
-    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?);
   `;
 
   const params = [
+    NAKSHATRAID,
     NAKSHATRACODE,
     NAKSHATRANAME,
     NAKSHATRACodeClean,
@@ -155,7 +121,7 @@ export const insertNakshatra = async (nakshatra) => {
     RASHIID2
   ];
 
-  const result = await db.executeAsync(query, params);
+  const result = await db.runAsync(query, params);
   console.log('====================================');
   console.log('Inserted Nakshatra');
   console.log('====================================');
@@ -163,9 +129,10 @@ export const insertNakshatra = async (nakshatra) => {
 };
 
 export const getAllNakshatras = async () => {
-  const query = 'SELECT * FROM Nakshatras';
+  db = await SQLite.openDatabaseAsync('vTempleVARADA');
+  const query = 'SELECT * FROM MstNAKSHATRA';
   try {
-    const result = await db.executeAsync(query);
+    const result = await db.getAllAsync(query);
     return result;
   } catch (error) {
     console.error('Error fetching Nakshatras:', error);
@@ -173,42 +140,36 @@ export const getAllNakshatras = async () => {
   }
 };
 
-
+export const getAllRashis = async () => {
+  db = await SQLite.openDatabaseAsync('vTempleVARADA');
+  const query = 'SELECT * FROM MstRASHI';
+  try {
+    const result = await db.getAllAsync(query);
+    console.log('====================================');
+    console.log('Rashis:', result);
+    console.log('====================================');
+    return result;
+  } catch (error) {
+    console.error('Error fetching Rashis:', error);
+    throw error;
+  }
+};
 
 // CSVJSON data
 
 // Sample data import
+const formatDate = (dateString) => {
+  if (dateString === "NULL") {
+    const now = new Date();
+    const year = now.getFullYear();
+    const month = String(now.getMonth() + 1).padStart(2, '0');
+    const day = String(now.getDate()).padStart(2, '0');
+    const hours = String(now.getHours()).padStart(2, '0');
+    const minutes = String(now.getMinutes()).padStart(2, '0');
+    const seconds = String(now.getSeconds()).padStart(2, '0');
+    return `${year}-${month}-${day} ${hours}:${minutes}:${seconds}`;
+  }
+  return new Date(dateString).toISOString();
+};
 
-// const formatDate = (dateString) => {
-//   if (dateString === "NULL") return new Date().toISOString();
-//   return new Date(dateString).toISOString();
-// };
-// // Process the data
-// const updatedData = data.map(item => ({
-//   RASHICODE: item.RASHICODE,
-//   RASHINAME: item.RASHINAME,
-//   RASHISeries: item.RASHISeries,
-//   RASHINO: item.RASHINO,
-//   InActiveRmks: item.InActiveRmks,
-//   InActive: item.InActive,
-//   Authorised: item.Authorised,
-//   AuthBy: item.AuthBy || 'Admin',
-//   AuthOn: formatDate(item.AuthOn),
-//   AddedBy: item.AddedBy || 'Admin',
-//   AddedOn: formatDate(item.AddedOn),
-//   ChangedBy: item.ChangedBy || 'Admin',
-//   ChangedOn: formatDate(item.ChangedOn),
-//   RashiCodeClean: item.RashiCodeClean
-// }));
-
-// // Function to insert the processed data
-// const insertProcessedData = async (data) => {
-//   for (const item of data) {
-//     await insertRashi(item);
-//   }
-// };
-
-// // Insert the processed data
-// insertProcessedData(updatedData)
-//   .then(() => console.log('Data inserted successfully'))
-//   .catch(error => console.error('Error inserting data:', error));
+// Process the data

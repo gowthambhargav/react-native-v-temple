@@ -33,7 +33,7 @@ import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
 import data from "../assets/csvjson.json"
-import { getAllRashis, getRashi, getRashiById } from "../db/database";
+import { getAllNakshatras, getAllRashis, getRashi, getRashiById } from "../db/database";
 
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
@@ -150,6 +150,11 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
 //   console.log('====================================');
 // })
 
+getAllNakshatras().then((nakshatras) => {
+  console.log('====================================');
+  console.log('Retrieved Nakshatras:', nakshatras);
+  console.log('====================================');
+})
 
   }, []);
  
