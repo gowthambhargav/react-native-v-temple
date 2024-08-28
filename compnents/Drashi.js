@@ -14,9 +14,11 @@ const Drashi = ({dplable,lable,rashi,setRashi}) => {
     const testFetch = async () => {
       try {
         const dataFromSqlLite = await getAllRashis();
-
+// console.log('====================================');
+// console.log(dataFromSqlLite,"dataFromSqlLite");
+// console.log('====================================');
         // Filter out the item with RASHIID equal to 1
-        const filteredData = dataFromSqlLite.filter(item => item.RASHIID !== 0);
+        const filteredData = dataFromSqlLite.filter(item => item.RASHIID !== 1);
         
         // Map the filtered data to the desired format
         const mappedData = filteredData.map(item => ({

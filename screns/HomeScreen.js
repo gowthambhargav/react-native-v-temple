@@ -33,7 +33,8 @@ import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
 import data from "../assets/csvjson.json"
-import { getAllGothras, getAllNakshatras, getAllRashis, GetAllSannidhi, GetAllSVA, getRashi, getRashiById } from "../db/database";
+import { getAllGothras, getAllNakshatras, getAllRashis, GetAllSannidhi, GetAllSVA, getRashi, getRashiById, initializeAndInsertData } from "../db/database";
+import { insertRashis } from "../utils/insertQueries";
 
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
@@ -120,23 +121,11 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     }
   };
 
-
   useEffect(() => {
     initializeSerialNo();
-   
-    // const sqldata = async () => {
-    //   await fetchUsers().then((res) => {
-    //     console.log(res, "data from db");
-    //   }).catch((err) => {
-    //     console.log(err);
-    //   });
-    // };
-    // sqldata();
+ 
+      
 
-
-    GetAllSannidhi().then((res) => {
-      console.log(res, "data from db");
-    })
 
 
 
