@@ -3,6 +3,8 @@ import AsyncStorage from "@react-native-async-storage/async-storage";
 import sqlDataRashi from '../assets/csvjson.json';
 import  sqlDataNakshatra from '../assets/jsonnakshara.json';
 import sqlDataGothra from '../assets/gothra.json';
+import sqlDataSeva from '../assets/seva.json'
+import sqlDataSannidhi from '../assets/sannidhi.json';
 
 
 var db;
@@ -70,7 +72,7 @@ const initializeDatabase = async () => {
       );
 
       CREATE TABLE IF NOT EXISTS MstSVA (
-        SVAID INTEGER PRIMARY KEY AUTOINCREMENT,
+        SVAID INTEGER PRIMARY KEY,
         SVACODE VARCHAR(250) NOT NULL,
         SVANAME VARCHAR(250) NOT NULL,
         SVACodeClean VARCHAR(250) NOT NULL,
@@ -93,7 +95,7 @@ const initializeDatabase = async () => {
       );
 
       CREATE TABLE IF NOT EXISTS MstSANNIDHI (
-        SANNIDHIID INTEGER PRIMARY KEY AUTOINCREMENT,
+        SANNIDHIID INTEGER PRIMARY KEY ,
         SANNIDHICODE VARCHAR(50) NOT NULL,
         SANNIDHINAME VARCHAR(250) NOT NULL,
         SANNIDHICodeClean VARCHAR(250) NOT NULL,
@@ -434,16 +436,284 @@ initializeAndInsertDataNakshatra();
 
 
 // insert into MstGOTHRA
+const formatDataGothra = (data) => {
+  return data.map(item => ({
+    GOTHRAID: item.GOTHRAID || null,
+    GOTHRACODE: item.GOTHRACODE || '',
+    GOTHRANAME: item.GOTHRANAME || '',
+    GOTHRACodeClean: item.GOTHRACodeClean || '',
+    GOTHRASeries: item.GOTHRASeries || '',
+    GOTHRANO: item.GOTHRANO || 0,
+    InActiveRmks: item.InActiveRmks || '',
+    InActive: item.InActive || 'N',
+    Authorised: item.Authorised || 'Y',
+    AuthBy: item.AuthBy || '',
+    AuthOn: item.AuthOn === "NULL" ? null : item.AuthOn,
+    AddedBy: item.AddedBy || '',
+    AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
+    ChangedBy: item.ChangedBy || '',
+    ChangedOn: item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn // Ensure ChangedOn is not null
+  }));
+};
+
+const insertDataGothra = async (data) => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  try {
+    // Insert or update data
+    for (const item of data) {
+      console.log("Inserting Gothra item:", item); // Log each item before insertion
+
+      // Check if the record already exists
+      const existingItem = await db.getAsync(
+        `SELECT 1 FROM MstGOTHRA WHERE GOTHRAID = ?`,
+        [item.GOTHRAID]
+      );
+
+      if (existingItem) {
+        console.log("Gothra item already exists for GOTHRAID:", item.GOTHRAID);
+        continue; // Skip insertion if the record already exists
+      }
+
+      try {
+        await db.runAsync(
+          `INSERT INTO MstGOTHRA (
+            GOTHRAID, GOTHRACODE, GOTHRANAME, GOTHRACodeClean, GOTHRASeries, 
+            GOTHRANO, InActiveRmks, InActive, Authorised, AuthBy, AuthOn, 
+            AddedBy, AddedOn, ChangedBy, ChangedOn
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            item.GOTHRAID, item.GOTHRACODE, item.GOTHRANAME, item.GOTHRACodeClean, item.GOTHRASeries,
+            item.GOTHRANO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
+            item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn
+          ]
+        );
+        console.log("Gothra data inserted successfully for GOTHRAID:", item.GOTHRAID);
+      } catch (error) {
+        if (error.message.includes('UNIQUE constraint failed')) {
+          // Update existing record
+          await db.runAsync(
+            `UPDATE MstGOTHRA SET 
+              GOTHRACODE = ?, GOTHRANAME = ?, GOTHRACodeClean = ?, GOTHRASeries = ?, 
+              GOTHRANO = ?, InActiveRmks = ?, InActive = ?, Authorised = ?, AuthBy = ?, AuthOn = ?, 
+              AddedBy = ?, AddedOn = ?, ChangedBy = ?, ChangedOn = ?
+            WHERE GOTHRAID = ?`,
+            [
+              item.GOTHRACODE, item.GOTHRANAME, item.GOTHRACodeClean, item.GOTHRASeries,
+              item.GOTHRANO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
+              item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.GOTHRAID
+            ]
+          );
+          console.log("Gothra data updated successfully for GOTHRAID:", item.GOTHRAID);
+        } else {
+          throw error;
+        }
+      }
+    }
+
+    // Verify data insertion
+    const result = await db.getAllAsync('SELECT * FROM MstGOTHRA');
+    console.log("Gothra data from SQLite:", result.length);
+
+  } catch (error) {
+    console.error("Error inserting Gothra data:", error);
+  }
+};
+
+const initializeAndInsertDataGothra = async () => {
+  const hasRun = await AsyncStorage.getItem('initializeAndInsertDataGothraHasRun');
+  if (hasRun !== 'true') {
+    await initializeDatabase();
+    const formattedData = formatDataGothra(sqlDataGothra);
+    await insertDataGothra(formattedData);
+    await AsyncStorage.setItem('initializeAndInsertDataGothraHasRun', 'true');
+  } else {
+    console.log("initializeAndInsertDataGothra has already run.");
+  }
+};
+
+initializeAndInsertDataGothra();
+
+
+// Insert into MstSVA
 
 
 
+const formatDataSVA = (data) => {
+  return data.map(item => ({
+    SVAID: item.SVAID,
+    SVACODE: item.SVACODE || '',
+    SVANAME: item.SVANAME || '',
+    SVACodeClean: item.SVACodeClean || '',
+    SVASeries: item.SVASeries || '',
+    SVANO: item.SVANO || 0,
+    InActiveRmks: item.InActiveRmks || '',
+    InActive: item.InActive || 'N',
+    Authorised: item.Authorised || 'Y',
+    AuthBy: item.AuthBy || '',
+    AuthOn: item.AuthOn === "NULL" ? new Date().toISOString() : item.AuthOn || new Date().toISOString(),
+    AddedBy: item.AddedBy || '',
+    AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
+    ChangedBy: item.ChangedBy || '',
+    ChangedOn: item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn,
+    AMT: item.AMT === "NULL" ? 0 : item.AMT || 0, // Ensure AMT is not null
+    RMKS: item.RMKS === "NULL" ? '' : item.RMKS,
+    RMKS_XML: item.RMKS_XML || '',
+    SEVAINKAN: item.SEVAINKAN === "NULL" ? '' : item.SEVAINKAN,
+    SVADISPNAME: item.SVADISPNAME || ''
+  }));
+};
+
+const insertDataSVA = async (data) => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  try {
+    // Insert new data
+    for (const item of data) {
+      console.log("Inserting SVA item:", item); // Log each item before insertion
+
+      try {
+        await db.runAsync(
+          `INSERT INTO MstSVA (
+            SVAID, SVACODE, SVANAME, SVACodeClean, SVASeries, 
+            SVANO, InActiveRmks, InActive, Authorised, AuthBy, AuthOn, 
+            AddedBy, AddedOn, ChangedBy, ChangedOn, AMT, RMKS, RMKS_XML, SEVAINKAN, SVADISPNAME
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            item.SVAID, item.SVACODE, item.SVANAME, item.SVACodeClean, item.SVASeries,
+            item.SVANO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
+            item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.AMT, item.RMKS, item.RMKS_XML,
+            item.SEVAINKAN, item.SVADISPNAME
+          ]
+        );
+        console.log("SVA data inserted successfully for SVAID:", item.SVAID);
+      } catch (error) {
+        console.error("Error inserting SVA data:", error);
+      }
+    }
+
+    // Verify data insertion
+    const result = await db.getAllAsync('SELECT * FROM MstSVA');
+    console.log("SVA data from SQLite:", result.length);
+
+  } catch (error) {
+    console.error("Error inserting SVA data:", error);
+  }
+};
+
+const initializeAndInsertDataSVA = async () => {
+  const hasRun = await AsyncStorage.getItem('initializeAndInsertDataSVAHasRun');
+  if (hasRun !== 'true') {
+    await initializeDatabase();
+    const formattedData = formatDataSVA(sqlDataSeva);
+    await insertDataSVA(formattedData);
+    await AsyncStorage.setItem('initializeAndInsertDataSVAHasRun', 'true');
+  } else {
+    console.log("initializeAndInsertDataSVA has already run.");
+  }
+};
+
+initializeAndInsertDataSVA();
 
 
+// Insert into MstSANNIDHI
 
+// Function to create the MstSANNIDHI table
+const createTableMstSANNIDHI = async () => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  try {
+    await db.runAsync(`
+      CREATE TABLE IF NOT EXISTS MstSANNIDHI (
+        SANNIDHIID INTEGER PRIMARY KEY,
+        SANNIDHICODE VARCHAR(50) NOT NULL,
+        SANNIDHINAME VARCHAR(250) NOT NULL,
+        SANNIDHICodeClean VARCHAR(250) NOT NULL,
+        SANNIDHISeries VARCHAR(10),
+        SANNIDHINO NUMERIC(19, 2),
+        InActiveRmks VARCHAR(250),
+        InActive CHAR(1),
+        Authorised CHAR(1),
+        AuthBy VARCHAR(50),
+        AuthOn DATETIME NOT NULL,
+        AddedBy VARCHAR(50),
+        AddedOn DATETIME,
+        ChangedBy VARCHAR(50),
+        ChangedOn DATETIME NOT NULL
+      );
+    `);
+    console.log("MstSANNIDHI table created successfully.");
+  } catch (error) {
+    console.error("Error creating MstSANNIDHI table:", error);
+  }
+};
 
+// Function to format data for SANNIDHI
+const formatDataSANNIDHI = (data) => {
+  return data.map(item => ({
+    SANNIDHIID: item.SANNIDHIID,
+    SANNIDHICODE: item.SANNIDHICODE || '',
+    SANNIDHINAME: item.SANNIDHINAME || '',
+    SANNIDHICodeClean: item.SANNIDHICodeClean || '',
+    SANNIDHISeries: item.SANNIDHISeries || '',
+    SANNIDHINO: item.SANNIDHINO || 0,
+    InActiveRmks: item.InActiveRmks || '',
+    InActive: item.InActive || 'N',
+    Authorised: item.Authorised || 'Y',
+    AuthBy: item.AuthBy || '',
+    AuthOn: item.AuthOn === "NULL" ? new Date().toISOString() : item.AuthOn || new Date().toISOString(),
+    AddedBy: item.AddedBy || '',
+    AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
+    ChangedBy: item.ChangedBy || '',
+    ChangedOn: item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn
+  }));
+};
 
+// Function to insert data into the MstSANNIDHI table
+const insertDataSANNIDHI = async (data) => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  try {
+    // Insert new data
+    for (const item of data) {
+      console.log("Inserting SANNIDHI item:", item); // Log each item before insertion
 
+      try {
+        await db.runAsync(
+          `INSERT INTO MstSANNIDHI (
+            SANNIDHIID, SANNIDHICODE, SANNIDHINAME, SANNIDHICodeClean, SANNIDHISeries, 
+            SANNIDHINO, InActiveRmks, InActive, Authorised, AuthBy, AuthOn, 
+            AddedBy, AddedOn, ChangedBy, ChangedOn
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 
+          [
+            item.SANNIDHIID, item.SANNIDHICODE, item.SANNIDHINAME, item.SANNIDHICodeClean, item.SANNIDHISeries,
+            item.SANNIDHINO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
+            item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn
+          ]
+        );
+        console.log("SANNIDHI data inserted successfully for SANNIDHIID:", item.SANNIDHIID);
+      } catch (error) {
+        console.error("Error inserting SANNIDHI data:", error);
+      }
+    }
 
+    // Verify data insertion
+    const result = await db.getAllAsync('SELECT * FROM MstSANNIDHI');
+    console.log("SANNIDHI data from SQLite:", result.length);
 
+  } catch (error) {
+    console.error("Error inserting SANNIDHI data:", error);
+  }
+};
 
+// Function to initialize and insert data into the MstSANNIDHI table
+const initializeAndInsertDataSANNIDHI = async () => {
+  const hasRun = await AsyncStorage.getItem('initializeAndInsertDataSANNIDHIHasRun');
+  if (hasRun !== 'true') {
+    await createTableMstSANNIDHI();
+    const formattedData = formatDataSANNIDHI(sqlDataSannidhi);
+    await insertDataSANNIDHI(formattedData);
+    await AsyncStorage.setItem('initializeAndInsertDataSANNIDHIHasRun', 'true');
+  } else {
+    console.log("initializeAndInsertDataSANNIDHI has already run.");
+  }
+};
+
+initializeAndInsertDataSANNIDHI();

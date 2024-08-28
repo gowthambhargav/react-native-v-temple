@@ -12,6 +12,8 @@ const SevaCom = ({dplable,lable,setSeva,value,requred}) => {
     const testFetch = async () => {
       try {
        const sqlData = await GetAllSVA();
+       console.log(sqlData,"sqlData");
+       
        const filteredData = sqlData.filter((item) => item.SVAID !== 0);
         const sevaData = filteredData.map((item) => ({
           label: `${item.SVANAME} ${item.SVAID}`,
