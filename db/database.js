@@ -434,71 +434,7 @@ initializeAndInsertDataNakshatra();
 
 
 // insert into MstGOTHRA
-const formatDataGothra = (data) => {
-  return data.map(item => ({
-    GOTHRAID: item.GOTHRAID || null,
-    GOTHRACODE: item.GOTHRACODE || '',
-    GOTHRANAME: item.GOTHRANAME || '',
-    GOTHRACodeClean: item.GOTHRACodeClean || '',
-    GOTHRASeries: item.GOTHRASeries || '',
-    GOTHRANO: item.GOTHRANO || 0,
-    InActiveRmks: item.InActiveRmks || '',
-    InActive: item.InActive || 'N',
-    Authorised: item.Authorised || 'Y',
-    AuthBy: item.AuthBy || '',
-    AuthOn: item.AuthOn === "NULL" ? null : item.AuthOn,
-    AddedBy: item.AddedBy || '',
-    AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
-    ChangedBy: item.ChangedBy || '',
-    ChangedOn: item.ChangedOn === "NULL" ? null : item.ChangedOn
-  }));
-};
 
-const insertDataGothra = async (data) => {
-  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
-  try {
-    // Insert new data
-    for (const item of data) {
-      console.log("Inserting Gothra item:", item); // Log each item before insertion
-
-      await db.runAsync(
-        `INSERT INTO MstGOTHRA (
-          GOTHRAID, GOTHRACODE, GOTHRANAME, GOTHRACodeClean, GOTHRASeries, 
-          GOTHRANO, InActiveRmks, InActive, Authorised, AuthBy, AuthOn, 
-          AddedBy, AddedOn, ChangedBy, ChangedOn
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-
-        [
-          item.GOTHRAID, item.GOTHRACODE, item.GOTHRANAME, item.GOTHRACodeClean, item.GOTHRASeries,
-          item.GOTHRANO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
-          item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn
-        ]
-      );
-      console.log("Gothra data inserted successfully for GOTHRAID:", item.GOTHRAID);
-    }
-
-    // Verify data insertion
-    const result = await db.getAllAsync('SELECT * FROM MstGOTHRA');
-    console.log("Gothra data from SQLite:", result.length);
-
-  } catch (error) {
-    console.error("Error inserting Gothra data:", error);
-  }
-};
-
-const initializeAndInsertDataGothra = async () => {
-  const hasRun = false;
-  if (hasRun !== 'true') {
-    await initializeDatabase();
-    const formattedData = formatDataGothra(sqlDataGothra);
-    await insertDataGothra(formattedData);
-    await AsyncStorage.setItem('initializeAndInsertDataGothraHasRun', 'true');
-  } else {
-    console.log("initializeAndInsertDataGothra has already run.");
-  }
-};
-
-initializeAndInsertDataGothra();
 
 
 
