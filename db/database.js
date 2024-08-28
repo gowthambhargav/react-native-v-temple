@@ -307,7 +307,7 @@ const insertOrUpdateData = async (data) => {
       // Check if the item already exists
       const existingItem = await db.getFirstAsync('SELECT * FROM MstRASHI WHERE RASHIID = ?', [item.RASHIID]);
 
-      if (existingItem.length > 0) {
+      if (existingItem && existingItem.length > 0) {
         // Update existing item
         await db.runAsync(
           `UPDATE MstRASHI SET
@@ -354,6 +354,10 @@ const initializeAndInsertData = async () => {
   const hasRun = await AsyncStorage.getItem('initializeAndInsertDataHasRun');
   if (hasRun !== 'true') {
     await initializeDatabase();
+    if (!Array.isArray(sqlDataRashi)) {
+      console.error("sqlDataRashi is not an array or is undefined");
+      return;
+    }
     const formattedData = formatData(sqlDataRashi);
     await insertOrUpdateData(formattedData);
     await AsyncStorage.setItem('initializeAndInsertDataHasRun', 'true');
@@ -437,13 +441,16 @@ initializeAndInsertDataNakshatra();
 
 // insert into MstGOTHRA
 const formatDataGothra = (data) => {
+  if (!Array.isArray(data)) {
+    throw new Error("Input data is not an array");
+  }
   return data.map(item => ({
     GOTHRAID: item.GOTHRAID || null,
     GOTHRACODE: item.GOTHRACODE || '',
     GOTHRANAME: item.GOTHRANAME || '',
     GOTHRACodeClean: item.GOTHRACodeClean || '',
     GOTHRASeries: item.GOTHRASeries || '',
-    GOTHRANO: item.GOTHRANO || 0,
+    GOTHRAno: item.GOTHRAno || 0,
     InActiveRmks: item.InActiveRmks || '',
     InActive: item.InActive || 'N',
     Authorised: item.Authorised || 'Y',
@@ -452,67 +459,34 @@ const formatDataGothra = (data) => {
     AddedBy: item.AddedBy || '',
     AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
     ChangedBy: item.ChangedBy || '',
-    ChangedOn: item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn // Ensure ChangedOn is not null
+    ChangedOn: item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn // Provide default value
   }));
 };
 
 const insertDataGothra = async (data) => {
   const db = await SQLite.openDatabaseAsync("vTempleVARADA");
   try {
-    // Insert or update data
+    // Insert new data
     for (const item of data) {
       console.log("Inserting Gothra item:", item); // Log each item before insertion
-
-      // Check if the record already exists
-      const existingItem = await db.getAsync(
-        `SELECT 1 FROM MstGOTHRA WHERE GOTHRAID = ?`,
-        [item.GOTHRAID]
+      await db.runAsync(
+        `INSERT OR REPLACE INTO MstGOTHRA (
+          GOTHRAID, GOTHRACODE, GOTHRANAME, GOTHRACodeClean, GOTHRASeries, 
+          GOTHRAno, InActiveRmks, InActive, Authorised, AuthBy, AuthOn, 
+          AddedBy, AddedOn, ChangedBy, ChangedOn
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+        [
+          item.GOTHRAID, item.GOTHRACODE, item.GOTHRANAME, item.GOTHRACodeClean, item.GOTHRASeries,
+          item.GOTHRAno, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
+          item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn
+        ]
       );
-
-      if (existingItem) {
-        console.log("Gothra item already exists for GOTHRAID:", item.GOTHRAID);
-        continue; // Skip insertion if the record already exists
-      }
-
-      try {
-        await db.runAsync(
-          `INSERT INTO MstGOTHRA (
-            GOTHRAID, GOTHRACODE, GOTHRANAME, GOTHRACodeClean, GOTHRASeries, 
-            GOTHRANO, InActiveRmks, InActive, Authorised, AuthBy, AuthOn, 
-            AddedBy, AddedOn, ChangedBy, ChangedOn
-          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-          [
-            item.GOTHRAID, item.GOTHRACODE, item.GOTHRANAME, item.GOTHRACodeClean, item.GOTHRASeries,
-            item.GOTHRANO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
-            item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn
-          ]
-        );
-        console.log("Gothra data inserted successfully for GOTHRAID:", item.GOTHRAID);
-      } catch (error) {
-        if (error.message.includes('UNIQUE constraint failed')) {
-          // Update existing record
-          await db.runAsync(
-            `UPDATE MstGOTHRA SET 
-              GOTHRACODE = ?, GOTHRANAME = ?, GOTHRACodeClean = ?, GOTHRASeries = ?, 
-              GOTHRANO = ?, InActiveRmks = ?, InActive = ?, Authorised = ?, AuthBy = ?, AuthOn = ?, 
-              AddedBy = ?, AddedOn = ?, ChangedBy = ?, ChangedOn = ?
-            WHERE GOTHRAID = ?`,
-            [
-              item.GOTHRACODE, item.GOTHRANAME, item.GOTHRACodeClean, item.GOTHRASeries,
-              item.GOTHRANO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
-              item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.GOTHRAID
-            ]
-          );
-          console.log("Gothra data updated successfully for GOTHRAID:", item.GOTHRAID);
-        } else {
-          throw error;
-        }
-      }
+      console.log("Gothra data inserted successfully for GOTHRAID:", item.GOTHRAID);
     }
 
     // Verify data insertion
     const result = await db.getAllAsync('SELECT * FROM MstGOTHRA');
-    console.log("Gothra data from SQLite:", result.length);
+    console.log("Gothra data from SQLite:", result.rows.length);
 
   } catch (error) {
     console.error("Error inserting Gothra data:", error);
@@ -520,9 +494,13 @@ const insertDataGothra = async (data) => {
 };
 
 const initializeAndInsertDataGothra = async () => {
-  const hasRun = await AsyncStorage.getItem('initializeAndInsertDataGothraHasRun');
+  const hasRun =  await AsyncStorage.getItem('initializeAndInsertDataGothraHasRun');
   if (hasRun !== 'true') {
     await initializeDatabase();
+    if (!Array.isArray(sqlDataGothra)) {
+      console.error("sqlDataGothra is not an array or is undefined");
+      return;
+    }
     const formattedData = formatDataGothra(sqlDataGothra);
     await insertDataGothra(formattedData);
     await AsyncStorage.setItem('initializeAndInsertDataGothraHasRun', 'true');
@@ -532,8 +510,6 @@ const initializeAndInsertDataGothra = async () => {
 };
 
 initializeAndInsertDataGothra();
-
-
 // Insert into MstSVA
 
 
@@ -688,7 +664,7 @@ const insertDataSANNIDHI = async (data) => {
             item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn
           ]
         );
-        console.log("SANNIDHI data inserted successfully for SANNIDHIID:", item.SANNIDHIID);
+        console.log("SANNIDHI data inserted successfully for SANNIDHIID:");
       } catch (error) {
         console.error("Error inserting SANNIDHI data:", error);
       }
@@ -717,3 +693,5 @@ const initializeAndInsertDataSANNIDHI = async () => {
 };
 
 initializeAndInsertDataSANNIDHI();
+
+// Insert into MstComp
