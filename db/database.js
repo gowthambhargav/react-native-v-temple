@@ -1,6 +1,9 @@
 import * as SQLite from "expo-sqlite";
-import sqlDataRashi from '../assets/csvjson.json';
 import AsyncStorage from "@react-native-async-storage/async-storage";
+import sqlDataRashi from '../assets/csvjson.json';
+import  sqlDataNakshatra from '../assets/jsonnakshara.json';
+import sqlDataGothra from '../assets/gothra.json';
+
 
 var db;
 
@@ -29,7 +32,7 @@ const initializeDatabase = async () => {
       );
 
       CREATE TABLE IF NOT EXISTS MstNAKSHATRA (
-        NAKSHATRAID INTEGER PRIMARY KEY AUTOINCREMENT,
+        NAKSHATRAID INTEGER PRIMARY KEY,
         NAKSHATRACODE VARCHAR(50) NOT NULL,
         NAKSHATRANAME VARCHAR(250) NOT NULL,
         NAKSHATRACodeClean VARCHAR(50) NOT NULL,
@@ -49,7 +52,7 @@ const initializeDatabase = async () => {
       );
 
       CREATE TABLE IF NOT EXISTS MstGOTHRA (
-        GOTHRAID INTEGER PRIMARY KEY AUTOINCREMENT,
+        GOTHRAID INTEGER PRIMARY KEY,
         GOTHRACODE VARCHAR(50) NOT NULL,
         GOTHRANAME VARCHAR(250) NOT NULL,
         GOTHRACodeClean VARCHAR(50) NOT NULL,
@@ -292,28 +295,48 @@ const formatData = (data) => {
   }));
 };
 
-const insertData = async (data) => {
-  db = await SQLite.openDatabaseAsync("vTempleVARADA");
+const insertOrUpdateData = async (data) => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
   try {
-    // Delete existing data
-    
-
-    // Insert new data
+    // Insert or update new data
     for (const item of data) {
-      console.log("Inserting item:", item); // Log each item before insertion
-      await db.runAsync(
-        `INSERT INTO MstRASHI (
-          RASHIID, RASHICODE, RASHINAME, RASHISeries, RASHINO, 
-          InActiveRmks, InActive, Authorised, AuthBy, AuthOn, 
-          AddedBy, AddedOn, ChangedBy, ChangedOn, RashiCodeClean
-        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
-        [
-          item.RASHIID, item.RASHICODE, item.RASHINAME, item.RASHISeries, item.RASHINO,
-          item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
-          item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.RashiCodeClean
-        ]
-      );
-      console.log("Data inserted successfully");
+      console.log("Processing item:", item); // Log each item before processing
+
+      // Check if the item already exists
+      const existingItem = await db.getFirstAsync('SELECT * FROM MstRASHI WHERE RASHIID = ?', [item.RASHIID]);
+
+      if (existingItem.length > 0) {
+        // Update existing item
+        await db.runAsync(
+          `UPDATE MstRASHI SET
+            RASHICODE = ?, RASHINAME = ?, RASHISeries = ?, RASHINO = ?, 
+            InActiveRmks = ?, InActive = ?, Authorised = ?, AuthBy = ?, AuthOn = ?, 
+            AddedBy = ?, AddedOn = ?, ChangedBy = ?, ChangedOn = ?, RashiCodeClean = ?
+          WHERE RASHIID = ?`,
+          [
+            item.RASHICODE, item.RASHINAME, item.RASHISeries, item.RASHINO,
+            item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
+            item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.RashiCodeClean,
+            item.RASHIID
+          ]
+        );
+        console.log("Data updated successfully for RASHIID:", item.RASHIID);
+      } else {
+        // Insert new item
+        await db.runAsync(
+          `INSERT INTO MstRASHI (
+            RASHIID, RASHICODE, RASHINAME, RASHISeries, RASHINO, 
+            InActiveRmks, InActive, Authorised, AuthBy, AuthOn, 
+            AddedBy, AddedOn, ChangedBy, ChangedOn, RashiCodeClean
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            item.RASHIID, item.RASHICODE, item.RASHINAME, item.RASHISeries, item.RASHINO,
+            item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
+            item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.RashiCodeClean
+          ]
+        );
+        console.log("Data inserted successfully for RASHIID:", item.RASHIID);
+      }
     }
 
     // Verify data insertion
@@ -321,7 +344,7 @@ const insertData = async (data) => {
     console.log("Data from SQLite:", result.length);
 
   } catch (error) {
-    console.error("Error inserting data:", error);
+    console.error("Error inserting or updating data:", error);
   }
 };
 
@@ -330,7 +353,7 @@ const initializeAndInsertData = async () => {
   if (hasRun !== 'true') {
     await initializeDatabase();
     const formattedData = formatData(sqlDataRashi);
-    await insertData(formattedData);
+    await insertOrUpdateData(formattedData);
     await AsyncStorage.setItem('initializeAndInsertDataHasRun', 'true');
   } else {
     console.log("initializeAndInsertData has already run.");
@@ -338,3 +361,153 @@ const initializeAndInsertData = async () => {
 };
 
 initializeAndInsertData();
+
+// Insert into MstNAKSHATRA
+
+const formatDataNakshatra = (data) => {
+  return data.map(item => ({
+    NAKSHATRAID: item.NAKSHATRAID || null,
+    NAKSHATRACODE: item.NAKSHATRACODE || '',
+    NAKSHATRANAME: item.NAKSHATRANAME || '',
+    NAKSHATRACodeClean: item.NAKSHATRACodeClean || '',
+    NAKSHATRASeries: item.NAKSHATRASeries || '',
+    NAKSHATRANO: item.NAKSHATRANO || 0,
+    InActiveRmks: item.InActiveRmks || '',
+    InActive: item.InActive || 'N',
+    Authorised: item.Authorised || 'Y',
+    AuthBy: item.AuthBy || '',
+    AuthOn: item.AuthOn === "NULL" ? null : item.AuthOn,
+    AddedBy: item.AddedBy || '',
+    AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
+    ChangedBy: item.ChangedBy || '',
+    ChangedOn: item.ChangedOn === "NULL" ? null : item.ChangedOn,
+    RASHIID1: item.RASHIID1 || null,
+    RASHIID2: item.RASHIID2 || 0 // Set a default value if RASHIID2 is null
+  }));
+};
+
+const insertDataNakshatra = async (data) => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  try {
+    // Insert new data
+    for (const item of data) {
+      console.log("Inserting Nakshatra item:", item); // Log each item before insertion
+      await db.runAsync(
+        `INSERT INTO MstNAKSHATRA (
+          NAKSHATRAID, NAKSHATRACODE, NAKSHATRANAME, NAKSHATRACodeClean, NAKSHATRASeries, 
+          NAKSHATRANO, InActiveRmks, InActive, Authorised, AuthBy, AuthOn, 
+          AddedBy, AddedOn, ChangedBy, ChangedOn, RASHIID1, RASHIID2
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+
+        [
+          item.NAKSHATRAID, item.NAKSHATRACODE, item.NAKSHATRANAME, item.NAKSHATRACodeClean, item.NAKSHATRASeries,
+          item.NAKSHATRANO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
+          item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.RASHIID1, item.RASHIID2
+        ]
+      );
+      console.log("Nakshatra data inserted successfully for NAKSHATRAID:");
+    }
+
+    // Verify data insertion
+    const result = await db.getAllAsync('SELECT * FROM MstNAKSHATRA');
+    console.log("Nakshatra data from SQLite:");
+
+  } catch (error) {
+    console.error("Error inserting Nakshatra data:", error);
+  }
+};
+
+const initializeAndInsertDataNakshatra = async () => {
+  const hasRun = await AsyncStorage.getItem('initializeAndInsertDataNakshatraHasRun');
+  if (hasRun !== 'true') {
+    await initializeDatabase();
+    const formattedData = formatDataNakshatra(sqlDataNakshatra);
+    await insertDataNakshatra(formattedData);
+    await AsyncStorage.setItem('initializeAndInsertDataNakshatraHasRun', 'true');
+  } else {
+    console.log("initializeAndInsertDataNakshatra has already run.");
+  }
+};
+
+initializeAndInsertDataNakshatra();
+
+
+
+// insert into MstGOTHRA
+const formatDataGothra = (data) => {
+  return data.map(item => ({
+    GOTHRAID: item.GOTHRAID || null,
+    GOTHRACODE: item.GOTHRACODE || '',
+    GOTHRANAME: item.GOTHRANAME || '',
+    GOTHRACodeClean: item.GOTHRACodeClean || '',
+    GOTHRASeries: item.GOTHRASeries || '',
+    GOTHRANO: item.GOTHRANO || 0,
+    InActiveRmks: item.InActiveRmks || '',
+    InActive: item.InActive || 'N',
+    Authorised: item.Authorised || 'Y',
+    AuthBy: item.AuthBy || '',
+    AuthOn: item.AuthOn === "NULL" ? null : item.AuthOn,
+    AddedBy: item.AddedBy || '',
+    AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
+    ChangedBy: item.ChangedBy || '',
+    ChangedOn: item.ChangedOn === "NULL" ? null : item.ChangedOn
+  }));
+};
+
+const insertDataGothra = async (data) => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  try {
+    // Insert new data
+    for (const item of data) {
+      console.log("Inserting Gothra item:", item); // Log each item before insertion
+
+      await db.runAsync(
+        `INSERT INTO MstGOTHRA (
+          GOTHRAID, GOTHRACODE, GOTHRANAME, GOTHRACodeClean, GOTHRASeries, 
+          GOTHRANO, InActiveRmks, InActive, Authorised, AuthBy, AuthOn, 
+          AddedBy, AddedOn, ChangedBy, ChangedOn
+        ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+
+        [
+          item.GOTHRAID, item.GOTHRACODE, item.GOTHRANAME, item.GOTHRACodeClean, item.GOTHRASeries,
+          item.GOTHRANO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
+          item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn
+        ]
+      );
+      console.log("Gothra data inserted successfully for GOTHRAID:", item.GOTHRAID);
+    }
+
+    // Verify data insertion
+    const result = await db.getAllAsync('SELECT * FROM MstGOTHRA');
+    console.log("Gothra data from SQLite:", result.length);
+
+  } catch (error) {
+    console.error("Error inserting Gothra data:", error);
+  }
+};
+
+const initializeAndInsertDataGothra = async () => {
+  const hasRun = false;
+  if (hasRun !== 'true') {
+    await initializeDatabase();
+    const formattedData = formatDataGothra(sqlDataGothra);
+    await insertDataGothra(formattedData);
+    await AsyncStorage.setItem('initializeAndInsertDataGothraHasRun', 'true');
+  } else {
+    console.log("initializeAndInsertDataGothra has already run.");
+  }
+};
+
+initializeAndInsertDataGothra();
+
+
+
+
+
+
+
+
+
+
+
+
