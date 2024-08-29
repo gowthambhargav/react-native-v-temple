@@ -17,6 +17,9 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
 const [seralNo, setSeralNo] = useState();
 
   useEffect(() => {
+    GetAllComp().then((res) => {
+      setaddressData(res[0]);
+    });
     const interval = setInterval(() => {
       const date = new Date();
       const monthNames = [
@@ -227,7 +230,7 @@ const [seralNo, setSeralNo] = useState();
             <Text style={[{ fontSize: 14 }, fontStyles.robotoBold]}>Seva Date:{currentDate}</Text>
             <View style={{ borderWidth: 1, width: "auto", flexDirection: "row", alignItems: "center", padding: 10, borderRadius: 10 }}>
               <FontAwesome name="rupee" size={20} color="black" />
-              <Text style={{ fontSize: 20, marginLeft: 5, marginTop: -4, fontWeight: "bold" }}>{sevaDetails.TotalAmt}</Text>
+              <Text style={{ fontSize: 20, marginLeft: 5, marginTop: -4, fontWeight: "bold" }}>{sevaDetails&& sevaDetails.TotalAmt}</Text>
             </View>
           </View>
           <View style={{ justifyContent: "space-between", flexDirection: "row" }}>
