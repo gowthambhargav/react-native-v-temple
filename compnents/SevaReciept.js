@@ -7,6 +7,7 @@ import { AntDesign } from '@expo/vector-icons';
 import { FontAwesome6 } from "@expo/vector-icons";
 import fontStyles from "../utils/fontStyles";
 import * as Print from 'expo-print';
+import { GetAllComp } from "../db/database";
 
 function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
   const date = new Date();
@@ -15,32 +16,7 @@ function SevaReciept({ HandleSavePrint, sevaDetails, setShowResipt }) {
   const [addressData, setaddressData] = useState();
 const [seralNo, setSeralNo] = useState();
 
-  const HandleFetchSevaAmount = async () => {
-    try {
-      const response = await axios.post(
-        "https://react-native-v-temple-b.onrender.com/api/seva/",
-        { SVANAME: sevaDetails && sevaDetails.seva }
-      );
-      if (response.data && response.data.data && response.data.data.length > 0) {
-        setSevaAmount(response.data.data[0].AMT);
-      } else {
-        console.error("No valid data received from API");
-        setSevaAmount(0);
-      }
-    } catch (error) {
-      console.error("Error fetching seva amount:", error);
-      setSevaAmount(0);
-    }
-  };
-
-  const HandleFetchCompanyAddress = async () => {
-    const addresResponse = await axios.get("https://react-native-v-temple-b.onrender.com/api/mstcomp/");
-    console.log(addresResponse.data.data[0].CompName);
-    setaddressData(addresResponse.data.data[0]);
-  };
-
   useEffect(() => {
-    HandleFetchCompanyAddress();
     const interval = setInterval(() => {
       const date = new Date();
       const monthNames = [
@@ -120,43 +96,43 @@ const [seralNo, setSeralNo] = useState();
         <div class="content">
             <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid; border-top: 1px solid; padding: 5px 0;">
                 <p style="font-size: 9px;">Date: <strong style="font-size: 11px;">${currentDate}</strong></p>
-                <p style="font-size: 9px;">Receipt No: <strong style="font-size: 11px;">${sevaDetails?.sevaReceiptID}</strong></p>
+                <p style="font-size: 9px;">Receipt No: <strong style="font-size: 11px;">${sevaDetails?.SEVANO}</strong></p>
             </div>
             <div style="margin-top: 5px; padding-bottom: 5px;">
                 <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                     <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Name:</p>
-                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.name}</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.KNAME}</p>
                 </div>
                 <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                     <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Gothra:</p>
-                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.gothra}</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.GothraName}</p>
                 </div>
                 <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                     <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Nakshatra:</p>
-                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.nakshatra}</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.NakshatraName}</p>
                 </div>
                 <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                     <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Rashi:</p>
-                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.rashi}</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.RashiName}</p>
                 </div>
                 <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                     <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Sannidhi:</p>
-                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.sannidhi}</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.SannidhiName}</p>
                 </div>
                 <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                     <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Seva:</p>
-                    <p style="padding-left: 5px; font-weight: bold; font-size: 14px; margin: 2px 0;">${sevaDetails?.seva}</p>
+                    <p style="padding-left: 5px; font-weight: bold; font-size: 14px; margin: 2px 0;">${sevaDetails?.SevaName}</p>
                 </div>
                 <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                     <p style="font-weight: bold; margin: 2px 0; font-size: 12px;">Mobile:</p>
-                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.phoneNo}</p>
+                    <p style="padding-left: 5px; margin: 2px 0; font-size: 13px;">${sevaDetails?.MOBNO}</p>
                 </div>
             </div>
         </div>
         <div class="footer">
             <p style="font-size: 12px; font-weight: bold; text-align: left;">Seva Date: ${currentDate}</p>
             <div style="width: fit-content;">
-                <p style="font-size: 13px; margin-left: 5px; margin-top: -4px; font-weight: bold;">₹${sevaAmount}</p>
+                <p style="font-size: 13px; margin-left: 5px; margin-top: -4px; font-weight: bold;">₹${sevaDetails.TotalAmt}</p>
             </div>
         </div>
     </div>
@@ -171,7 +147,6 @@ const [seralNo, setSeralNo] = useState();
     }
   };
 
-  HandleFetchSevaAmount();
 
   return (
     <TouchableOpacity
@@ -214,41 +189,45 @@ const [seralNo, setSeralNo] = useState();
           </View>
           <View style={{ flexDirection: "row", justifyContent: "space-between", alignItems: "center", width: "100%", borderBottomWidth: 1, borderTopWidth: 1 }}>
             <Text>Date: <Text style={{ fontWeight: "bold", fontSize: 13 }}>{currentDate}</Text></Text>
-            <Text>Reciept No: <Text style={{ fontWeight: "bold", fontSize: 13 }}>{sevaDetails && sevaDetails.sevaReceiptID}</Text></Text>
+            <Text>Reciept No: <Text style={{ fontWeight: "bold", fontSize: 13 }}>{sevaDetails && sevaDetails.SEVANO}</Text></Text>
           </View>
           <View style={{ flexDirection: "row", alignItems: "flex-end", marginTop: 10, paddingBottom: 10 }}>
-            <View style={{ flex: 1 }}>
-              <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
-                <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Sannidhi:</Text>
-                <Text style={{ paddingLeft: 10, textAlign: "center", fontWeight: "bold", }}>{sevaDetails && sevaDetails.sannidhi}</Text>
-              </View>
-              <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
-                <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Seva:</Text>
-                <Text style={{ paddingLeft: 10, fontWeight: "bold", fontSize: 15 }}>{sevaDetails && sevaDetails.seva}</Text>
-              </View>
-              <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
-                <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Name:</Text>
-                <Text style={[{ paddingLeft: 10 }, fontStyles.robotoBold]}>{sevaDetails && sevaDetails.name}</Text>
-              </View>
-              <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
-                <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Gothra:</Text>
-                <Text style={[{ paddingLeft: 10 }, fontStyles.robotoBold]}>{sevaDetails && sevaDetails.gothra}</Text>
-              </View>
-              <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
-                <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Rashi:</Text>
-                <Text style={[{ paddingLeft: 10 }, fontStyles.robotoBold]}>{sevaDetails && sevaDetails.rashi}</Text>
-              </View>
-              <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
-                <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Mobile:</Text>
-                <Text style={[{ paddingLeft: 10 }, fontStyles.robotoBold]}>{sevaDetails && sevaDetails.phoneNo}</Text>
-              </View>
-            </View>
+          <View style={{ flex: 1 }}>
+  <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
+    <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Name:</Text>
+    <Text style={[{ paddingLeft: 10 }, fontStyles.robotoBold]}>{sevaDetails && sevaDetails.KNAME}</Text>
+  </View>
+  <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
+    <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Gothra:</Text>
+    <Text style={[{ paddingLeft: 10 }, fontStyles.robotoBold]}>{sevaDetails && sevaDetails.GothraName}</Text>
+  </View>
+  <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
+    <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Nakshatra:</Text>
+    <Text style={[{ paddingLeft: 10 }, fontStyles.robotoBold]}>{sevaDetails && sevaDetails.NakshatraName}</Text>
+  </View>
+  <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
+    <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Rashi:</Text>
+    <Text style={[{ paddingLeft: 10 }, fontStyles.robotoBold]}>{sevaDetails && sevaDetails.RashiName}</Text>
+  </View>
+  <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
+    <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Sannidhi:</Text>
+    <Text style={{ paddingLeft: 10, textAlign: "center", fontWeight: "bold", }}>{sevaDetails && sevaDetails.SannidhiName}</Text>
+  </View>
+  <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
+    <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Seva:</Text>
+    <Text style={{ paddingLeft: 10, fontWeight: "bold", fontSize: 15 }}>{sevaDetails && sevaDetails.SevaName}</Text>
+  </View>
+  <View style={{ flexDirection: "row", justifyContent: "flex-start", paddingRight: 10, alignItems: "center" }}>
+    <Text style={[styles.SevaRecieptDetails, fontStyles.robotoBold]}>Mobile:</Text>
+    <Text style={[{ paddingLeft: 10 }, fontStyles.robotoBold]}>{sevaDetails && sevaDetails.MOBNO}</Text>
+  </View>
+</View>
           </View>
           <View style={{ borderBottomWidth: 1, borderTopWidth: 1, paddingBottom: 10, paddingTop: 5, marginBottom: 5 }}>
             <Text style={[{ fontSize: 14 }, fontStyles.robotoBold]}>Seva Date:{currentDate}</Text>
             <View style={{ borderWidth: 1, width: "auto", flexDirection: "row", alignItems: "center", padding: 10, borderRadius: 10 }}>
               <FontAwesome name="rupee" size={20} color="black" />
-              <Text style={{ fontSize: 20, marginLeft: 5, marginTop: -4, fontWeight: "bold" }}>{sevaAmount}</Text>
+              <Text style={{ fontSize: 20, marginLeft: 5, marginTop: -4, fontWeight: "bold" }}>{sevaDetails.TotalAmt}</Text>
             </View>
           </View>
           <View style={{ justifyContent: "space-between", flexDirection: "row" }}>

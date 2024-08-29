@@ -4,13 +4,15 @@ import Card from './Card'
 import { TouchableOpacity } from 'react-native';
 import { Button } from 'react-native';
 import axios from 'axios';
+import { getAllTrnHdrSEVA } from '../db/database';
 function Showrreciept({setShowReceiptDetails}) {
     const [receiptData, setReceiptData] = React.useState();
 useEffect(() => 
     { 
-      axios.get('https://react-native-v-temple-b.onrender.com/api/sevareceiptsql/show')
+      // getAllTrnHdrSEVA()
+      getAllTrnHdrSEVA()
       .then((response) => {
-        setReceiptData(response.data.data)
+        setReceiptData(response)
       }).catch((error) => {
         console.log(error)
       })  
@@ -18,10 +20,14 @@ useEffect(() =>
 
     }, 
 
-[])
+[]);
+
+
   return (
     <SafeAreaView style={{position:"absolute",backgroundColor:"#8a8a8a",flex:1,justifyContent:"center",width:"100%",height:"100%",}}>
         {/* <Text style={{textAlign:"center"}}>ShowrReciept</Text> */}
+
+
         <ScrollView style={{height:"auto"}}>
           <View style={{padding:10}}>
           {receiptData && receiptData.map((data, index) => (

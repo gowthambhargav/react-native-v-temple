@@ -27,15 +27,13 @@ import axios from "axios";
 import SevaReciept from "../compnents/SevaReciept";
 import Showrreciept from "../compnents/Showrreciept";
 import AsyncStorage from '@react-native-async-storage/async-storage';
-import DatabaseService, { csvDataUpload, fetchUsers, getMstComp, getRashis, insertRashi } from "../db/queries";
 import Getseva from "../compnents/Getseva";
 import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
-import data from "../assets/csvjson.json"
-import { GetAllComp, getAllGothras, getAllNakshatras, getAllRashis, GetAllSannidhi, GetAllSVA, getRashi, getRashiById, initializeAndInsertData } from "../db/database";
-import { insertRashis } from "../utils/insertQueries";
-
+import  {format, set}  from 'date-fns';
+import { GetReciptDetails, GetSevaAmt, insertTrnHdrSEVA } from "../db/database";
+import { ToWords } from 'to-words';
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [error, setError] = useState({ type: "", msg: "" });
@@ -47,7 +45,6 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [nakshatra, setNakshatra] = useState("");
   const [rashi, setRashi] = useState("");
   const [SeralNo, setSeralNo] = useState(0);
-  const [submissionError, setSubmissionError] = useState(false);
   const [showResipt, setShowResipt] = useState(false);
   const [ReceiptDetails, setReceiptDetails] = useState();
   const [translateMenu, setTranslateMenu] = useState(-290);
@@ -64,6 +61,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     "Popins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
     "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
   });
+  const scrollViewRef = useRef();
 
 
   const initializeSerialNo = async () => {
@@ -124,15 +122,19 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   useEffect(() => {
     initializeSerialNo();
 
-
-
-
+   
   }, []);
  
 
+const convertAmountToWords = (amount) => {
+  const toWords = new ToWords();
 
+  let words = toWords.convert(amount, { currency: true, ignoreDecimal: true });
+  // words = Four Hundred Fifty Two Rupees Only
+return words;
+}
 
-  const handleSubmit = () => {
+  const handleSubmit = async () => {
     let hasError = false;
 
     // Check if 'name' is empty
@@ -163,127 +165,75 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
       rashi,
       "from HomeScreen"
     );
+ 
     if (hasError) {
       return;
     }
 
-    // If there are no errors, submit the form
-    setLoading(true);
-    setLoadingContent("Saving");
-    const url = "https://react-native-v-temple-b.onrender.com/api/sevaReceipt";
-    const url2 = "https://react-native-v-temple-b.onrender.com/api/sevareceiptsql";
-    // Get Seva Receipt ID from the server using the url and then submit the form on url2 with the data
-    // whine submitting the form with the url use the patch to get the sevaId and rashiiId and gothraId ...so on
-    // then submit the form with the data on url2
 
+const sevaAmt = await GetSevaAmt(seva);
+const sevaData = {
+  SEVANO: SeralNo,
+  Prefix: '',
+  PrintSEVANO: SeralNo,
+  SEVADate: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+  SEVADateYear: new Date().getFullYear(),
+  SEVADateMonth: new Date().getMonth() + 1,
+  Authorised: 'Y',
+  AuthBy: '',
+  AuthOn:format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+  ChangedBy: '',
+  ChangedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+  Cancelled: "N",
+  AddedBy: 'Admin',
+  AddedOn:format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+  SANNIDHIID: sannidhi,
+  RMKS: '',
+  CHQNO: '',
+  CHQDATE: '',
+  SevaRate: sevaAmt, // need to fetch from the seva table
+  NoOfdays: 1,
+  TotalAmt: sevaAmt, // need to fetch from the seva table
+  Add1: '',
+  Add2: '',
+  Add3: '',
+  Add4: '',
+  AMTINWRDS: convertAmountToWords(sevaAmt), // need to convert the amount in words
+  RegularD: 'N',
+  DaysPrintText: '',
+  KNAME: name,
+  SECKNAME: '',
+  NAKSHATRAID: nakshatra,
+  SECNAKSHATRAID: '',
+  GOTHRAID: gothra,
+  BANKNAME: '',
+  PAYMENT: '',
+  SVAID: seva,
+  MOBNUM: phone,
+  REFNO: '',
+  ADDRES: '',
+  ISSUEDBY: 'Admin',
+  GRPSEVAID: '',
+  NAMEINKAN: '',
+  MOBNO: phone,
+  PRASADA: 'No',
+  RASHIID: rashi,
+  Synced: false
+};
 
-console.log('====================================');
-console.log(sqlDetails, "sqlDetails");
-console.log('====================================');
-
-
+insertTrnHdrSEVA(sevaData).then((res) => {
+  console.log("data inserted successfully");
+  updateSerialNo();
+  alert("Data Seaved successfully");
+}).catch((err) => {
+  console.log(err);
+ 
+});
+HandelClear();
     // submit the form with the data on url first time
-    axios
-      .post(url, {
-        seva,
-        sannidhi,
-        name,
-        phoneNo: phone,
-        gothra,
-        nakshatra,
-        rashi,
-        sevaReceiptID: SeralNo,
-      })
-      .then( async (res) => {
-        setError({ type: "", msg: "" });
-        setName();
-        setSannidhi("");
-        setSeva("");
-        setPhone("");
-        setGothra("");
-        setNakshatra("");
-        setRashi("");
-        // update the serial number in the state and AsyncStorage
-        updateSerialNo();
-        // submit the form with the data on url2
-        axios.patch(url, {
-          sevaID:  seva,
-          sannidhiID:sannidhi,
-          gothraID: gothra,
-          nakshatraId: nakshatra,
-          rashiID: rashi,
-        }).then((res) => {
-          const {
-            findSevaId,
-            findSannidhiId,
-            findSevaAmt,
-            // findNakshatraId,
-            // findGothraId,
-            // findRashiId,
-          } = res.data.data;
-          console.log(res.data.data, "ldsjflslfj", "data from patch");
-          setSqlDetails(res.data.data);
-          console.log('====================================');
-          console.log( 
-          {
-            SEVAID: findSevaId,
-            SEVANO: SeralNo,
-            PrintSEVANO: SeralNo,
-            SANNIDHIID: findSannidhiId,
-            SevaRate: findSevaAmt,
-            TotalAmt: findSevaAmt,
-            NAKSHATRAID: res.data.data.findNakshatraId ,
-            GOTHRAID: res.data.data.findGothraId ,
-            SVAID: findSevaId ,
-            MOBNUM: "9876543210",
-            RASHIID: res.data.data.findRashiId ,
-          },
-          "data from patch");
-          console.log('====================================');
-          axios
-            .post(url2, {
-              SEVAID: res.data.data.findSevaId,
-              SEVANO: SeralNo,
-              PrintSEVANO: SeralNo,
-              SANNIDHIID: res.data.data.findSannidhiId,
-              SevaRate: res.data.data.findSevaAmt,
-              TotalAmt:res.data.data.findSevaAmt,
-              NAKSHATRAID:res.data.data.findNakshatraId,
-              GOTHRAID: res.data.data.findGothraId,
-              SVAID: findSevaId ,
-              MOBNUM: phone,
-              RASHIID: res.data.data.findRashiId,
-              KNAME: name,
-            })
-            .then((res) => {
-              console.log(res.data.data, "data from post");
-            })
-            .catch((err) => {
-              console.log(err);
-            });
-        }).catch((err) => {
-          setLoading(false);
-          console.log(err);
-        })
-        Alert.alert("Seva Receipt", "Seva Receipt is submitted successfully");
-        setLoading(false);
-        setLoadingContent("Loading");
-console.log('====================================');
-console.log(res.data.data, "data from post");
-console.log('====================================');
-        setReceiptDetails(res.data.data);
-      })
-      .catch((err) => {
-        setSubmissionError(true);
-        Alert.alert(
-          "Seva Receipt",
-          "Seva Receipt is not submitted successfully"
-        );
-        console.log(err);
-      });
+  
   };
 
-  const scrollViewRef = useRef();
   const HandelClear = () => {
     setName("");
     setSannidhi("");
@@ -293,7 +243,7 @@ console.log('====================================');
     setNakshatra("");
     setRashi("");
   };
-  const HandleSavePrint = () => {
+  const HandleSavePrint = async () => {
     let hasError = false;
 
     // Check if 'name' is empty
@@ -318,89 +268,75 @@ console.log('====================================');
       return;
     }
     // If there are no errors, submit the form
-    setLoading(true);
-    setLoadingContent("Saving");
-    const url = "https://react-native-v-temple-b.onrender.com/api/sevaReceipt";
-    const url2 = "https://react-native-v-temple-b.onrender.com/api/sevareceiptsql";
-    axios
-      .post(url, {
-        seva,
-        sannidhi,
-        name,
-        phoneNo: phone,
-        gothra,
-        nakshatra,
-        rashi,
-        sevaReceiptID: SeralNo,
-      })
-      .then( async (res) => {
-        setError({ type: "", msg: "" });
-        setName("");
-        setSannidhi("");
-        setSeva("");
-        setPhone("");
-        setGothra("");
-        setNakshatra("");
-        setRashi("");
-        // update the serial number in the state and AsyncStorage;
-        updateSerialNo();
+    const sevaAmt = await GetSevaAmt(seva);
+    const sevaData = {
+      SEVANO: SeralNo,
+      Prefix: '',
+      PrintSEVANO: SeralNo,
+      SEVADate: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+      SEVADateYear: new Date().getFullYear(),
+      SEVADateMonth: new Date().getMonth() + 1,
+      Authorised: 'Y',
+      AuthBy: '',
+      AuthOn:format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+      ChangedBy: '',
+      ChangedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+      Cancelled: "N",
+      AddedBy: 'Admin',
+      AddedOn:format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+      SANNIDHIID: sannidhi,
+      RMKS: '',
+      CHQNO: '',
+      CHQDATE: '',
+      SevaRate: sevaAmt, // need to fetch from the seva table
+      NoOfdays: 1,
+      TotalAmt: sevaAmt, // need to fetch from the seva table
+      Add1: '',
+      Add2: '',
+      Add3: '',
+      Add4: '',
+      AMTINWRDS: convertAmountToWords(sevaAmt), // need to convert the amount in words
+      RegularD: 'N',
+      DaysPrintText: '',
+      KNAME: name,
+      SECKNAME: '',
+      NAKSHATRAID: nakshatra,
+      SECNAKSHATRAID: '',
+      GOTHRAID: gothra,
+      BANKNAME: '',
+      PAYMENT: '',
+      SVAID: seva,
+      MOBNUM: phone,
+      REFNO: '',
+      ADDRES: '',
+      ISSUEDBY: 'Admin',
+      GRPSEVAID: '',
+      NAMEINKAN: '',
+      MOBNO: phone,
+      PRASADA: 'No',
+      RASHIID: rashi,
+      Synced: false
+    };
+    
+    insertTrnHdrSEVA(sevaData).then((res) => {
+      console.log("data inserted successfully");
+      updateSerialNo();
+      alert("Data Seaved successfully");
+    }).catch((err) => {
+      console.log(err);
+     
+    });
+    HandelClear();
+    // setReceiptDetails
+    GetReciptDetails().then((res) => {
+      console.log('====================================');
+      console.log(res,"res");
+      setReceiptDetails(res);
+      console.log('====================================');
+    });
+
 setShowResipt(true);
-setLoading(false);
-        setReceiptDetails(res.data.data);
-        axios.patch(url, {
-          sevaID:  seva,
-          sannidhiID:sannidhi,
-          gothraID: gothra,
-          nakshatraId: nakshatra,
-          rashiID: rashi,
-        }).then((res) => {
-          const {
-            findSevaId,
-            findSannidhiId,
-            findSevaAmt,
-            findNakshatraId,
-            findGothraId,
-            findRashiId,
-          } = res.data.data;
-          console.log(res.data.data, "ldsjflslfj", "data from patch");
-          setSqlDetails(res.data.data);
-          axios
-            .post(url2, {
-              SEVAID: res.data.data.findSevaId,
-              SEVANO: SeralNo,
-              PrintSEVANO: SeralNo,
-              SANNIDHIID: res.data.data.findSannidhiId,
-              SevaRate: res.data.data.findSevaAmt,
-              TotalAmt:res.data.data.findSevaAmt,
-              NAKSHATRAID:res.data.data.findNakshatraId,
-              GOTHRAID: res.data.data.findGothraId,
-              SVAID: findSevaId ,
-              MOBNUM: phone,
-              RASHIID: res.data.data.findRashiId,
-              KNAME: name,
-            })
-            .then((res) => {
-              setLoading(false);
-              setLoadingContent("Loading");
-              console.log(res.data.data, "data from post");
-            })
-            .catch((err) => {
-              setLoading(false);
-              console.log(err);
-            });
-        }).catch((err) => {
-          setLoading(false);
-          console.log(err);
-        })
-      })
-      .catch((err) => {
-        setSubmissionError(true);
-        setLoading(false);
-        console.log(err);
-      });
-      if (hasError) {
-        return;
-      }
+
   };
 
   const HandelSyncClick =()=>{

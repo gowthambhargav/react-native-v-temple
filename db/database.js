@@ -267,16 +267,144 @@ export const GetAllComp = async () => {
   const query = "SELECT * FROM MstComp";
   try {
     const result = await db.getAllAsync(query);
-    console.log("====================================");
-    console.log("Comp: From Database.js", result);
-    console.log("====================================");
+ 
     return result;
   } catch (error) {
     console.error("Error fetching Comp:", error);
     throw error;
   }
 };
+export const insertTrnHdrSEVA = async (sevaData) => {
+  await initializeDatabase();
+  db = await SQLite.openDatabaseAsync("vTempleVARADA");
 
+  // Add the Synced column if it doesn't exist
+  const alterTableQuery = `
+    ALTER TABLE TrnHdrSEVA ADD COLUMN Synced INTEGER DEFAULT 0
+  `;
+  try {
+    await db.runAsync(alterTableQuery);
+  } catch (error) {
+    if (!error.message.includes('duplicate column name')) {
+      console.error("Error altering table:", error);
+      throw error;
+    }
+  }
+
+  const query = `
+    INSERT INTO TrnHdrSEVA (
+      SEVANO, Prefix, PrintSEVANO, SEVADate, SEVADateYear, SEVADateMonth, 
+      Authorised, AuthBy, AuthOn, ChangedBy, ChangedOn, Cancelled, AddedBy, 
+      AddedOn, SANNIDHIID, RMKS, CHQNO, CHQDATE, SevaRate, NoOfdays, TotalAmt, 
+      Add1, Add2, Add3, Add4, AMTINWRDS, RegularD, DaysPrintText, KNAME, 
+      SECKNAME, NAKSHATRAID, SECNAKSHATRAID, GOTHRAID, BANKNAME, PAYMENT, 
+      SVAID, MOBNUM, REFNO, ADDRES, ISSUEDBY, GRPSEVAID, NAMEINKAN, MOBNO, 
+      PRASADA, RASHIID, Synced
+    ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)
+  `;
+  try {
+    const result = await db.runAsync(query, [
+      sevaData.SEVANO, sevaData.Prefix, sevaData.PrintSEVANO, sevaData.SEVADate, 
+      sevaData.SEVADateYear, sevaData.SEVADateMonth, sevaData.Authorised, 
+      sevaData.AuthBy, sevaData.AuthOn, sevaData.ChangedBy, sevaData.ChangedOn, 
+      sevaData.Cancelled, sevaData.AddedBy, sevaData.AddedOn, sevaData.SANNIDHIID, 
+      sevaData.RMKS, sevaData.CHQNO, sevaData.CHQDATE, sevaData.SevaRate, 
+      sevaData.NoOfdays, sevaData.TotalAmt, sevaData.Add1, sevaData.Add2, 
+      sevaData.Add3, sevaData.Add4, sevaData.AMTINWRDS, sevaData.RegularD, 
+      sevaData.DaysPrintText, sevaData.KNAME, sevaData.SECKNAME, sevaData.NAKSHATRAID, 
+      sevaData.SECNAKSHATRAID, sevaData.GOTHRAID, sevaData.BANKNAME, sevaData.PAYMENT, 
+      sevaData.SVAID, sevaData.MOBNUM, sevaData.REFNO, sevaData.ADDRES, sevaData.ISSUEDBY, 
+      sevaData.GRPSEVAID, sevaData.NAMEINKAN, sevaData.MOBNO, sevaData.PRASADA, 
+      sevaData.RASHIID, sevaData.Synced ? 1 : 0 // Convert boolean to integer
+    ]);
+    console.log("Record inserted successfully:");
+    return result;
+  } catch (error) {
+    console.error("Error inserting record:", error);
+    throw error;
+  }
+};
+
+export const getAllTrnHdrSEVA = async () => {
+  db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  const query = "SELECT * FROM TrnHdrSEVA";
+  try {
+    const result = await db.getAllAsync(query);
+    console.log("====================================");
+    console.log("TrnHdrSEVA: From Database.js",result);
+    console.log("====================================");
+    return result;
+  } catch (error) {
+    console.error("Error fetching TrnHdrSEVA:", error);
+    throw error;
+  }
+}
+
+
+export const GetSevaAmt = async (SVAID) => {
+  db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  const query = "SELECT AMT FROM MstSVA WHERE SVAID = ?";
+  try {
+    const result = await db.getFirstAsync(query, [SVAID]);
+    console.log("====================================");
+    console.log("SevaAmt: From Database.js");
+    console.log("====================================");
+    return result.AMT;
+  } catch (error) {
+    console.error("Error fetching SevaAmt:", error);
+    throw error;
+  }
+}
+
+/*
+
+This is the query for the show resipet details , like the below query, to show the names insted of the id's in the resipet details that is saved in the trnhdrseva table
+
+*/ 
+
+export const GetReciptDetails = async () => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+
+  // Fetch the last inserted row
+  const LatestData = await db.getFirstAsync('SELECT * FROM TrnHdrSEVA WHERE rowid = last_insert_rowid()');
+  if (!LatestData) {
+    console.error("No data found for the last inserted row.");
+    return null;
+  }
+
+  const { GOTHRAID, NAKSHATRAID, RASHIID, SANNIDHIID, SVAID } = LatestData;
+  const query = `
+  SELECT 
+    MstGOTHRA.GOTHRANAME AS GothraName,
+    MstNAKSHATRA.NAKSHATRANAME AS NakshatraName,
+    MstRASHI.RASHINAME AS RashiName,
+    MstSANNIDHI.SANNIDHINAME AS SannidhiName,
+    MstSVA.SVANAME AS SevaName
+  FROM 
+    MstGOTHRA, MstNAKSHATRA, MstRASHI, MstSANNIDHI, MstSVA
+  WHERE 
+    MstGOTHRA.GOTHRAID = ? AND
+    MstNAKSHATRA.NAKSHATRAID = ? AND
+    MstRASHI.RASHIID = ? AND
+    MstSANNIDHI.SANNIDHIID = ? AND
+    MstSVA.SVAID = ?
+`;
+
+  try {
+    const names = await db.getFirstAsync(query, [GOTHRAID, NAKSHATRAID, RASHIID, SANNIDHIID, SVAID]);
+    console.log('====================================');
+    // console.log('LatestData:', LatestData);
+    console.log('Names:', names);
+    console.log('====================================');
+    return {...LatestData, ...names };
+  } catch (error) {
+    console.error("Error fetching names:", error);
+    throw error;
+  }
+};
+
+
+/* insertion on the startup application   */ 
 // Insert into MstRASHI
 const formatData = (data) => {
   return data.map((item) => ({
@@ -849,3 +977,4 @@ const initializeAndInsertDataComp = async () => {
 };
 
 initializeAndInsertDataComp();
+
