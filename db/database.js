@@ -1,11 +1,11 @@
 import * as SQLite from "expo-sqlite";
 import AsyncStorage from "@react-native-async-storage/async-storage";
-import sqlDataRashi from '../assets/csvjson.json';
-import  sqlDataNakshatra from '../assets/jsonnakshara.json';
-import sqlDataGothra from '../assets/gothra.json';
-import sqlDataSeva from '../assets/seva.json'
-import sqlDataSannidhi from '../assets/sannidhi.json';
-
+import sqlDataRashi from "../assets/csvjson.json";
+import sqlDataNakshatra from "../assets/jsonnakshara.json";
+import sqlDataGothra from "../assets/gothra.json";
+import sqlDataSeva from "../assets/seva.json";
+import sqlDataSannidhi from "../assets/sannidhi.json";
+import sqlDataMstComp from "../assets/mstcom.json";
 
 var db;
 
@@ -112,57 +112,58 @@ const initializeDatabase = async () => {
         ChangedOn DATETIME NOT NULL
       );
 
-      CREATE TABLE IF NOT EXISTS TrnHdrSEVA (
-        SEVAID INTEGER PRIMARY KEY AUTOINCREMENT,
-        SEVANO VARCHAR(12),
-        Prefix VARCHAR(3),
-        PrintSEVANO VARCHAR(50),
-        SEVADate DATETIME,
-        SEVADateYear INTEGER NOT NULL,
-        SEVADateMonth INTEGER NOT NULL,
-        Authorised CHAR(1),
-        AuthBy VARCHAR(50),
-        AuthOn DATETIME NOT NULL,
-        ChangedBy VARCHAR(50),
-        ChangedOn DATETIME NOT NULL,
-        Cancelled CHAR(1),
-        AddedBy VARCHAR(50),
-        AddedOn DATETIME,
-        SANNIDHIID INTEGER NOT NULL,
-        RMKS VARCHAR(250) NOT NULL,
-        CHQNO VARCHAR(250) NOT NULL,
-        CHQDATE SMALLDATETIME NOT NULL,
-        SevaRate NUMERIC(19, 2) NOT NULL,
-        NoOfdays INTEGER NOT NULL,
-        TotalAmt NUMERIC(19, 2) NOT NULL,
-        Add1 VARCHAR(250) NOT NULL,
-        Add2 VARCHAR(250) NOT NULL,
-        Add3 VARCHAR(250) NOT NULL,
-        Add4 VARCHAR(250) NOT NULL,
-        AMTINWRDS VARCHAR(250) NOT NULL,
-        RegularD CHAR(1) NOT NULL,
-        DaysPrintText VARCHAR(250) NOT NULL,
-        KNAME VARCHAR(500) NOT NULL,
-        SECKNAME VARCHAR(250) NOT NULL,
-        NAKSHATRAID INTEGER NOT NULL,
-        SECNAKSHATRAID INTEGER NOT NULL,
-        GOTHRAID INTEGER NOT NULL,
-        BANKNAME VARCHAR(100) NOT NULL,
-        PAYMENT VARCHAR(50) NOT NULL,
-        SVAID INTEGER NOT NULL,
-        MOBNUM VARCHAR(50) NOT NULL,
-        REFNO VARCHAR(10) NOT NULL,
-        ADDRES VARCHAR(250) NOT NULL,
-        ISSUEDBY VARCHAR(10) NOT NULL,
-        GRPSEVAID INTEGER NOT NULL,
-        NAMEINKAN NVARCHAR(150) NOT NULL,
-        MOBNO VARCHAR(50) NOT NULL,
-        PRASADA VARCHAR(10) NOT NULL,
-        RASHIID INTEGER NOT NULL
-      );
+  CREATE TABLE IF NOT EXISTS TrnHdrSEVA (
+    SEVAID INTEGER PRIMARY KEY AUTOINCREMENT,
+    SEVANO VARCHAR(12),
+    Prefix VARCHAR(3),
+    PrintSEVANO VARCHAR(50),
+    SEVADate DATETIME,
+    SEVADateYear INTEGER NOT NULL,
+    SEVADateMonth INTEGER NOT NULL,
+    Authorised CHAR(1),
+    AuthBy VARCHAR(50),
+    AuthOn DATETIME NOT NULL,
+    ChangedBy VARCHAR(50),
+    ChangedOn DATETIME NOT NULL,
+    Cancelled CHAR(1),
+    AddedBy VARCHAR(50),
+    AddedOn DATETIME,
+    SANNIDHIID INTEGER NOT NULL,
+    RMKS VARCHAR(250) NOT NULL,
+    CHQNO VARCHAR(250) NOT NULL,
+    CHQDATE SMALLDATETIME NOT NULL,
+    SevaRate NUMERIC(19, 2) NOT NULL,
+    NoOfdays INTEGER NOT NULL,
+    TotalAmt NUMERIC(19, 2) NOT NULL,
+    Add1 VARCHAR(250) NOT NULL,
+    Add2 VARCHAR(250) NOT NULL,
+    Add3 VARCHAR(250) NOT NULL,
+    Add4 VARCHAR(250) NOT NULL,
+    AMTINWRDS VARCHAR(250) NOT NULL,
+    RegularD CHAR(1) NOT NULL,
+    DaysPrintText VARCHAR(250) NOT NULL,
+    KNAME VARCHAR(500) NOT NULL,
+    SECKNAME VARCHAR(250) NOT NULL,
+    NAKSHATRAID INTEGER NOT NULL,
+    SECNAKSHATRAID INTEGER NOT NULL,
+    GOTHRAID INTEGER NOT NULL,
+    BANKNAME VARCHAR(100) NOT NULL,
+    PAYMENT VARCHAR(50) NOT NULL,
+    SVAID INTEGER NOT NULL,
+    MOBNUM VARCHAR(50) NOT NULL,
+    REFNO VARCHAR(10) NOT NULL,
+    ADDRES VARCHAR(250) NOT NULL,
+    ISSUEDBY VARCHAR(10) NOT NULL,
+    GRPSEVAID INTEGER NOT NULL,
+    NAMEINKAN NVARCHAR(150) NOT NULL,
+    MOBNO VARCHAR(50) NOT NULL,
+    PRASADA VARCHAR(10) NOT NULL,
+    RASHIID INTEGER NOT NULL,
+    Synced BOOLEAN NOT NULL DEFAULT 0
+);
 
       CREATE TABLE IF NOT EXISTS MstComp (
-        CompID INTEGER PRIMARY KEY AUTOINCREMENT,
+        CompID INTEGER PRIMARY KEY,
         CompName VARCHAR(250),
         Address1 VARCHAR(100) NOT NULL,
         Address2 VARCHAR(100) NOT NULL,
@@ -267,7 +268,7 @@ export const GetAllComp = async () => {
   try {
     const result = await db.getAllAsync(query);
     console.log("====================================");
-    console.log("Comp: From Database.js");
+    console.log("Comp: From Database.js", result);
     console.log("====================================");
     return result;
   } catch (error) {
@@ -278,22 +279,22 @@ export const GetAllComp = async () => {
 
 // Insert into MstRASHI
 const formatData = (data) => {
-  return data.map(item => ({
+  return data.map((item) => ({
     RASHIID: item.RASHIID || null,
-    RASHICODE: item.RASHICODE || '',
-    RASHINAME: item.RASHINAME || '',
-    RASHISeries: item.RASHISeries || '',
+    RASHICODE: item.RASHICODE || "",
+    RASHINAME: item.RASHINAME || "",
+    RASHISeries: item.RASHISeries || "",
     RASHINO: item.RASHINO || 0,
-    InActiveRmks: item.InActiveRmks || '',
-    InActive: item.InActive || 'N',
-    Authorised: item.Authorised || 'Y',
-    AuthBy: item.AuthBy || '',
+    InActiveRmks: item.InActiveRmks || "",
+    InActive: item.InActive || "N",
+    Authorised: item.Authorised || "Y",
+    AuthBy: item.AuthBy || "",
     AuthOn: item.AuthOn === "NULL" ? null : item.AuthOn,
-    AddedBy: item.AddedBy || '',
+    AddedBy: item.AddedBy || "",
     AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
-    ChangedBy: item.ChangedBy || '',
+    ChangedBy: item.ChangedBy || "",
     ChangedOn: item.ChangedOn === "NULL" ? null : item.ChangedOn,
-    RashiCodeClean: item.RashiCodeClean || ''
+    RashiCodeClean: item.RashiCodeClean || "",
   }));
 };
 
@@ -305,7 +306,10 @@ const insertOrUpdateData = async (data) => {
       console.log("Processing item:", item); // Log each item before processing
 
       // Check if the item already exists
-      const existingItem = await db.getFirstAsync('SELECT * FROM MstRASHI WHERE RASHIID = ?', [item.RASHIID]);
+      const existingItem = await db.getFirstAsync(
+        "SELECT * FROM MstRASHI WHERE RASHIID = ?",
+        [item.RASHIID]
+      );
 
       if (existingItem && existingItem.length > 0) {
         // Update existing item
@@ -316,10 +320,21 @@ const insertOrUpdateData = async (data) => {
             AddedBy = ?, AddedOn = ?, ChangedBy = ?, ChangedOn = ?, RashiCodeClean = ?
           WHERE RASHIID = ?`,
           [
-            item.RASHICODE, item.RASHINAME, item.RASHISeries, item.RASHINO,
-            item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
-            item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.RashiCodeClean,
-            item.RASHIID
+            item.RASHICODE,
+            item.RASHINAME,
+            item.RASHISeries,
+            item.RASHINO,
+            item.InActiveRmks,
+            item.InActive,
+            item.Authorised,
+            item.AuthBy,
+            item.AuthOn,
+            item.AddedBy,
+            item.AddedOn,
+            item.ChangedBy,
+            item.ChangedOn,
+            item.RashiCodeClean,
+            item.RASHIID,
           ]
         );
         console.log("Data updated successfully for RASHIID:", item.RASHIID);
@@ -332,27 +347,34 @@ const insertOrUpdateData = async (data) => {
             AddedBy, AddedOn, ChangedBy, ChangedOn, RashiCodeClean
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            item.RASHIID, item.RASHICODE, item.RASHINAME, item.RASHISeries, item.RASHINO,
-            item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
-            item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.RashiCodeClean
+            item.RASHIID,
+            item.RASHICODE,
+            item.RASHINAME,
+            item.RASHISeries,
+            item.RASHINO,
+            item.InActiveRmks,
+            item.InActive,
+            item.Authorised,
+            item.AuthBy,
+            item.AuthOn,
+            item.AddedBy,
+            item.AddedOn,
+            item.ChangedBy,
+            item.ChangedOn,
+            item.RashiCodeClean,
           ]
         );
         console.log("Data inserted successfully for RASHIID:", item.RASHIID);
       }
     }
-
-    // Verify data insertion
-    const result = await db.getAllAsync('SELECT * FROM MstRASHI');
-    console.log("Data from SQLite:", result.length);
-
   } catch (error) {
     console.error("Error inserting or updating data:", error);
   }
 };
 
 const initializeAndInsertData = async () => {
-  const hasRun = await AsyncStorage.getItem('initializeAndInsertDataHasRun');
-  if (hasRun !== 'true') {
+  const hasRun = await AsyncStorage.getItem("initializeAndInsertDataHasRun");
+  if (hasRun !== "true") {
     await initializeDatabase();
     if (!Array.isArray(sqlDataRashi)) {
       console.error("sqlDataRashi is not an array or is undefined");
@@ -360,7 +382,7 @@ const initializeAndInsertData = async () => {
     }
     const formattedData = formatData(sqlDataRashi);
     await insertOrUpdateData(formattedData);
-    await AsyncStorage.setItem('initializeAndInsertDataHasRun', 'true');
+    await AsyncStorage.setItem("initializeAndInsertDataHasRun", "true");
   } else {
     console.log("initializeAndInsertData has already run.");
   }
@@ -371,24 +393,24 @@ initializeAndInsertData();
 // Insert into MstNAKSHATRA
 
 const formatDataNakshatra = (data) => {
-  return data.map(item => ({
+  return data.map((item) => ({
     NAKSHATRAID: item.NAKSHATRAID || null,
-    NAKSHATRACODE: item.NAKSHATRACODE || '',
-    NAKSHATRANAME: item.NAKSHATRANAME || '',
-    NAKSHATRACodeClean: item.NAKSHATRACodeClean || '',
-    NAKSHATRASeries: item.NAKSHATRASeries || '',
+    NAKSHATRACODE: item.NAKSHATRACODE || "",
+    NAKSHATRANAME: item.NAKSHATRANAME || "",
+    NAKSHATRACodeClean: item.NAKSHATRACodeClean || "",
+    NAKSHATRASeries: item.NAKSHATRASeries || "",
     NAKSHATRANO: item.NAKSHATRANO || 0,
-    InActiveRmks: item.InActiveRmks || '',
-    InActive: item.InActive || 'N',
-    Authorised: item.Authorised || 'Y',
-    AuthBy: item.AuthBy || '',
+    InActiveRmks: item.InActiveRmks || "",
+    InActive: item.InActive || "N",
+    Authorised: item.Authorised || "Y",
+    AuthBy: item.AuthBy || "",
     AuthOn: item.AuthOn === "NULL" ? null : item.AuthOn,
-    AddedBy: item.AddedBy || '',
+    AddedBy: item.AddedBy || "",
     AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
-    ChangedBy: item.ChangedBy || '',
+    ChangedBy: item.ChangedBy || "",
     ChangedOn: item.ChangedOn === "NULL" ? null : item.ChangedOn,
     RASHIID1: item.RASHIID1 || null,
-    RASHIID2: item.RASHIID2 || 0 // Set a default value if RASHIID2 is null
+    RASHIID2: item.RASHIID2 || 0, // Set a default value if RASHIID2 is null
   }));
 };
 
@@ -406,30 +428,48 @@ const insertDataNakshatra = async (data) => {
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 
         [
-          item.NAKSHATRAID, item.NAKSHATRACODE, item.NAKSHATRANAME, item.NAKSHATRACodeClean, item.NAKSHATRASeries,
-          item.NAKSHATRANO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
-          item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.RASHIID1, item.RASHIID2
+          item.NAKSHATRAID,
+          item.NAKSHATRACODE,
+          item.NAKSHATRANAME,
+          item.NAKSHATRACodeClean,
+          item.NAKSHATRASeries,
+          item.NAKSHATRANO,
+          item.InActiveRmks,
+          item.InActive,
+          item.Authorised,
+          item.AuthBy,
+          item.AuthOn,
+          item.AddedBy,
+          item.AddedOn,
+          item.ChangedBy,
+          item.ChangedOn,
+          item.RASHIID1,
+          item.RASHIID2,
         ]
       );
       console.log("Nakshatra data inserted successfully for NAKSHATRAID:");
     }
 
     // Verify data insertion
-    const result = await db.getAllAsync('SELECT * FROM MstNAKSHATRA');
+    const result = await db.getAllAsync("SELECT * FROM MstNAKSHATRA");
     console.log("Nakshatra data from SQLite:");
-
   } catch (error) {
     console.error("Error inserting Nakshatra data:", error);
   }
 };
 
 const initializeAndInsertDataNakshatra = async () => {
-  const hasRun = await AsyncStorage.getItem('initializeAndInsertDataNakshatraHasRun');
-  if (hasRun !== 'true') {
+  const hasRun = await AsyncStorage.getItem(
+    "initializeAndInsertDataNakshatraHasRun"
+  );
+  if (hasRun !== "true") {
     await initializeDatabase();
     const formattedData = formatDataNakshatra(sqlDataNakshatra);
     await insertDataNakshatra(formattedData);
-    await AsyncStorage.setItem('initializeAndInsertDataNakshatraHasRun', 'true');
+    await AsyncStorage.setItem(
+      "initializeAndInsertDataNakshatraHasRun",
+      "true"
+    );
   } else {
     console.log("initializeAndInsertDataNakshatra has already run.");
   }
@@ -437,29 +477,28 @@ const initializeAndInsertDataNakshatra = async () => {
 
 initializeAndInsertDataNakshatra();
 
-
-
 // insert into MstGOTHRA
 const formatDataGothra = (data) => {
   if (!Array.isArray(data)) {
     throw new Error("Input data is not an array");
   }
-  return data.map(item => ({
+  return data.map((item) => ({
     GOTHRAID: item.GOTHRAID || null,
-    GOTHRACODE: item.GOTHRACODE || '',
-    GOTHRANAME: item.GOTHRANAME || '',
-    GOTHRACodeClean: item.GOTHRACodeClean || '',
-    GOTHRASeries: item.GOTHRASeries || '',
+    GOTHRACODE: item.GOTHRACODE || "",
+    GOTHRANAME: item.GOTHRANAME || "",
+    GOTHRACodeClean: item.GOTHRACodeClean || "",
+    GOTHRASeries: item.GOTHRASeries || "",
     GOTHRAno: item.GOTHRAno || 0,
-    InActiveRmks: item.InActiveRmks || '',
-    InActive: item.InActive || 'N',
-    Authorised: item.Authorised || 'Y',
-    AuthBy: item.AuthBy || '',
+    InActiveRmks: item.InActiveRmks || "",
+    InActive: item.InActive || "N",
+    Authorised: item.Authorised || "Y",
+    AuthBy: item.AuthBy || "",
     AuthOn: item.AuthOn === "NULL" ? null : item.AuthOn,
-    AddedBy: item.AddedBy || '',
+    AddedBy: item.AddedBy || "",
     AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
-    ChangedBy: item.ChangedBy || '',
-    ChangedOn: item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn // Provide default value
+    ChangedBy: item.ChangedBy || "",
+    ChangedOn:
+      item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn, // Provide default value
   }));
 };
 
@@ -476,26 +515,38 @@ const insertDataGothra = async (data) => {
           AddedBy, AddedOn, ChangedBy, ChangedOn
         ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
         [
-          item.GOTHRAID, item.GOTHRACODE, item.GOTHRANAME, item.GOTHRACodeClean, item.GOTHRASeries,
-          item.GOTHRAno, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
-          item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn
+          item.GOTHRAID,
+          item.GOTHRACODE,
+          item.GOTHRANAME,
+          item.GOTHRACodeClean,
+          item.GOTHRASeries,
+          item.GOTHRAno,
+          item.InActiveRmks,
+          item.InActive,
+          item.Authorised,
+          item.AuthBy,
+          item.AuthOn,
+          item.AddedBy,
+          item.AddedOn,
+          item.ChangedBy,
+          item.ChangedOn,
         ]
       );
-      console.log("Gothra data inserted successfully for GOTHRAID:", item.GOTHRAID);
+      console.log(
+        "Gothra data inserted successfully for GOTHRAID:",
+        item.GOTHRAID
+      );
     }
-
-    // Verify data insertion
-    const result = await db.getAllAsync('SELECT * FROM MstGOTHRA');
-    console.log("Gothra data from SQLite:", result.rows.length);
-
   } catch (error) {
     console.error("Error inserting Gothra data:", error);
   }
 };
 
 const initializeAndInsertDataGothra = async () => {
-  const hasRun =  await AsyncStorage.getItem('initializeAndInsertDataGothraHasRun');
-  if (hasRun !== 'true') {
+  const hasRun = await AsyncStorage.getItem(
+    "initializeAndInsertDataGothraHasRun"
+  );
+  if (hasRun !== "true") {
     await initializeDatabase();
     if (!Array.isArray(sqlDataGothra)) {
       console.error("sqlDataGothra is not an array or is undefined");
@@ -503,7 +554,7 @@ const initializeAndInsertDataGothra = async () => {
     }
     const formattedData = formatDataGothra(sqlDataGothra);
     await insertDataGothra(formattedData);
-    await AsyncStorage.setItem('initializeAndInsertDataGothraHasRun', 'true');
+    await AsyncStorage.setItem("initializeAndInsertDataGothraHasRun", "true");
   } else {
     console.log("initializeAndInsertDataGothra has already run.");
   }
@@ -512,30 +563,32 @@ const initializeAndInsertDataGothra = async () => {
 initializeAndInsertDataGothra();
 // Insert into MstSVA
 
-
-
 const formatDataSVA = (data) => {
-  return data.map(item => ({
+  return data.map((item) => ({
     SVAID: item.SVAID,
-    SVACODE: item.SVACODE || '',
-    SVANAME: item.SVANAME || '',
-    SVACodeClean: item.SVACodeClean || '',
-    SVASeries: item.SVASeries || '',
+    SVACODE: item.SVACODE || "",
+    SVANAME: item.SVANAME || "",
+    SVACodeClean: item.SVACodeClean || "",
+    SVASeries: item.SVASeries || "",
     SVANO: item.SVANO || 0,
-    InActiveRmks: item.InActiveRmks || '',
-    InActive: item.InActive || 'N',
-    Authorised: item.Authorised || 'Y',
-    AuthBy: item.AuthBy || '',
-    AuthOn: item.AuthOn === "NULL" ? new Date().toISOString() : item.AuthOn || new Date().toISOString(),
-    AddedBy: item.AddedBy || '',
+    InActiveRmks: item.InActiveRmks || "",
+    InActive: item.InActive || "N",
+    Authorised: item.Authorised || "Y",
+    AuthBy: item.AuthBy || "",
+    AuthOn:
+      item.AuthOn === "NULL"
+        ? new Date().toISOString()
+        : item.AuthOn || new Date().toISOString(),
+    AddedBy: item.AddedBy || "",
     AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
-    ChangedBy: item.ChangedBy || '',
-    ChangedOn: item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn,
+    ChangedBy: item.ChangedBy || "",
+    ChangedOn:
+      item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn,
     AMT: item.AMT === "NULL" ? 0 : item.AMT || 0, // Ensure AMT is not null
-    RMKS: item.RMKS === "NULL" ? '' : item.RMKS,
-    RMKS_XML: item.RMKS_XML || '',
-    SEVAINKAN: item.SEVAINKAN === "NULL" ? '' : item.SEVAINKAN,
-    SVADISPNAME: item.SVADISPNAME || ''
+    RMKS: item.RMKS === "NULL" ? "" : item.RMKS,
+    RMKS_XML: item.RMKS_XML || "",
+    SEVAINKAN: item.SEVAINKAN === "NULL" ? "" : item.SEVAINKAN,
+    SVADISPNAME: item.SVADISPNAME || "",
   }));
 };
 
@@ -554,10 +607,26 @@ const insertDataSVA = async (data) => {
             AddedBy, AddedOn, ChangedBy, ChangedOn, AMT, RMKS, RMKS_XML, SEVAINKAN, SVADISPNAME
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
           [
-            item.SVAID, item.SVACODE, item.SVANAME, item.SVACodeClean, item.SVASeries,
-            item.SVANO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
-            item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn, item.AMT, item.RMKS, item.RMKS_XML,
-            item.SEVAINKAN, item.SVADISPNAME
+            item.SVAID,
+            item.SVACODE,
+            item.SVANAME,
+            item.SVACodeClean,
+            item.SVASeries,
+            item.SVANO,
+            item.InActiveRmks,
+            item.InActive,
+            item.Authorised,
+            item.AuthBy,
+            item.AuthOn,
+            item.AddedBy,
+            item.AddedOn,
+            item.ChangedBy,
+            item.ChangedOn,
+            item.AMT,
+            item.RMKS,
+            item.RMKS_XML,
+            item.SEVAINKAN,
+            item.SVADISPNAME,
           ]
         );
         console.log("SVA data inserted successfully for SVAID:", item.SVAID);
@@ -565,23 +634,18 @@ const insertDataSVA = async (data) => {
         console.error("Error inserting SVA data:", error);
       }
     }
-
-    // Verify data insertion
-    const result = await db.getAllAsync('SELECT * FROM MstSVA');
-    console.log("SVA data from SQLite:", result.length);
-
   } catch (error) {
     console.error("Error inserting SVA data:", error);
   }
 };
 
 const initializeAndInsertDataSVA = async () => {
-  const hasRun = await AsyncStorage.getItem('initializeAndInsertDataSVAHasRun');
-  if (hasRun !== 'true') {
+  const hasRun = await AsyncStorage.getItem("initializeAndInsertDataSVAHasRun");
+  if (hasRun !== "true") {
     await initializeDatabase();
     const formattedData = formatDataSVA(sqlDataSeva);
     await insertDataSVA(formattedData);
-    await AsyncStorage.setItem('initializeAndInsertDataSVAHasRun', 'true');
+    await AsyncStorage.setItem("initializeAndInsertDataSVAHasRun", "true");
   } else {
     console.log("initializeAndInsertDataSVA has already run.");
   }
@@ -589,10 +653,8 @@ const initializeAndInsertDataSVA = async () => {
 
 initializeAndInsertDataSVA();
 
-
 // Insert into MstSANNIDHI
 
-// Function to create the MstSANNIDHI table
 const createTableMstSANNIDHI = async () => {
   const db = await SQLite.openDatabaseAsync("vTempleVARADA");
   try {
@@ -621,28 +683,30 @@ const createTableMstSANNIDHI = async () => {
   }
 };
 
-// Function to format data for SANNIDHI
 const formatDataSANNIDHI = (data) => {
-  return data.map(item => ({
+  return data.map((item) => ({
     SANNIDHIID: item.SANNIDHIID,
-    SANNIDHICODE: item.SANNIDHICODE || '',
-    SANNIDHINAME: item.SANNIDHINAME || '',
-    SANNIDHICodeClean: item.SANNIDHICodeClean || '',
-    SANNIDHISeries: item.SANNIDHISeries || '',
+    SANNIDHICODE: item.SANNIDHICODE || "",
+    SANNIDHINAME: item.SANNIDHINAME || "",
+    SANNIDHICodeClean: item.SANNIDHICodeClean || "",
+    SANNIDHISeries: item.SANNIDHISeries || "",
     SANNIDHINO: item.SANNIDHINO || 0,
-    InActiveRmks: item.InActiveRmks || '',
-    InActive: item.InActive || 'N',
-    Authorised: item.Authorised || 'Y',
-    AuthBy: item.AuthBy || '',
-    AuthOn: item.AuthOn === "NULL" ? new Date().toISOString() : item.AuthOn || new Date().toISOString(),
-    AddedBy: item.AddedBy || '',
+    InActiveRmks: item.InActiveRmks || "",
+    InActive: item.InActive || "N",
+    Authorised: item.Authorised || "Y",
+    AuthBy: item.AuthBy || "",
+    AuthOn:
+      item.AuthOn === "NULL"
+        ? new Date().toISOString()
+        : item.AuthOn || new Date().toISOString(),
+    AddedBy: item.AddedBy || "",
     AddedOn: item.AddedOn === "NULL" ? null : item.AddedOn,
-    ChangedBy: item.ChangedBy || '',
-    ChangedOn: item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn
+    ChangedBy: item.ChangedBy || "",
+    ChangedOn:
+      item.ChangedOn === "NULL" ? new Date().toISOString() : item.ChangedOn,
   }));
 };
 
-// Function to insert data into the MstSANNIDHI table
 const insertDataSANNIDHI = async (data) => {
   const db = await SQLite.openDatabaseAsync("vTempleVARADA");
   try {
@@ -659,9 +723,21 @@ const insertDataSANNIDHI = async (data) => {
           ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
 
           [
-            item.SANNIDHIID, item.SANNIDHICODE, item.SANNIDHINAME, item.SANNIDHICodeClean, item.SANNIDHISeries,
-            item.SANNIDHINO, item.InActiveRmks, item.InActive, item.Authorised, item.AuthBy, item.AuthOn,
-            item.AddedBy, item.AddedOn, item.ChangedBy, item.ChangedOn
+            item.SANNIDHIID,
+            item.SANNIDHICODE,
+            item.SANNIDHINAME,
+            item.SANNIDHICodeClean,
+            item.SANNIDHISeries,
+            item.SANNIDHINO,
+            item.InActiveRmks,
+            item.InActive,
+            item.Authorised,
+            item.AuthBy,
+            item.AuthOn,
+            item.AddedBy,
+            item.AddedOn,
+            item.ChangedBy,
+            item.ChangedOn,
           ]
         );
         console.log("SANNIDHI data inserted successfully for SANNIDHIID:");
@@ -669,24 +745,20 @@ const insertDataSANNIDHI = async (data) => {
         console.error("Error inserting SANNIDHI data:", error);
       }
     }
-
-    // Verify data insertion
-    const result = await db.getAllAsync('SELECT * FROM MstSANNIDHI');
-    console.log("SANNIDHI data from SQLite:", result.length);
-
   } catch (error) {
     console.error("Error inserting SANNIDHI data:", error);
   }
 };
 
-// Function to initialize and insert data into the MstSANNIDHI table
 const initializeAndInsertDataSANNIDHI = async () => {
-  const hasRun = await AsyncStorage.getItem('initializeAndInsertDataSANNIDHIHasRun');
-  if (hasRun !== 'true') {
+  const hasRun = await AsyncStorage.getItem(
+    "initializeAndInsertDataSANNIDHIHasRun"
+  );
+  if (hasRun !== "true") {
     await createTableMstSANNIDHI();
     const formattedData = formatDataSANNIDHI(sqlDataSannidhi);
     await insertDataSANNIDHI(formattedData);
-    await AsyncStorage.setItem('initializeAndInsertDataSANNIDHIHasRun', 'true');
+    await AsyncStorage.setItem("initializeAndInsertDataSANNIDHIHasRun", "true");
   } else {
     console.log("initializeAndInsertDataSANNIDHI has already run.");
   }
@@ -695,3 +767,85 @@ const initializeAndInsertDataSANNIDHI = async () => {
 initializeAndInsertDataSANNIDHI();
 
 // Insert into MstComp
+const formatDataComp = (data) => {
+  return data.map((item) => ({
+    CompID: item.CompID,
+    CompName: item.CompName || "",
+    Address1: item.Address1 || "",
+    Address2: item.Address2 || "",
+    Address3: item.Address3 || "",
+    Address4: item.Address4 || "",
+    Address5: item.Address5 === "NULL" ? "" : item.Address5,
+    JpgFile: item.JpgFile || null,
+    Custcode: item.Custcode || "",
+    EMAIL: item.EMAIL || "",
+    MOBNO: item.MOBNO || "",
+    PANNO: item.PANNO || "",
+    WEB: item.WEB || "",
+    GSTNO: item.GSTNO || "",
+    CompLoc: item.CompLoc || "",
+    CINNO: item.CINNO || "",
+    TELNO: item.TELNO || "",
+    DashBoardLink: item.DashBoardLink || "",
+  }));
+};
+
+const insertDataComp = async (data) => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  try {
+    // Insert new data
+    for (const item of data) {
+      console.log("Inserting Comp item:", item); // Log each item before insertion
+
+      try {
+        await db.runAsync(
+          `INSERT INTO MstComp (
+            CompID, CompName, Address1, Address2, Address3, Address4, Address5, 
+            JpgFile, Custcode, EMAIL, MOBNO, PANNO, WEB, GSTNO, CompLoc, CINNO, TELNO, DashBoardLink
+          ) VALUES (?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?, ?)`,
+          [
+            item.CompID,
+            item.CompName,
+            item.Address1,
+            item.Address2,
+            item.Address3,
+            item.Address4,
+            item.Address5,
+            item.JpgFile,
+            item.Custcode,
+            item.EMAIL,
+            item.MOBNO,
+            item.PANNO,
+            item.WEB,
+            item.GSTNO,
+            item.CompLoc,
+            item.CINNO,
+            item.TELNO,
+            item.DashBoardLink,
+          ]
+        );
+        console.log("Comp data inserted successfully for CompID:", item.CompID);
+      } catch (error) {
+        console.error("Error inserting Comp data:", error);
+      }
+    }
+  } catch (error) {
+    console.error("Error inserting Comp data:", error);
+  }
+};
+
+const initializeAndInsertDataComp = async () => {
+  const hasRun = await AsyncStorage.getItem(
+    "initializeAndInsertDataCompHasRun"
+  );
+  if (hasRun !== "true") {
+    await initializeDatabase();
+    const formattedData = formatDataComp(sqlDataMstComp);
+    await insertDataComp(formattedData);
+    await AsyncStorage.setItem("initializeAndInsertDataCompHasRun", "true");
+  } else {
+    console.log("initializeAndInsertDataComp has already run.");
+  }
+};
+
+initializeAndInsertDataComp();

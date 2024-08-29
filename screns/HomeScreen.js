@@ -33,7 +33,7 @@ import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
 import data from "../assets/csvjson.json"
-import { getAllGothras, getAllNakshatras, getAllRashis, GetAllSannidhi, GetAllSVA, getRashi, getRashiById, initializeAndInsertData } from "../db/database";
+import { GetAllComp, getAllGothras, getAllNakshatras, getAllRashis, GetAllSannidhi, GetAllSVA, getRashi, getRashiById, initializeAndInsertData } from "../db/database";
 import { insertRashis } from "../utils/insertQueries";
 
 
@@ -123,8 +123,6 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
 
   useEffect(() => {
     initializeSerialNo();
- 
-      
 
 
 
