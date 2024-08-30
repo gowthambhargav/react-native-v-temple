@@ -6,6 +6,7 @@ import sqlDataGothra from "../assets/gothra.json";
 import sqlDataSeva from "../assets/seva.json";
 import sqlDataSannidhi from "../assets/sannidhi.json";
 import sqlDataMstComp from "../assets/mstcom.json";
+import axios from "axios";
 
 var db;
 
@@ -150,7 +151,7 @@ const initializeDatabase = async () => {
     BANKNAME VARCHAR(100) NOT NULL,
     PAYMENT VARCHAR(50) NOT NULL,
     SVAID INTEGER NOT NULL,
-    MOBNUM VARCHAR(50) NOT NULL,
+    MOBNUM VARCHAR(50),
     REFNO VARCHAR(10) NOT NULL,
     ADDRES VARCHAR(250) NOT NULL,
     ISSUEDBY VARCHAR(10) NOT NULL,
@@ -978,3 +979,58 @@ const initializeAndInsertDataComp = async () => {
 
 initializeAndInsertDataComp();
 
+
+
+
+
+
+
+/*
+Hear the sync the data from the exposqllit local to the mysql server,
+*/ 
+
+
+export const syncData = async () => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  const query = "SELECT * FROM TrnHdrSEVA WHERE Synced = 0";
+
+  try {
+    const result = await db.getAllAsync(query);
+    console.log("====================================");
+    console.log("SyncData: From Database.js", result.length);
+    console.log("====================================");
+
+    if (result.length === 0) {
+      return { message: "No data to sync" };
+    }
+
+    const syncPost = await axios.post("https://react-native-v-temple-b.onrender.com/api/sevareceiptsql/sync", { data: result });
+    console.log('====================================');
+    console.log('SyncData:', syncPost.data);
+    console.log('====================================');
+
+    // Update the Synced column from 0 to 1
+    const updateQuery = "UPDATE TrnHdrSEVA SET Synced = 1 WHERE Synced = 0";
+    await db.runAsync(updateQuery);
+    console.log("Synced column updated successfully.");
+
+    return syncPost.data;
+  } catch (error) {
+    console.error("Error during sync:", error);
+    throw error.response ? error.response.data : { message: error.message };
+  }
+};
+//  hera i sth e query for the update the trnhdrseva table sync column from 1 to 0,
+
+export const updateSyncedData = async () => {
+   db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  const query = "UPDATE TrnHdrSEVA SET Synced = 0 WHERE Synced = 1";
+
+  try {
+    await db.runAsync(query);
+    console.log("Synced column updated successfully.");
+  } catch (error) {
+    console.error("Error updating Synced column:", error);
+    throw error;
+  }
+};

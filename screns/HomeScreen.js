@@ -23,7 +23,6 @@ import SevaCom from "../compnents/SevaCom";
 import Dgothra from "../compnents/Dgothra";
 import Dnakshara from "../compnents/Dnakshara";
 import Drashi from "../compnents/Drashi";
-import axios from "axios";
 import SevaReciept from "../compnents/SevaReciept";
 import Showrreciept from "../compnents/Showrreciept";
 import AsyncStorage from '@react-native-async-storage/async-storage';
@@ -32,7 +31,7 @@ import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
 import  {format, set}  from 'date-fns';
-import { GetReciptDetails, GetSevaAmt, insertTrnHdrSEVA } from "../db/database";
+import { GetReciptDetails, GetSevaAmt, insertTrnHdrSEVA, syncData, updateSyncedData } from "../db/database";
 import { ToWords } from 'to-words';
 
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
@@ -122,7 +121,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   useEffect(() => {
     initializeSerialNo();
 
-   
+  
   }, []);
  
 
@@ -339,19 +338,18 @@ setShowResipt(true);
 
   };
 
-  const HandelSyncClick =()=>{
-    console.log("Sync button pressed");
-setLoading(true);
-    axios.post("https://react-native-v-temple-b.onrender.com/api/sevareceiptsql/sync ").then((res) => {
+  const HandelSyncClick = async () => {
+    try {
+      const res = await syncData();
       console.log("data from sync");
-      Alert.alert("Sync", "Sync is done successfully");
-      setLoading(false);
-    }).catch((err) => {
-      console.log(err);
-      setLoading(false);
-      Alert.alert("Sync", "Sync is not done successfully");
-    })
-  }
+      console.log(res);
+      console.log('====================================');
+      Alert.alert('Sync Complete', `${res.message}`);
+    } catch (err) {
+      console.log(err, "error from sync");
+      Alert.alert('Sync Failed', `${err.message}`);
+    }
+  };
 
 
 if (!loaded) {
