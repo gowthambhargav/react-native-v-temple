@@ -12,7 +12,7 @@ import {
   Alert,
 } from "react-native";
 import { FontAwesome6 } from "@expo/vector-icons";
-import { AntDesign } from '@expo/vector-icons';
+import { AntDesign } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import CurrentDateComponent from "../compnents/Date";
 import LabeledTextInput from "../compnents/InputComp";
@@ -25,15 +25,20 @@ import Dnakshara from "../compnents/Dnakshara";
 import Drashi from "../compnents/Drashi";
 import SevaReciept from "../compnents/SevaReciept";
 import Showrreciept from "../compnents/Showrreciept";
-import AsyncStorage from '@react-native-async-storage/async-storage';
+import AsyncStorage from "@react-native-async-storage/async-storage";
 import Getseva from "../compnents/Getseva";
 import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
-import  {format, set}  from 'date-fns';
-import { GetReciptDetails, GetSevaAmt, insertTrnHdrSEVA, syncData, updateSyncedData } from "../db/database";
-import { ToWords } from 'to-words';
-
+import { format, set } from "date-fns";
+import {
+  GetReciptDetails,
+  GetSevaAmt,
+  insertTrnHdrSEVA,
+  syncData,
+} from "../db/database";
+import { ToWords } from "to-words";
+import NetInfo from "@react-native-community/netinfo";
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [error, setError] = useState({ type: "", msg: "" });
   const [name, setName] = useState("");
@@ -48,12 +53,12 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [ReceiptDetails, setReceiptDetails] = useState();
   const [translateMenu, setTranslateMenu] = useState(-290);
   const [showReceiptDetails, setShowReceiptDetails] = useState(false);
-  const [sqlDetails, setSqlDetails] = useState();
+
   const [showGetSeva, setShowGetSeva] = useState(false);
   const [showSevaList, setShowSevaList] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingContent, setLoadingContent] = useState("Loading");
-  const [csvData, setCsvData] = useState([]);
+
   // loading fonts
   const [loaded] = useFonts({
     "Roboto-Regular": require("../assets/fonts/Poppins-Regular.ttf"),
@@ -62,23 +67,22 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   });
   const scrollViewRef = useRef();
 
-
   const initializeSerialNo = async () => {
     const date = new Date();
-    const currentDate = date.getDate().toString().padStart(2, '0'); // Ensure date is in 'dd' format
+    const currentDate = date.getDate().toString().padStart(2, "0"); // Ensure date is in 'dd' format
     const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
     const deviceID = "01";
 
-    const storedData = await AsyncStorage.getItem('storedData');
+    const storedData = await AsyncStorage.getItem("storedData");
     let storedDate, storedCount;
 
     if (storedData) {
-      [storedDate, storedCount] = storedData.split('-').map(Number);
+      [storedDate, storedCount] = storedData.split("-").map(Number);
     }
 
     if (storedDate === parseInt(currentDate)) {
       // Same day, use the stored count
-      const currentCount = storedCount.toString().padStart(5, '0');
+      const currentCount = storedCount.toString().padStart(5, "0");
       const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${currentCount}`;
       setSeralNo(newSerialNo);
     } else {
@@ -86,52 +90,55 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
       const newCount = "00001";
       const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${newCount}`;
       setSeralNo(newSerialNo);
-      await AsyncStorage.setItem('storedData', `${currentDate}-1`);
+      await AsyncStorage.setItem("storedData", `${currentDate}-1`);
     }
   };
 
   const updateSerialNo = async () => {
     const date = new Date();
-    const currentDate = date.getDate().toString().padStart(2, '0'); // Ensure date is in 'dd' format
+    const currentDate = date.getDate().toString().padStart(2, "0"); // Ensure date is in 'dd' format
     const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
     const deviceID = "01";
 
-    const storedData = await AsyncStorage.getItem('storedData');
+    const storedData = await AsyncStorage.getItem("storedData");
     let storedDate, storedCount;
 
     if (storedData) {
-      [storedDate, storedCount] = storedData.split('-').map(Number);
+      [storedDate, storedCount] = storedData.split("-").map(Number);
     }
 
     if (storedDate === parseInt(currentDate)) {
       // Same day, increment the count
-      const currentCount = (storedCount + 1).toString().padStart(5, '0');
+      const currentCount = (storedCount + 1).toString().padStart(5, "0");
       const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${currentCount}`;
       setSeralNo(newSerialNo);
-      await AsyncStorage.setItem('storedData', `${currentDate}-${storedCount + 1}`);
+      await AsyncStorage.setItem(
+        "storedData",
+        `${currentDate}-${storedCount + 1}`
+      );
     } else {
       // New day, reset the count
       const newCount = "00001";
       const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${newCount}`;
       setSeralNo(newSerialNo);
-      await AsyncStorage.setItem('storedData', `${currentDate}-1`);
+      await AsyncStorage.setItem("storedData", `${currentDate}-1`);
     }
   };
 
   useEffect(() => {
     initializeSerialNo();
-
-  
   }, []);
- 
 
-const convertAmountToWords = (amount) => {
-  const toWords = new ToWords();
+  const convertAmountToWords = (amount) => {
+    const toWords = new ToWords();
 
-  let words = toWords.convert(amount, { currency: true, ignoreDecimal: true });
-  // words = Four Hundred Fifty Two Rupees Only
-return words;
-}
+    let words = toWords.convert(amount, {
+      currency: true,
+      ignoreDecimal: true,
+    });
+    // words = Four Hundred Fifty Two Rupees Only
+    return words;
+  };
 
   const handleSubmit = async () => {
     let hasError = false;
@@ -164,73 +171,72 @@ return words;
       rashi,
       "from HomeScreen"
     );
- 
+
     if (hasError) {
       return;
     }
 
+    const sevaAmt = await GetSevaAmt(seva);
+    const sevaData = {
+      SEVANO: SeralNo,
+      Prefix: "",
+      PrintSEVANO: SeralNo,
+      SEVADate: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+      SEVADateYear: new Date().getFullYear(),
+      SEVADateMonth: new Date().getMonth() + 1,
+      Authorised: "Y",
+      AuthBy: "",
+      AuthOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+      ChangedBy: "",
+      ChangedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+      Cancelled: "N",
+      AddedBy: "Admin",
+      AddedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+      SANNIDHIID: sannidhi,
+      RMKS: "",
+      CHQNO: "",
+      CHQDATE: "",
+      SevaRate: sevaAmt, // need to fetch from the seva table
+      NoOfdays: 1,
+      TotalAmt: sevaAmt, // need to fetch from the seva table
+      Add1: "",
+      Add2: "",
+      Add3: "",
+      Add4: "",
+      AMTINWRDS: convertAmountToWords(sevaAmt), // need to convert the amount in words
+      RegularD: "N",
+      DaysPrintText: "",
+      KNAME: name,
+      SECKNAME: "",
+      NAKSHATRAID: nakshatra,
+      SECNAKSHATRAID: "",
+      GOTHRAID: gothra,
+      BANKNAME: "",
+      PAYMENT: "",
+      SVAID: seva,
+      MOBNUM: phone,
+      REFNO: "",
+      ADDRES: "",
+      ISSUEDBY: "Admin",
+      GRPSEVAID: "",
+      NAMEINKAN: "",
+      MOBNO: phone,
+      PRASADA: "No",
+      RASHIID: rashi,
+      Synced: false,
+    };
 
-const sevaAmt = await GetSevaAmt(seva);
-const sevaData = {
-  SEVANO: SeralNo,
-  Prefix: '',
-  PrintSEVANO: SeralNo,
-  SEVADate: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
-  SEVADateYear: new Date().getFullYear(),
-  SEVADateMonth: new Date().getMonth() + 1,
-  Authorised: 'Y',
-  AuthBy: '',
-  AuthOn:format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
-  ChangedBy: '',
-  ChangedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
-  Cancelled: "N",
-  AddedBy: 'Admin',
-  AddedOn:format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
-  SANNIDHIID: sannidhi,
-  RMKS: '',
-  CHQNO: '',
-  CHQDATE: '',
-  SevaRate: sevaAmt, // need to fetch from the seva table
-  NoOfdays: 1,
-  TotalAmt: sevaAmt, // need to fetch from the seva table
-  Add1: '',
-  Add2: '',
-  Add3: '',
-  Add4: '',
-  AMTINWRDS: convertAmountToWords(sevaAmt), // need to convert the amount in words
-  RegularD: 'N',
-  DaysPrintText: '',
-  KNAME: name,
-  SECKNAME: '',
-  NAKSHATRAID: nakshatra,
-  SECNAKSHATRAID: '',
-  GOTHRAID: gothra,
-  BANKNAME: '',
-  PAYMENT: '',
-  SVAID: seva,
-  MOBNUM: phone,
-  REFNO: '',
-  ADDRES: '',
-  ISSUEDBY: 'Admin',
-  GRPSEVAID: '',
-  NAMEINKAN: '',
-  MOBNO: phone,
-  PRASADA: 'No',
-  RASHIID: rashi,
-  Synced: false
-};
-
-insertTrnHdrSEVA(sevaData).then((res) => {
-  console.log("data inserted successfully");
-  updateSerialNo();
-  alert("Data Seaved successfully");
-}).catch((err) => {
-  console.log(err);
- 
-});
-HandelClear();
+    insertTrnHdrSEVA(sevaData)
+      .then((res) => {
+        console.log("data inserted successfully");
+        updateSerialNo();
+        alert("Data Seaved successfully");
+      })
+      .catch((err) => {
+        console.log(err);
+      });
+    HandelClear();
     // submit the form with the data on url first time
-  
   };
 
   const HandelClear = () => {
@@ -244,20 +250,19 @@ HandelClear();
   };
   const HandleSavePrint = async () => {
     let hasError = false;
-
+  
     // Check if 'name' is empty
     if (!name) {
       setError({ type: "name", msg: "Name is required" });
       hasError = true;
-      // Alert.alert("Name is required");
     }
-
+  
     // Check if 'sannidhi' is empty
     if (sannidhi === "") {
       setError({ type: "sannidhi", msg: "Sannidhi is required" });
       hasError = true;
     }
-
+  
     // Check if 'seva' is empty
     if (seva === "") {
       setError({ type: "seva", msg: "Seva is required" });
@@ -266,96 +271,105 @@ HandelClear();
     if (hasError) {
       return;
     }
+  
     // If there are no errors, submit the form
     const sevaAmt = await GetSevaAmt(seva);
     const sevaData = {
       SEVANO: SeralNo,
-      Prefix: '',
+      Prefix: "",
       PrintSEVANO: SeralNo,
       SEVADate: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
       SEVADateYear: new Date().getFullYear(),
       SEVADateMonth: new Date().getMonth() + 1,
-      Authorised: 'Y',
-      AuthBy: '',
-      AuthOn:format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
-      ChangedBy: '',
+      Authorised: "Y",
+      AuthBy: "",
+      AuthOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+      ChangedBy: "",
       ChangedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
       Cancelled: "N",
-      AddedBy: 'Admin',
-      AddedOn:format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+      AddedBy: "Admin",
+      AddedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
       SANNIDHIID: sannidhi,
-      RMKS: '',
-      CHQNO: '',
-      CHQDATE: '',
+      RMKS: "",
+      CHQNO: "",
+      CHQDATE: "",
       SevaRate: sevaAmt, // need to fetch from the seva table
       NoOfdays: 1,
       TotalAmt: sevaAmt, // need to fetch from the seva table
-      Add1: '',
-      Add2: '',
-      Add3: '',
-      Add4: '',
+      Add1: "",
+      Add2: "",
+      Add3: "",
+      Add4: "",
       AMTINWRDS: convertAmountToWords(sevaAmt), // need to convert the amount in words
-      RegularD: 'N',
-      DaysPrintText: '',
+      RegularD: "N",
+      DaysPrintText: "",
       KNAME: name,
-      SECKNAME: '',
+      SECKNAME: "",
       NAKSHATRAID: nakshatra,
-      SECNAKSHATRAID: '',
+      SECNAKSHATRAID: "",
       GOTHRAID: gothra,
-      BANKNAME: '',
-      PAYMENT: '',
+      BANKNAME: "",
+      PAYMENT: "",
       SVAID: seva,
-      MOBNUM: phone,
-      REFNO: '',
-      ADDRES: '',
-      ISSUEDBY: 'Admin',
-      GRPSEVAID: '',
-      NAMEINKAN: '',
+      MOBNUM: phone || "",
+      REFNO: "",
+      ADDRES: "",
+      ISSUEDBY: "Admin",
+      GRPSEVAID: "",
+      NAMEINKAN: "",
       MOBNO: phone,
-      PRASADA: 'No',
+      PRASADA: "No",
       RASHIID: rashi,
-      Synced: false
+      Synced: false,
     };
-    
-    insertTrnHdrSEVA(sevaData).then((res) => {
+  
+    try {
+      setLoadingContent("Saving Data");
+      setLoading(true);
+      await insertTrnHdrSEVA(sevaData);
       console.log("data inserted successfully");
-      updateSerialNo();
-      alert("Data Seaved successfully");
-    }).catch((err) => {
-      console.log(err);
+      await updateSerialNo();
      
-    });
+  
+      // Fetch receipt details and update state
+      const receiptDetails = await GetReciptDetails();
+      setReceiptDetails(receiptDetails);
+      setShowResipt(true);
+      setLoading(false);
+      setLoadingContent("Loading");
+    } catch (err) {
+      console.log(err);
+    }
+  
     HandelClear();
-    // setReceiptDetails
-    GetReciptDetails().then((res) => {
-      console.log('====================================');
-      console.log(res,"res");
-      setReceiptDetails(res);
-      console.log('====================================');
-    });
-
-setShowResipt(true);
-
   };
 
   const HandelSyncClick = async () => {
+    // Check internet connection
+    const state = await NetInfo.fetch();
+    if (!state.isConnected) {
+      Alert.alert(
+        "No Internet Connection",
+        "Please turn on the internet to proceed with the sync."
+      );
+      return;
+    }
+
     try {
       const res = await syncData();
       console.log("data from sync");
       console.log(res);
-      console.log('====================================');
-      Alert.alert('Sync Complete', `${res.message}`);
+      console.log("====================================");
+      Alert.alert("Sync Complete", `${res.message}`);
     } catch (err) {
       console.log(err, "error from sync");
-      Alert.alert('Sync Failed', `${err.message}`);
+      Alert.alert("Sync Failed", `${err.message}`);
     }
   };
 
-
-if (!loaded) {
-  return <LoadingComponent name="Loading" />;
-}
-
+  if (!loaded) {
+    return <LoadingComponent name="Loading" />;
+  }
 
   return (
     <SafeAreaView>
@@ -379,7 +393,6 @@ if (!loaded) {
           />
         )}
         <SafeAreaView>
-     
           <View style={{ position: "static", top: 35, bottom: 0 }}>
             <View
               style={{
@@ -389,7 +402,6 @@ if (!loaded) {
                 top: 10,
               }}
             >
-        
               <Text
                 onPress={() => {
                   setTranslateMenu(0);
@@ -399,14 +411,17 @@ if (!loaded) {
                 ☰
               </Text>
               <Text
-                style={[{
-                  // fontWeight: "500",
-                  fontSize: 20,
-                  left: 100,
-                  top: -28,
-                  alignContent: "center",
-                 textAlign: "center",
-                },styles.fontBold]}
+                style={[
+                  {
+                    // fontWeight: "500",
+                    fontSize: 20,
+                    left: 100,
+                    top: -28,
+                    alignContent: "center",
+                    textAlign: "center",
+                  },
+                  styles.fontBold,
+                ]}
               >
                 Seva Receipt
               </Text>
@@ -415,33 +430,50 @@ if (!loaded) {
           <View style={{ flexDirection: "row", left: -10 }}>
             <CurrentDateComponent />
             <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
-
           </View>
-          <View style={{ justifyContent: "center", alignItems: "flex-end", paddingHorizontal: 20,paddingBottom:5 }}>
-          <TouchableOpacity 
-  style={{ 
-    marginTop:-15,
-    width: "25%", 
-    borderRadius: 10, 
-    alignItems: 'center', 
-    padding: 10 ,
-    flexDirection: "row",
-    backgroundColor: "#f2f2f2",
-    // justifyContent: "center",
-    alignContent: "center",
-  }} 
-  onPress={HandelSyncClick}
->
-  <AntDesign name="cloud" size={19} color="#333333" />
-  <Text style={[{ color: "#333333", marginLeft:5,textTransform:"uppercase"},styles.font]}>Sync</Text>
-</TouchableOpacity>
-    </View>
+          <View
+            style={{
+              justifyContent: "center",
+              alignItems: "flex-end",
+              paddingHorizontal: 20,
+              paddingBottom: 5,
+            }}
+          >
+            <TouchableOpacity
+              style={{
+                marginTop: -15,
+                width: "25%",
+                borderRadius: 10,
+                alignItems: "center",
+                padding: 10,
+                flexDirection: "row",
+                backgroundColor: "#f2f2f2",
+                // justifyContent: "center",
+                alignContent: "center",
+              }}
+              onPress={HandelSyncClick}
+            >
+              <AntDesign name="cloud" size={19} color="#333333" />
+              <Text
+                style={[
+                  {
+                    color: "#333333",
+                    marginLeft: 5,
+                    textTransform: "uppercase",
+                  },
+                  styles.font,
+                ]}
+              >
+                Sync
+              </Text>
+            </TouchableOpacity>
+          </View>
         </SafeAreaView>
         <ScrollView
           ref={scrollViewRef}
           contentContainerStyle={styles.container}
         >
-   <SafeAreaView
+          <SafeAreaView
             style={{
               flex: 1,
               flexDirection: "column",
@@ -452,74 +484,77 @@ if (!loaded) {
               top: -85,
             }}
           >
-            <View style={{flex: 1,
-              flexDirection: "column",
-              justifyContent: "center",
-              alignItems: "center",
-              alignContent: "center",}}>
-          
-            <SannidhiCom
-              requred={true}
-              setSannidhi={setSannidhi}
-              value={sannidhi}
-              dplable={"Sannidhi*"}
-              lable={"Sannidhi"}
-            />
-            {sannidhi === "" || undefined || null ? (
-              <Text style={{ color: "red" }}>Sannidhi is required</Text>
-            ) : null}
-            {error.type === "sannidhi" ? (
-              <Text style={{ color: "red" }}>Sannidhi is required</Text>
-            ) : null}
-            <SevaCom
-              requred={true}
-              value={seva}
-              setSeva={setSeva}
-              dplable={"seva*"}
-              lable={"Seva"}
-            />
-            {error.type === "seva" ? (
-              <Text style={{ color: "red" }}>Seva is required</Text>
-            ) : null}
-            <LabeledTextInput
-              requred={true}
-              error={error.type === "name" ? true : false}
-              label={"name"}
-              setName={setName}
-              name={name}
-              // placeholder={"Name"}
-              key={2313}
-            />
-            {error.type === "name" ? (
-              <Text style={{ color: "red" }}>Name is required</Text>
-            ) : null}
-            <LabeledTextInputPhone
-              setPhone={setPhone}
-              phone={phone}
-              label={"phone no"}
-              // placeholder={"Phone No"}
-              keyboardType="numeric"
-              key={"hy97975"}
-            />
-            <Dgothra
-              gothra={gothra}
-              setGothra={setGothra}
-              dplable={"Gothra"}
-              lable={"Gothra"}
-            />
-            <Dnakshara
-              nakshatra={nakshatra}
-              setNakshatra={setNakshatra}
-              dplable={"Nakshara"}
-              lable={"Nakshara"}
-            />
-            <Drashi
-              rashi={rashi}
-              setRashi={setRashi}
-              dplable={"Rashi"}
-              lable={"Rashi"}
-            />
-              </View>
+            <View
+              style={{
+                flex: 1,
+                flexDirection: "column",
+                justifyContent: "center",
+                alignItems: "center",
+                alignContent: "center",
+              }}
+            >
+              <SannidhiCom
+                requred={true}
+                setSannidhi={setSannidhi}
+                value={sannidhi}
+                dplable={"Sannidhi*"}
+                lable={"Sannidhi"}
+              />
+              {sannidhi === "" || undefined || null ? (
+                <Text style={{ color: "red" }}>Sannidhi is required</Text>
+              ) : null}
+              {error.type === "sannidhi" ? (
+                <Text style={{ color: "red" }}>Sannidhi is required</Text>
+              ) : null}
+              <SevaCom
+                requred={true}
+                value={seva}
+                setSeva={setSeva}
+                dplable={"seva*"}
+                lable={"Seva"}
+              />
+              {error.type === "seva" ? (
+                <Text style={{ color: "red" }}>Seva is required</Text>
+              ) : null}
+              <LabeledTextInput
+                requred={true}
+                error={error.type === "name" ? true : false}
+                label={"name"}
+                setName={setName}
+                name={name}
+                // placeholder={"Name"}
+                key={2313}
+              />
+              {error.type === "name" ? (
+                <Text style={{ color: "red" }}>Name is required</Text>
+              ) : null}
+              <LabeledTextInputPhone
+                setPhone={setPhone}
+                phone={phone}
+                label={"phone no"}
+                // placeholder={"Phone No"}
+                keyboardType="numeric"
+                key={"hy97975"}
+              />
+              <Dgothra
+                gothra={gothra}
+                setGothra={setGothra}
+                dplable={"Gothra"}
+                lable={"Gothra"}
+              />
+              <Dnakshara
+                nakshatra={nakshatra}
+                setNakshatra={setNakshatra}
+                dplable={"Nakshara"}
+                lable={"Nakshara"}
+              />
+              <Drashi
+                rashi={rashi}
+                setRashi={setRashi}
+                dplable={"Rashi"}
+                lable={"Rashi"}
+              />
+            </View>
           </SafeAreaView>
           <TouchableOpacity onPress={handleSubmit} style={{ top: -140 }}>
             <Text
@@ -530,8 +565,7 @@ if (!loaded) {
                 backgroundColor: "#4287f5",
                 paddingBottom: 10,
                 paddingTop: 10,
-                fontFamily: 'Roboto-Regular',
-                
+                fontFamily: "Roboto-Regular",
               }}
             >
               <FontAwesome6 name="save" size={24} color="white" /> Save
@@ -546,7 +580,7 @@ if (!loaded) {
                 backgroundColor: "#4287f5",
                 paddingBottom: 10,
                 paddingTop: 10,
-                fontFamily: 'Roboto-Regular',
+                fontFamily: "Roboto-Regular",
               }}
             >
               <FontAwesome6 name="print" size={24} color="white" /> Save & Print
@@ -564,7 +598,7 @@ if (!loaded) {
                 alignContent: "center",
                 alignItems: "center",
                 justifyContent: "center",
-                fontFamily: 'Roboto-Regular',
+                fontFamily: "Roboto-Regular",
               }}
             >
               <Feather name="minus-circle" size={24} color="white" />{" "}
@@ -602,36 +636,45 @@ if (!loaded) {
                 source={require("../assets/account.png")}
               />
               <Text
-                style={{ fontSize: 20, marginLeft: 10,fontFamily: 'Popins-Bold', }}
+                style={{
+                  fontSize: 20,
+                  marginLeft: 10,
+                  fontFamily: "Popins-Bold",
+                }}
               >
                 Admin
               </Text>
-              <TouchableOpacity style={{left:60}} onPress={()=>{setTranslateMenu(-290);}}>
-              <AntDesign name="closecircle" size={28} color="red" />
+              <TouchableOpacity
+                style={{ left: 60 }}
+                onPress={() => {
+                  setTranslateMenu(-290);
+                }}
+              >
+                <AntDesign name="closecircle" size={28} color="red" />
               </TouchableOpacity>
             </View>
             <View style={{ marginTop: 50 }}>
-            <Button
+              <Button
                 title="Seva List"
                 onPress={() => {
-           
                   setShowSevaList(true);
-                  setTranslateMenu(-290) 
-console.log("Seva list button pressed");
+                  setTranslateMenu(-290);
+                  console.log("Seva list button pressed");
                 }}
               />
-              <TouchableOpacity style={[{marginTop:10,marginBottom:10},styles.font]}>
-                    <Button
-                title="Getseva"
-                onPress={() => {
-                  setShowGetSeva(true);
-                  setTranslateMenu(-290) 
-console.log("Getseva button pressed");
-                }}
-              />
+              <TouchableOpacity
+                style={[{ marginTop: 10, marginBottom: 10 }, styles.font]}
+              >
+                <Button
+                  title="Getseva"
+                  onPress={() => {
+                    setShowGetSeva(true);
+                    setTranslateMenu(-290);
+                    console.log("Getseva button pressed");
+                  }}
+                />
               </TouchableOpacity>
               <Button
-              
                 title="Show Receipt"
                 onPress={() => {
                   setLoading(true);
@@ -639,18 +682,18 @@ console.log("Getseva button pressed");
                     setLoading(false);
                   }, 1000);
                   setShowReceiptDetails(true);
-                  setTranslateMenu(-290) 
-console.log("close button pressed");
+                  setTranslateMenu(-290);
+                  console.log("close button pressed");
                 }}
               />
-                
+
               <Text
                 onPress={() => {
                   setLoggedIn(false);
                   setUserName("");
                   setUserPassword("");
                 }}
-                style={[styles.buttonStyle,{fontFamily: 'Roboto-Regular',}]}
+                style={[styles.buttonStyle, { fontFamily: "Roboto-Regular" }]}
               >
                 Logout
               </Text>
@@ -658,10 +701,12 @@ console.log("close button pressed");
           </SafeAreaView>
         </View>
       </SafeAreaView>
-     {showReceiptDetails&& <Showrreciept setShowReceiptDetails={setShowReceiptDetails}/>}
-     {showGetSeva&& <Getseva setShowGetSeva={setShowGetSeva}/>}
-     {showSevaList&& <Getsevalist setShowSevaList={setShowSevaList}/>}
-    {loading && <LoadingComponent name={loadingContent}/>}
+      {showReceiptDetails && (
+        <Showrreciept setShowReceiptDetails={setShowReceiptDetails} />
+      )}
+      {showGetSeva && <Getseva setShowGetSeva={setShowGetSeva} />}
+      {showSevaList && <Getsevalist setShowSevaList={setShowSevaList} />}
+      {loading && <LoadingComponent name={loadingContent} />}
     </SafeAreaView>
   );
 };
@@ -671,7 +716,7 @@ const styles = StyleSheet.create({
     paddingTop: StatusBar.currentHeight,
     padding: 20,
     top: 10,
-    fontFamily: 'Roboto-Regular',
+    fontFamily: "Roboto-Regular",
     // height: 700,
     // backgroundColor: "#000",
     // flex:1,
@@ -720,10 +765,10 @@ const styles = StyleSheet.create({
     textAlign: "center",
   },
   font: {
-    fontFamily: 'Roboto-Regular',
+    fontFamily: "Roboto-Regular",
   },
   fontBold: {
-    fontFamily: 'Popins-Bold',
+    fontFamily: "Popins-Bold",
   },
 });
 

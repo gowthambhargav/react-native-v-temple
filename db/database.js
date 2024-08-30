@@ -157,7 +157,7 @@ const initializeDatabase = async () => {
     ISSUEDBY VARCHAR(10) NOT NULL,
     GRPSEVAID INTEGER NOT NULL,
     NAMEINKAN NVARCHAR(150) NOT NULL,
-    MOBNO VARCHAR(50) NOT NULL,
+    MOBNO VARCHAR(50),
     PRASADA VARCHAR(10) NOT NULL,
     RASHIID INTEGER NOT NULL,
     Synced BOOLEAN NOT NULL DEFAULT 0
@@ -268,7 +268,7 @@ export const GetAllComp = async () => {
   const query = "SELECT * FROM MstComp";
   try {
     const result = await db.getAllAsync(query);
- 
+
     return result;
   } catch (error) {
     console.error("Error fetching Comp:", error);
@@ -286,7 +286,7 @@ export const insertTrnHdrSEVA = async (sevaData) => {
   try {
     await db.runAsync(alterTableQuery);
   } catch (error) {
-    if (!error.message.includes('duplicate column name')) {
+    if (!error.message.includes("duplicate column name")) {
       console.error("Error altering table:", error);
       throw error;
     }
@@ -305,18 +305,52 @@ export const insertTrnHdrSEVA = async (sevaData) => {
   `;
   try {
     const result = await db.runAsync(query, [
-      sevaData.SEVANO, sevaData.Prefix, sevaData.PrintSEVANO, sevaData.SEVADate, 
-      sevaData.SEVADateYear, sevaData.SEVADateMonth, sevaData.Authorised, 
-      sevaData.AuthBy, sevaData.AuthOn, sevaData.ChangedBy, sevaData.ChangedOn, 
-      sevaData.Cancelled, sevaData.AddedBy, sevaData.AddedOn, sevaData.SANNIDHIID, 
-      sevaData.RMKS, sevaData.CHQNO, sevaData.CHQDATE, sevaData.SevaRate, 
-      sevaData.NoOfdays, sevaData.TotalAmt, sevaData.Add1, sevaData.Add2, 
-      sevaData.Add3, sevaData.Add4, sevaData.AMTINWRDS, sevaData.RegularD, 
-      sevaData.DaysPrintText, sevaData.KNAME, sevaData.SECKNAME, sevaData.NAKSHATRAID, 
-      sevaData.SECNAKSHATRAID, sevaData.GOTHRAID, sevaData.BANKNAME, sevaData.PAYMENT, 
-      sevaData.SVAID, sevaData.MOBNUM, sevaData.REFNO, sevaData.ADDRES, sevaData.ISSUEDBY, 
-      sevaData.GRPSEVAID, sevaData.NAMEINKAN, sevaData.MOBNO, sevaData.PRASADA, 
-      sevaData.RASHIID, sevaData.Synced ? 1 : 0 // Convert boolean to integer
+      sevaData.SEVANO,
+      sevaData.Prefix,
+      sevaData.PrintSEVANO,
+      sevaData.SEVADate,
+      sevaData.SEVADateYear,
+      sevaData.SEVADateMonth,
+      sevaData.Authorised,
+      sevaData.AuthBy,
+      sevaData.AuthOn,
+      sevaData.ChangedBy,
+      sevaData.ChangedOn,
+      sevaData.Cancelled,
+      sevaData.AddedBy,
+      sevaData.AddedOn,
+      sevaData.SANNIDHIID,
+      sevaData.RMKS,
+      sevaData.CHQNO,
+      sevaData.CHQDATE,
+      sevaData.SevaRate,
+      sevaData.NoOfdays,
+      sevaData.TotalAmt,
+      sevaData.Add1,
+      sevaData.Add2,
+      sevaData.Add3,
+      sevaData.Add4,
+      sevaData.AMTINWRDS,
+      sevaData.RegularD,
+      sevaData.DaysPrintText,
+      sevaData.KNAME,
+      sevaData.SECKNAME,
+      sevaData.NAKSHATRAID,
+      sevaData.SECNAKSHATRAID,
+      sevaData.GOTHRAID,
+      sevaData.BANKNAME,
+      sevaData.PAYMENT,
+      sevaData.SVAID,
+      sevaData.MOBNUM,
+      sevaData.REFNO,
+      sevaData.ADDRES,
+      sevaData.ISSUEDBY,
+      sevaData.GRPSEVAID,
+      sevaData.NAMEINKAN,
+      sevaData.MOBNO,
+      sevaData.PRASADA,
+      sevaData.RASHIID,
+      sevaData.Synced ? 1 : 0, // Convert boolean to integer
     ]);
     console.log("Record inserted successfully:");
     return result;
@@ -332,15 +366,14 @@ export const getAllTrnHdrSEVA = async () => {
   try {
     const result = await db.getAllAsync(query);
     console.log("====================================");
-    console.log("TrnHdrSEVA: From Database.js",result);
+    console.log("TrnHdrSEVA: From Database.js");
     console.log("====================================");
     return result;
   } catch (error) {
     console.error("Error fetching TrnHdrSEVA:", error);
     throw error;
   }
-}
-
+};
 
 export const GetSevaAmt = async (SVAID) => {
   db = await SQLite.openDatabaseAsync("vTempleVARADA");
@@ -355,19 +388,21 @@ export const GetSevaAmt = async (SVAID) => {
     console.error("Error fetching SevaAmt:", error);
     throw error;
   }
-}
+};
 
 /*
 
 This is the query for the show resipet details , like the below query, to show the names insted of the id's in the resipet details that is saved in the trnhdrseva table
 
-*/ 
+*/
 
 export const GetReciptDetails = async () => {
   const db = await SQLite.openDatabaseAsync("vTempleVARADA");
 
   // Fetch the last inserted row
-  const LatestData = await db.getFirstAsync('SELECT * FROM TrnHdrSEVA WHERE rowid = last_insert_rowid()');
+  const LatestData = await db.getFirstAsync(
+    "SELECT * FROM TrnHdrSEVA WHERE rowid = last_insert_rowid()"
+  );
   if (!LatestData) {
     console.error("No data found for the last inserted row.");
     return null;
@@ -382,30 +417,38 @@ export const GetReciptDetails = async () => {
     MstSANNIDHI.SANNIDHINAME AS SannidhiName,
     MstSVA.SVANAME AS SevaName
   FROM 
-    MstGOTHRA, MstNAKSHATRA, MstRASHI, MstSANNIDHI, MstSVA
+    MstSANNIDHI
+    INNER JOIN MstSVA ON MstSVA.SVAID = ?
+    LEFT JOIN MstGOTHRA ON MstGOTHRA.GOTHRAID = ?
+    LEFT JOIN MstNAKSHATRA ON MstNAKSHATRA.NAKSHATRAID = ?
+    LEFT JOIN MstRASHI ON MstRASHI.RASHIID = ?
   WHERE 
-    MstGOTHRA.GOTHRAID = ? AND
-    MstNAKSHATRA.NAKSHATRAID = ? AND
-    MstRASHI.RASHIID = ? AND
-    MstSANNIDHI.SANNIDHIID = ? AND
-    MstSVA.SVAID = ?
+    MstSANNIDHI.SANNIDHIID = ?
 `;
 
   try {
-    const names = await db.getFirstAsync(query, [GOTHRAID, NAKSHATRAID, RASHIID, SANNIDHIID, SVAID]);
-    console.log('====================================');
-    // console.log('LatestData:', LatestData);
-    console.log('Names:', names);
-    console.log('====================================');
-    return {...LatestData, ...names };
+    const names = await db.getFirstAsync(query, [
+      SVAID,
+      GOTHRAID,
+      NAKSHATRAID,
+      RASHIID,
+      SANNIDHIID,
+    ]);
+    console.log("====================================");
+    console.log("Names:", names);
+    console.log("====================================");
+
+    const result = { ...LatestData, ...names };
+    console.log(result, "result");
+
+    return result;
   } catch (error) {
     console.error("Error fetching names:", error);
     throw error;
   }
 };
 
-
-/* insertion on the startup application   */ 
+/* insertion on the startup application   */
 // Insert into MstRASHI
 const formatData = (data) => {
   return data.map((item) => ({
@@ -432,7 +475,7 @@ const insertOrUpdateData = async (data) => {
   try {
     // Insert or update new data
     for (const item of data) {
-      console.log("Processing item:", item); // Log each item before processing
+      console.log("Processing item:"); // Log each item before processing
 
       // Check if the item already exists
       const existingItem = await db.getFirstAsync(
@@ -466,7 +509,7 @@ const insertOrUpdateData = async (data) => {
             item.RASHIID,
           ]
         );
-        console.log("Data updated successfully for RASHIID:", item.RASHIID);
+        console.log("Data updated successfully for RASHIID:",);
       } else {
         // Insert new item
         await db.runAsync(
@@ -493,7 +536,7 @@ const insertOrUpdateData = async (data) => {
             item.RashiCodeClean,
           ]
         );
-        console.log("Data inserted successfully for RASHIID:", item.RASHIID);
+        console.log("Data inserted successfully for RASHIID:",);
       }
     }
   } catch (error) {
@@ -548,7 +591,7 @@ const insertDataNakshatra = async (data) => {
   try {
     // Insert new data
     for (const item of data) {
-      console.log("Inserting Nakshatra item:", item); // Log each item before insertion
+      console.log("Inserting Nakshatra item:"); // Log each item before insertion
       await db.runAsync(
         `INSERT INTO MstNAKSHATRA (
           NAKSHATRAID, NAKSHATRACODE, NAKSHATRANAME, NAKSHATRACodeClean, NAKSHATRASeries, 
@@ -636,7 +679,7 @@ const insertDataGothra = async (data) => {
   try {
     // Insert new data
     for (const item of data) {
-      console.log("Inserting Gothra item:", item); // Log each item before insertion
+      console.log("Inserting Gothra item:"); // Log each item before insertion
       await db.runAsync(
         `INSERT OR REPLACE INTO MstGOTHRA (
           GOTHRAID, GOTHRACODE, GOTHRANAME, GOTHRACodeClean, GOTHRASeries, 
@@ -662,9 +705,7 @@ const insertDataGothra = async (data) => {
         ]
       );
       console.log(
-        "Gothra data inserted successfully for GOTHRAID:",
-        item.GOTHRAID
-      );
+        "Gothra data inserted successfully for GOTHRAID:");
     }
   } catch (error) {
     console.error("Error inserting Gothra data:", error);
@@ -726,7 +767,7 @@ const insertDataSVA = async (data) => {
   try {
     // Insert new data
     for (const item of data) {
-      console.log("Inserting SVA item:", item); // Log each item before insertion
+      console.log("Inserting SVA item:"); // Log each item before insertion
 
       try {
         await db.runAsync(
@@ -758,7 +799,7 @@ const insertDataSVA = async (data) => {
             item.SVADISPNAME,
           ]
         );
-        console.log("SVA data inserted successfully for SVAID:", item.SVAID);
+        console.log("SVA data inserted successfully for SVAID:");
       } catch (error) {
         console.error("Error inserting SVA data:", error);
       }
@@ -841,7 +882,7 @@ const insertDataSANNIDHI = async (data) => {
   try {
     // Insert new data
     for (const item of data) {
-      console.log("Inserting SANNIDHI item:", item); // Log each item before insertion
+      console.log("Inserting SANNIDHI item:"); // Log each item before insertion
 
       try {
         await db.runAsync(
@@ -924,7 +965,7 @@ const insertDataComp = async (data) => {
   try {
     // Insert new data
     for (const item of data) {
-      console.log("Inserting Comp item:", item); // Log each item before insertion
+      console.log("Inserting Comp item:"); // Log each item before insertion
 
       try {
         await db.runAsync(
@@ -953,7 +994,7 @@ const insertDataComp = async (data) => {
             item.DashBoardLink,
           ]
         );
-        console.log("Comp data inserted successfully for CompID:", item.CompID);
+        console.log("Comp data inserted successfully for CompID:");
       } catch (error) {
         console.error("Error inserting Comp data:", error);
       }
@@ -979,16 +1020,9 @@ const initializeAndInsertDataComp = async () => {
 
 initializeAndInsertDataComp();
 
-
-
-
-
-
-
 /*
 Hear the sync the data from the exposqllit local to the mysql server,
-*/ 
-
+*/
 
 export const syncData = async () => {
   const db = await SQLite.openDatabaseAsync("vTempleVARADA");
@@ -1004,10 +1038,13 @@ export const syncData = async () => {
       return { message: "No data to sync" };
     }
 
-    const syncPost = await axios.post("https://react-native-v-temple-b.onrender.com/api/sevareceiptsql/sync", { data: result });
-    console.log('====================================');
-    console.log('SyncData:', syncPost.data);
-    console.log('====================================');
+    const syncPost = await axios.post(
+      "https://react-native-v-temple-b.onrender.com/api/sevareceiptsql/sync",
+      { data: result }
+    );
+    console.log("====================================");
+    console.log("SyncData:"); //syncPost.data
+    console.log("====================================");
 
     // Update the Synced column from 0 to 1
     const updateQuery = "UPDATE TrnHdrSEVA SET Synced = 1 WHERE Synced = 0";
@@ -1020,10 +1057,10 @@ export const syncData = async () => {
     throw error.response ? error.response.data : { message: error.message };
   }
 };
-//  hera i sth e query for the update the trnhdrseva table sync column from 1 to 0,
+//  hera i  query for the update the trnhdrseva table sync column from 1 to 0,
 
 export const updateSyncedData = async () => {
-   db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  db = await SQLite.openDatabaseAsync("vTempleVARADA");
   const query = "UPDATE TrnHdrSEVA SET Synced = 0 WHERE Synced = 1";
 
   try {
