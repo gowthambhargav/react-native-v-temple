@@ -47,7 +47,8 @@
     "to-words": "^4.1.0",
     "xml2js": "^0.6.2",
     "yup": "^1.4.0",
-    "@react-native-community/netinfo": "11.3.1"
+    "@react-native-community/netinfo": "11.3.1",
+    "expo-location": "~17.0.1"
   },
   "devDependencies": {
     "@babel/core": "^7.20.0"

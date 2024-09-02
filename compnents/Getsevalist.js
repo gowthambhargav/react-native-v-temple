@@ -1,23 +1,36 @@
-import React, { useState, useEffect } from 'react';
-import { View, Button, Text, Platform, ScrollView, SafeAreaView, TouchableOpacity } from 'react-native';
-import DateTimePicker from '@react-native-community/datetimepicker';
-import axios from 'axios';
-import CardWithShowMore from './CardWithShowMore';
+import React, { useState, useEffect } from "react";
+import {
+  View,
+  Button,
+  Text,
+  Platform,
+  ScrollView,
+  SafeAreaView,
+  TouchableOpacity,
+} from "react-native";
+import DateTimePicker from "@react-native-community/datetimepicker";
+import axios from "axios";
+import CardWithShowMore from "./CardWithShowMore";
+import * as Location from "expo-location";
 
-const Getsevalist = ({setShowSevaList}) => {
+const Getsevalist = ({ setShowSevaList }) => {
   const [fromDate, setFromDate] = useState(new Date());
   const [toDate, setToDate] = useState(new Date());
   const [showFrom, setShowFrom] = useState(false);
   const [showTo, setShowTo] = useState(false);
-const [SevaDataList,setSevaDataList] = useState();
+  const [SevaDataList, setSevaDataList] = useState();
+  const [location, setLocation] = useState(null);
+  const [errorMsg, setErrorMsg] = useState(null);
+
   const onChangeFrom = (event, selectedDate) => {
     const currentDate = selectedDate || fromDate;
-    setShowFrom(Platform.OS === 'ios');
+    setShowFrom(Platform.OS === "ios");
     setFromDate(currentDate);
   };
+
   const onChangeTo = (event, selectedDate) => {
     const currentDate = selectedDate || toDate;
-    setShowTo(Platform.OS === 'ios');
+    setShowTo(Platform.OS === "ios");
     setToDate(currentDate);
   };
 
@@ -28,76 +41,146 @@ const [SevaDataList,setSevaDataList] = useState();
   const showToDatepicker = () => {
     setShowTo(true);
   };
+
   function formatDate(date) {
     const year = date.getFullYear();
-    const month = String(date.getMonth() + 1).padStart(2, '0');
-    const day = String(date.getDate()).padStart(2, '0');
+    const month = String(date.getMonth() + 1).padStart(2, "0");
+    const day = String(date.getDate()).padStart(2, "0");
     return `${year}-${month}-${day}`;
   }
 
-  const HandeleGetsevaList = ()=>{
-    console.log(formatDate(fromDate),formatDate(toDate),"fk;gk;'k;sga;lf;lfsj;falsfa");
-    
-    axios.get(`http://192.168.1.24/vTempleApi/GetSevaList/${formatDate(fromDate)}/${formatDate(toDate)}`)
-    .then((res)=>{
-      console.log(res.data);
-      const data = JSON.parse(`${res.data}`);
-      console.log('====================================');
-      console.log("Parsed data",data);
-      console.log('====================================');
-      
-    })
-    .catch((err)=>{
-      console.log(err);
-      
-    })
-  }
+  const HandeleGetsevaList = () => {
+    console.log(
+      formatDate(fromDate),
+      formatDate(toDate),
+      "Fetching Seva List"
+    );
 
-  useEffect(() => {
-    // Add any side effects here if needed
-  }, []);
+    axios
+      .get(
+        `http://192.168.1.24/vTempleApi/GetSevaList/${formatDate(
+          fromDate
+        )}/${formatDate(toDate)}`
+      )
+      .then((res) => {
+        console.log("API Response:", res.data);
+        const data = JSON.parse(`${res.data}`);
+        console.log("Parsed Data:", data);
+        setSevaDataList(data); // Make sure to set the data to state
+      })
+      .catch((err) => {
+        console.error("Error fetching Seva List:", err);
+      });
+  };
+
+  const HandelGetCurrentLocation = async () => {
+    try {
+      // Request location permissions
+      let { status } = await Location.requestForegroundPermissionsAsync();
+      if (status !== "granted") {
+        setErrorMsg("Permission to access location was denied");
+        return;
+      }
+
+      // Try to get the current location
+      let location = await Location.getCurrentPositionAsync({
+        accuracy: Location.Accuracy.High,
+        // timeout: 5000, // Optionally set a timeout
+      });
+      setLocation(location);
+      console.log("Current Location:", location);
+    } catch (error) {
+      console.error("Error getting current location:", error);
+      setErrorMsg("Error fetching location. Make sure GPS is enabled.");
+    }
+  };
 
   return (
-    <SafeAreaView style={{ position: "absolute", backgroundColor: "#8a8a8a", flex: 1, justifyContent: "center", width: "100%", height: "100%" }}>
-<View style={{ flexDirection: 'row', marginBottom: 20,padding:10}}>
-  <View style={{ flex: 1,margin:5 }}>
-    <Button onPress={showFromDatepicker} title="Select From Date" />
-    {showFrom && (
-      <DateTimePicker
-        testID="dateTimePickerFrom"
-        value={fromDate}
-        mode="date"
-        display="default"
-        onChange={onChangeFrom}
-      />
-    )}
-  </View>
-  <View style={{ flex: 1,margin:5 }}>
-    <Button onPress={showToDatepicker} title="Select To Date" />
-    {showTo && (
-      <DateTimePicker
-        testID="dateTimePickerTo"
-        value={toDate}
-        mode="date"
-        display="default"
-        onChange={onChangeTo}
-      />
-    )}
-  </View>
-</View>
+    <SafeAreaView
+      style={{
+        position: "absolute",
+        backgroundColor: "#8a8a8a",
+        flex: 1,
+        justifyContent: "center",
+        width: "100%",
+        height: "100%",
+      }}
+    >
+      <View style={{ flexDirection: "row", marginBottom: 20, padding: 10 }}>
+        <View style={{ flex: 1, margin: 5 }}>
+          <Button onPress={showFromDatepicker} title="Select From Date" />
+          {showFrom && (
+            <DateTimePicker
+              testID="dateTimePickerFrom"
+              value={fromDate}
+              mode="date"
+              display="default"
+              onChange={onChangeFrom}
+            />
+          )}
+        </View>
+        <View style={{ flex: 1, margin: 5 }}>
+          <Button onPress={showToDatepicker} title="Select To Date" />
+          {showTo && (
+            <DateTimePicker
+              testID="dateTimePickerTo"
+              value={toDate}
+              mode="date"
+              display="default"
+              onChange={onChangeTo}
+            />
+          )}
+        </View>
+      </View>
       <ScrollView style={{ height: "auto" }}>
         <View style={{ padding: 10 }}>
-          <Text>{formatDate(fromDate)} - {formatDate(toDate)}</Text>
-          {SevaDataList ?<CardWithShowMore data={SevaDataList} />:null}
+          <Text>
+            {formatDate(fromDate)} - {formatDate(toDate)}
+          </Text>
+          {SevaDataList ? <CardWithShowMore data={SevaDataList} /> : null}
         </View>
+        {location && (
+          <View style={{ padding: 10 }}>
+            <Text>Latitude: {location.coords.latitude}</Text>
+            <Text>Longitude: {location.coords.longitude}</Text>
+          </View>
+        )}
+        {errorMsg && (
+          <View style={{ padding: 10 }}>
+            <Text>{errorMsg}</Text>
+          </View>
+        )}
       </ScrollView>
-      <View style={{width:"80%",marginLeft:"auto",marginRight:"auto",padding:10}}>
-<TouchableOpacity style={{marginBottom:10}}>
-<Button  title="Get Seva" color={"#4285F4"} onPress={()=>{console.log("clicked on Get Seva");
-HandeleGetsevaList();
-       }}/>
-</TouchableOpacity>
-      <Button  title="Close" color={"tomato"} onPress={()=>{setShowSevaList(false) }}/>
+      <View
+        style={{
+          width: "80%",
+          marginLeft: "auto",
+          marginRight: "auto",
+          padding: 10,
+        }}
+      >
+        <Button
+          title="Get Current Location"
+          color={"green"}
+          onPress={HandelGetCurrentLocation}
+        />
+        <TouchableOpacity style={{ marginBottom: 10 }}>
+          <Button
+            title="Get Seva"
+            color={"#4285F4"}
+            onPress={() => {
+              console.log("Clicked on Get Seva");
+              HandeleGetsevaList();
+            }}
+          />
+        </TouchableOpacity>
+        <Button
+          title="Close"
+          color={"tomato"}
+          onPress={() => {
+            setShowSevaList(false);
+          }}
+        />
       </View>
     </SafeAreaView>
   );
