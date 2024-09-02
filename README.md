@@ -11,7 +11,7 @@ select * from trnhdrseva
 
 add sync btn whine the button is clicked get the all data saved in sevareceipts and update it to trnhdrseva this db in mysql
 
-
+```javascript
   const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
@@ -118,9 +118,9 @@ add sync btn whine the button is clicked get the all data saved in sevareceipts 
     </body>
     </html>
     `;
+```
 
-
-
+```javascript
 
 import React, { useState, useEffect } from "react";
 import {
@@ -312,3 +312,4 @@ const Getsevalist = ({ setShowSevaList }) => {
 
 export default Getsevalist;
 
+```
