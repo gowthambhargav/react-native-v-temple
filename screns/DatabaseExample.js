@@ -1,5 +1,5 @@
 import React, { useEffect } from 'react';
-import { View, Text, Button } from 'react-native';
+import { View, Text } from 'react-native';
 import * as SQLite from 'expo-sqlite';
 
 const DatabaseExample = () => {

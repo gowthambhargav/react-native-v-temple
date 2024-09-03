@@ -1,7 +1,6 @@
 
 import React from 'react';
 import { StyleSheet, Text, TextInput,SafeAreaView,Button,Alert,ImageBackground, View, Image } from 'react-native';
-import fontStyles from '../utils/fontStyles';
 
 export default function Login() {
   const [userName, onUserNameChange] = React.useState('');

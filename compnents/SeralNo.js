@@ -1,5 +1,4 @@
-import { useFonts } from 'expo-font';
-import React, { useState } from 'react';
+import React from 'react';
 import { View, Text, StyleSheet } from 'react-native';
 
 const SerialNo = ({SeralNo, setSeralNo}) => {
@@ -20,7 +19,6 @@ const styles = StyleSheet.create({
   },
   text: {
     fontSize: 15,
-    // fontWeight: '400',
     fontFamily: 'Poppins-Medium',
   },
   loadingText: {

@@ -448,7 +448,6 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
                 padding: 10,
                 flexDirection: "row",
                 backgroundColor: "#f2f2f2",
-                // justifyContent: "center",
                 alignContent: "center",
               }}
               onPress={HandelSyncClick}

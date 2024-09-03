@@ -1,9 +1,8 @@
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
-import axios from 'axios';
 import fontStyles from '../utils/fontStyles';
-import { GetAllSannidhi, GetAllSVA } from '../db/database';
+import { GetAllSannidhi } from '../db/database';
 
 
 const SannidhiCom = ({dplable,lable,setSannidhi,value,requred}) => {

@@ -1,6 +1,6 @@
 // LoadingComponent.js
 import React from 'react';
-import { View, ActivityIndicator, Text, StyleSheet, TouchableHighlight } from 'react-native';
+import { View, ActivityIndicator, Text, StyleSheet } from 'react-native';
 
 const LoadingComponent = ({ name }) => {
   return (

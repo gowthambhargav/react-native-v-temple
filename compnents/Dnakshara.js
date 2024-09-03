@@ -1,4 +1,3 @@
-import axios from 'axios';
 import React, { useEffect, useState } from 'react';
 import { StyleSheet, Text, View } from 'react-native';
 import { Dropdown } from 'react-native-element-dropdown';
@@ -58,7 +57,6 @@ const Dnakshara = ({dplable,lable,setNakshatra,nakshatra}) => {
         onFocus={() => setIsFocus(true)}
         onBlur={() => setIsFocus(false)}
         onChange={item => {
-          // console.log(item,"hkhkjhkhj");
           setNakshatra(item.value);
           setIsFocus(false);
         }}

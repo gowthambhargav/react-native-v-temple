@@ -1,9 +1,7 @@
 import React, { useEffect } from 'react'
-import { Text,SafeAreaView,ScrollView, View, Touchable } from 'react-native'
+import { SafeAreaView,ScrollView, View } from 'react-native'
 import Card from './Card'
-import { TouchableOpacity } from 'react-native';
 import { Button } from 'react-native';
-import axios from 'axios';
 import { getAllTrnHdrSEVA } from '../db/database';
 function Showrreciept({setShowReceiptDetails}) {
     const [receiptData, setReceiptData] = React.useState();
@@ -25,7 +23,6 @@ useEffect(() =>
 
   return (
     <SafeAreaView style={{position:"absolute",backgroundColor:"#8a8a8a",flex:1,justifyContent:"center",width:"100%",height:"100%",}}>
-        {/* <Text style={{textAlign:"center"}}>ShowrReciept</Text> */}
 
 
         <ScrollView style={{height:"auto"}}>
@@ -43,4 +40,4 @@ useEffect(() =>
   )
 }
 
-export default Showrreciept
+export default Showrreciept;
