@@ -30,7 +30,7 @@ import Getseva from "../compnents/Getseva";
 import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
-import { format, set } from "date-fns";
+import { format } from "date-fns";
 import {
   GetReciptDetails,
   GetSevaAmt,
@@ -65,6 +65,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     "Popins-Bold": require("../assets/fonts/Poppins-Bold.ttf"),
     "Poppins-Medium": require("../assets/fonts/Poppins-Medium.ttf"),
   });
+
   const scrollViewRef = useRef();
 
   const initializeSerialNo = async () => {
