@@ -11,7 +11,7 @@ import {
   TouchableOpacity,
   Alert,
 } from "react-native";
-import { FontAwesome6 } from "@expo/vector-icons";
+import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
 import { Feather } from "@expo/vector-icons";
 import CurrentDateComponent from "../compnents/Date";
@@ -34,6 +34,7 @@ import { format } from "date-fns";
 import {
   GetReciptDetails,
   GetSevaAmt,
+  getTrnHdrSevaBySevaId,
   insertTrnHdrSEVA,
   syncData,
 } from "../db/database";
@@ -53,11 +54,14 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [ReceiptDetails, setReceiptDetails] = useState();
   const [translateMenu, setTranslateMenu] = useState(-290);
   const [showReceiptDetails, setShowReceiptDetails] = useState(false);
-
   const [showGetSeva, setShowGetSeva] = useState(false);
   const [showSevaList, setShowSevaList] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingContent, setLoadingContent] = useState("Loading");
+  const [selectedNo,setSelectedNo] = useState(null);
+  const [selectedNoData,setSelectedNoData] = useState();
+
+
 
   // loading fonts
   const [loaded] = useFonts({
@@ -125,10 +129,28 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
       await AsyncStorage.setItem("storedData", `${currentDate}-1`);
     }
   };
-
+console.log(selectedNo,"from the HomeScreen.js");
+const GetSevaById = async ()=>{
+  const test = await getTrnHdrSevaBySevaId(selectedNo);
+  console.log('====================================');
+  console.log(test,"test from HomeScreen");
+  setSelectedNoData(test)
+  console.log('====================================');
+}
   useEffect(() => {
     initializeSerialNo();
-  }, []);
+    GetSevaById().then((r)=>{
+      setGothra(selectedNoData  && selectedNoData.GOTHRAID);
+      setNakshatra(selectedNoData && selectedNoData.NAKSHATRAID);
+      setRashi(selectedNoData && selectedNoData.RASHIID);
+      setName(selectedNoData && selectedNoData.KNAME);
+      setPhone(selectedNoData && selectedNoData.MOBNUM);
+      setSannidhi(selectedNoData && selectedNoData.SANNIDHIID);
+      setSeva(selectedNoData && selectedNoData.SVAID);
+      // setSeralNo(selectedNoData && selectedNoData.SEVANO);
+    }).catch((error)=>console.log(error)
+    )
+  }, [selectedNo]);
 
   const convertAmountToWords = (amount) => {
     const toWords = new ToWords();
@@ -430,7 +452,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
           </View>
           <View style={{ flexDirection: "row", left: -10 }}>
             <CurrentDateComponent />
-            <SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />
+            {<SerialNo SeralNo={SeralNo} setSeralNo={setSeralNo} />}
           </View>
           <View
             style={{
@@ -568,7 +590,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
                 fontFamily: "Roboto-Regular",
               }}
             >
-              <FontAwesome6 name="save" size={24} color="white" /> Save
+              <FontAwesome6 name="save" size={24} color="white" /> Save / Update
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={HandleSavePrint} style={{ top: -130 }}>
@@ -606,6 +628,33 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
               Clear
             </Text>
           </TouchableOpacity>
+          <TouchableOpacity onPress={()=>{
+            setShowReceiptDetails(true);
+          }} style={{ top: -110 }}>
+  <View
+    style={{
+      flexDirection: 'row',
+      alignItems: 'center',
+      justifyContent: 'center',
+      backgroundColor: '#4287f5',
+      paddingBottom: 10,
+      paddingTop: 10,
+    }}
+  >
+    <FontAwesome name="list-ul" size={22} color="white" style={{marginTop:0,marginBottom:"auto"}} />
+    <Text
+      style={{
+        color: 'white',
+        fontSize: 18,
+        textAlign: 'center',
+        marginLeft: 10, // Add some margin to separate the icon and text
+        fontFamily: 'Roboto-Regular',
+      }}
+    >
+      List
+    </Text>
+  </View>
+</TouchableOpacity>
         </ScrollView>
         <View
           style={{
@@ -702,7 +751,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
         </View>
       </SafeAreaView>
       {showReceiptDetails && (
-        <Showrreciept setShowReceiptDetails={setShowReceiptDetails} />
+        <Showrreciept setShowReceiptDetails={setShowReceiptDetails} setSelectedNo={setSelectedNo} setLoading={setLoading} />
       )}
       {showGetSeva && <Getseva setShowGetSeva={setShowGetSeva} />}
       {showSevaList && <Getsevalist setShowSevaList={setShowSevaList} />}

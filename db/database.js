@@ -509,7 +509,7 @@ const insertOrUpdateData = async (data) => {
             item.RASHIID,
           ]
         );
-        console.log("Data updated successfully for RASHIID:",);
+        console.log("Data updated successfully for RASHIID:");
       } else {
         // Insert new item
         await db.runAsync(
@@ -536,7 +536,7 @@ const insertOrUpdateData = async (data) => {
             item.RashiCodeClean,
           ]
         );
-        console.log("Data inserted successfully for RASHIID:",);
+        console.log("Data inserted successfully for RASHIID:");
       }
     }
   } catch (error) {
@@ -704,8 +704,7 @@ const insertDataGothra = async (data) => {
           item.ChangedOn,
         ]
       );
-      console.log(
-        "Gothra data inserted successfully for GOTHRAID:");
+      console.log("Gothra data inserted successfully for GOTHRAID:");
     }
   } catch (error) {
     console.error("Error inserting Gothra data:", error);
@@ -1068,6 +1067,61 @@ export const updateSyncedData = async () => {
     console.log("Synced column updated successfully.");
   } catch (error) {
     console.error("Error updating Synced column:", error);
+    throw error;
+  }
+};
+
+export const getSevaDetails = async () => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  const query = `
+    SELECT 
+      trnhdrseva.SEVANO AS no,
+      trnhdrseva.TotalAmt AS amount,
+      trnhdrseva.SVAID,
+      mstsva.SVANAME AS sevaName
+    FROM 
+      trnhdrseva
+    JOIN 
+      mstsva ON trnhdrseva.SVAID = mstsva.SVAID;
+  `;
+
+  try {
+    const result = await db.getAllAsync(query);
+    // console.log("Seva details retrieved successfully.");
+    // console.log('====================================');
+    // console.log(result, "From the database");
+    // console.log('====================================');
+    return result.map((row) => ({
+      no: row.no,
+      sevaName: row.sevaName,
+      amount: row.amount,
+    }));
+  } catch (error) {
+    console.error("Error retrieving seva details:", error);
+    throw error;
+  }
+};
+
+export const getTrnHdrSevaBySevaId = async (sevaId) => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  const query = `
+    SELECT *
+    FROM 
+      trnhdrseva
+    WHERE 
+      SEVANO = ?;
+  `;
+
+  try {
+    console.log("Executing query with SVAID:", sevaId);
+    const result = await db.getFirstAsync(query, [sevaId]);
+    console.log("TrnHdrSEVA records retrieved successfully.");
+    // console.log("====================================");
+    // console.log(result, "From the database");
+    // console.log("====================================");
+    return result;
+  } catch (error) {
+    console.error("Error retrieving TrnHdrSEVA records:", error);
     throw error;
   }
 };
