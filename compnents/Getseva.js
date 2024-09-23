@@ -22,7 +22,7 @@ function Getseva({ setShowGetSeva }) {
         console.log("====================================");
       });
   };
-  useEffect(() => {}, []);
+  // useEffect(() => {}, []);
 
   return (
     <SafeAreaView

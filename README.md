@@ -5,15 +5,14 @@ eas build -p android --profile preview
 
 ximosay984@vasomly.com Pass:Gowtham@1234
 
-
-select * from trnhdrseva
+select \* from trnhdrseva
 
 eas build --platform android --local
 
 add sync btn whine the button is clicked get the all data saved in sevareceipts and update it to trnhdrseva this db in mysql
 
 ```javascript
-  const htmlContent = `
+const htmlContent = `
     <!DOCTYPE html>
     <html lang="en">
     <head>
@@ -68,44 +67,66 @@ add sync btn whine the button is clicked get the all data saved in sevareceipts 
     <body>
         <div class="container">
             <div class="header">
-                <h1 style="font-size: 14px; font-weight: bold; text-transform: uppercase;">${addressData?.CompName}</h1>
+                <h1 style="font-size: 14px; font-weight: bold; text-transform: uppercase;">${
+                  addressData?.CompName
+                }</h1>
                 <p style="text-transform: capitalize; width: 60%; margin: 2px auto;">
-                    ${addressData?.Address1} <br> ${addressData?.Address2}<br> ${addressData?.Address3} <br>${addressData?.Address5 ? `${addressData.Address5} ` : ''}Ph: ${addressData?.MOBNO}
+                    ${addressData?.Address1} <br> ${
+  addressData?.Address2
+}<br> ${addressData?.Address3} <br>${
+  addressData?.Address5 ? `${addressData.Address5} ` : ""
+}Ph: ${addressData?.MOBNO}
                 </p>
             </div>
             <div class="content">
                 <div style="display: flex; justify-content: space-between; align-items: center; border-bottom: 1px solid; border-top: 1px solid; padding: 5px 0;">
                     <p>Date: <strong>${currentDate}</strong></p>
-                    <p>Receipt No: <strong>${sevaDetails?.sevaReceiptID}</strong></p>
+                    <p>Receipt No: <strong>${
+                      sevaDetails?.sevaReceiptID
+                    }</strong></p>
                 </div>
                 <div style="margin-top: 5px; padding-bottom: 5px;">
                     <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                         <p style="font-weight: bold; margin: 2px 0;">Name:</p>
-                        <p style="padding-left: 5px; margin: 2px 0;">${sevaDetails?.name}</p>
+                        <p style="padding-left: 5px; margin: 2px 0;">${
+                          sevaDetails?.name
+                        }</p>
                     </div>
                     <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                         <p style="font-weight: bold; margin: 2px 0;">Gothra:</p>
-                        <p style="padding-left: 5px; margin: 2px 0;">${sevaDetails?.gothra}</p>
+                        <p style="padding-left: 5px; margin: 2px 0;">${
+                          sevaDetails?.gothra
+                        }</p>
                     </div>
                     <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                         <p style="font-weight: bold; margin: 2px 0;">Nakshatra:</p>
-                        <p style="padding-left: 5px; margin: 2px 0;">${sevaDetails?.nakshatra}</p>
+                        <p style="padding-left: 5px; margin: 2px 0;">${
+                          sevaDetails?.nakshatra
+                        }</p>
                     </div>
                     <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                         <p style="font-weight: bold; margin: 2px 0;">Rashi:</p>
-                        <p style="padding-left: 5px; margin: 2px 0;">${sevaDetails?.rashi}</p>
+                        <p style="padding-left: 5px; margin: 2px 0;">${
+                          sevaDetails?.rashi
+                        }</p>
                     </div>
                     <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                         <p style="font-weight: bold; margin: 2px 0;">Sannidhi:</p>
-                        <p style="padding-left: 5px; margin: 2px 0;">${sevaDetails?.sannidhi}</p>
+                        <p style="padding-left: 5px; margin: 2px 0;">${
+                          sevaDetails?.sannidhi
+                        }</p>
                     </div>
                     <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                         <p style="font-weight: bold; margin: 2px 0;">Seva:</p>
-                        <p style="padding-left: 5px; font-weight: bold; font-size: 15px; margin: 2px 0;">${sevaDetails?.seva}</p>
+                        <p style="padding-left: 5px; font-weight: bold; font-size: 15px; margin: 2px 0;">${
+                          sevaDetails?.seva
+                        }</p>
                     </div>
                     <div style="display: flex; justify-content: flex-start; padding-right: 5px; align-items: center;">
                         <p style="font-weight: bold; margin: 2px 0;">Mobile:</p>
-                        <p style="padding-left: 5px; margin: 2px 0;">${sevaDetails?.phoneNo}</p>
+                        <p style="padding-left: 5px; margin: 2px 0;">${
+                          sevaDetails?.phoneNo
+                        }</p>
                     </div>
                 </div>
             </div>
@@ -122,7 +143,6 @@ add sync btn whine the button is clicked get the all data saved in sevareceipts 
 ```
 
 ```javascript
-
 import React, { useState, useEffect } from "react";
 import {
   View,
@@ -175,11 +195,7 @@ const Getsevalist = ({ setShowSevaList }) => {
   }
 
   const HandeleGetsevaList = () => {
-    console.log(
-      formatDate(fromDate),
-      formatDate(toDate),
-      "Fetching Seva List"
-    );
+    console.log(formatDate(fromDate), formatDate(toDate), "Fetching Seva List");
 
     axios
       .get(
@@ -312,5 +328,4 @@ const Getsevalist = ({ setShowSevaList }) => {
 };
 
 export default Getsevalist;
-
 ```
