@@ -1,15 +1,24 @@
-import React, { useEffect } from 'react';
-import { SafeAreaView, ScrollView, View, Text, Button, TouchableOpacity } from 'react-native';
-import { getSevaDetails } from '../db/database';
+import React, { useEffect } from "react";
+import {
+  SafeAreaView,
+  ScrollView,
+  View,
+  Text,
+  Button,
+  TouchableOpacity,
+} from "react-native";
+import { getSevaDetails } from "../db/database";
 
-function Showrreciept({ setShowReceiptDetails,setSelectedNo,setLoading }) {
+function Showrreciept({ setShowReceiptDetails, setSelectedNo, setLoading }) {
   const [receiptData, setReceiptData] = React.useState([]);
-  const [currentDate, setCurrentDate] = React.useState('');
+  const [currentDate, setCurrentDate] = React.useState("");
 
   useEffect(() => {
     // Set current date
     const date = new Date();
-    const formattedDate = `${date.getDate()}/${date.getMonth() + 1}/${date.getFullYear()}`;
+    const formattedDate = `${date.getDate()}/${
+      date.getMonth() + 1
+    }/${date.getFullYear()}`;
     setCurrentDate(formattedDate);
 
     // Fetch data from database
@@ -21,21 +30,21 @@ function Showrreciept({ setShowReceiptDetails,setSelectedNo,setLoading }) {
         console.error("Error fetching seva details:", error);
       });
 
-    console.log('Showrreciept');
+    console.log("Showrreciept");
   }, []);
 
   return (
     <SafeAreaView
       style={{
-        position: 'absolute',
-        backgroundColor: '#8a8a8a',
+        position: "absolute",
+        backgroundColor: "#8a8a8a",
         flex: 1,
-        justifyContent: 'center',
-        width: '100%',
-        height: '100%',
+        justifyContent: "center",
+        width: "100%",
+        height: "100%",
       }}
     >
-      <ScrollView style={{ height: 'auto' }}>
+      <ScrollView style={{ height: "auto" }}>
         <View style={{ padding: 10 }}>
           {/* Current Date */}
           <Text style={{ fontSize: 13, marginBottom: 10 }}>
@@ -45,15 +54,21 @@ function Showrreciept({ setShowReceiptDetails,setSelectedNo,setLoading }) {
           {/* Header */}
           <View
             style={{
-              flexDirection: 'row',
-              justifyContent: 'space-between',
+              flexDirection: "row",
+              justifyContent: "space-between",
               padding: 10,
-              backgroundColor: '#4287f5',
+              backgroundColor: "#4287f5",
             }}
           >
-            <Text style={{ color: 'white', fontWeight: 'bold', flex: 1.8 }}>No</Text>
-            <Text style={{ color: 'white', fontWeight: 'bold', flex: 4 }}>Seva Name</Text>
-            <Text style={{ color: 'white', fontWeight: 'bold', flex: 1 }}>Amount</Text>
+            <Text style={{ color: "white", fontWeight: "bold", flex: 1.8 }}>
+              No
+            </Text>
+            <Text style={{ color: "white", fontWeight: "bold", flex: 4 }}>
+              Seva Name
+            </Text>
+            <Text style={{ color: "white", fontWeight: "bold", flex: 1 }}>
+              Amount
+            </Text>
           </View>
 
           {/* List Items */}
@@ -61,21 +76,20 @@ function Showrreciept({ setShowReceiptDetails,setSelectedNo,setLoading }) {
             receiptData.map((data) => (
               <TouchableOpacity
                 key={data.no}
-                onPress={() =>{
-                  setSelectedNo(data.no);
-                  setShowReceiptDetails(false);
-                  setLoading(true)
+                onPress={() => {
+                  // setSelectedNo(data.no);
+                  // setShowReceiptDetails(false);
+                  // setLoading(true);
                   //  console.log(data.no,"From the Showrreciept")
-                  }
-                  }
+                }}
               >
                 <View
                   style={{
-                    flexDirection: 'row',
-                    justifyContent: 'space-between',
+                    flexDirection: "row",
+                    justifyContent: "space-between",
                     padding: 10,
                     borderBottomWidth: 1,
-                    borderBottomColor: '#ccc',
+                    borderBottomColor: "#ccc",
                   }}
                 >
                   <Text style={{ flex: 1.8 }}>{data.no}</Text>
@@ -86,12 +100,19 @@ function Showrreciept({ setShowReceiptDetails,setSelectedNo,setLoading }) {
             ))}
         </View>
       </ScrollView>
-      <View style={{ width: '80%', marginLeft: 'auto', marginRight: 'auto', padding: 10 }}>
+      <View
+        style={{
+          width: "80%",
+          marginLeft: "auto",
+          marginRight: "auto",
+          padding: 10,
+        }}
+      >
         <Button
           title="Close"
-          color={'tomato'}
+          color={"tomato"}
           onPress={() => {
-            console.log('Print');
+            console.log("Print");
             setShowReceiptDetails(false);
           }}
         />

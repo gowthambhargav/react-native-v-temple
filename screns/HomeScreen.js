@@ -58,10 +58,8 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [showSevaList, setShowSevaList] = useState(false);
   const [loading, setLoading] = useState(false);
   const [loadingContent, setLoadingContent] = useState("Loading");
-  const [selectedNo,setSelectedNo] = useState(null);
-  const [selectedNoData,setSelectedNoData] = useState();
-
-
+  const [selectedNo, setSelectedNo] = useState(null);
+  const [selectedNoData, setSelectedNoData] = useState();
 
   // loading fonts
   const [loaded] = useFonts({
@@ -129,27 +127,28 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
       await AsyncStorage.setItem("storedData", `${currentDate}-1`);
     }
   };
-console.log(selectedNo,"from the HomeScreen.js");
-const GetSevaById = async ()=>{
-  const test = await getTrnHdrSevaBySevaId(selectedNo);
-  console.log('====================================');
-  console.log(test,"test from HomeScreen");
-  setSelectedNoData(test)
-  console.log('====================================');
-}
+  console.log(selectedNo, "from the HomeScreen.js");
+  const GetSevaById = async () => {
+    const test = await getTrnHdrSevaBySevaId(selectedNo);
+    console.log("====================================");
+    console.log(test, "test from HomeScreen");
+    setSelectedNoData(test);
+    console.log("====================================");
+  };
   useEffect(() => {
     initializeSerialNo();
-    GetSevaById().then((r)=>{
-      setGothra(selectedNoData  && selectedNoData.GOTHRAID);
-      setNakshatra(selectedNoData && selectedNoData.NAKSHATRAID);
-      setRashi(selectedNoData && selectedNoData.RASHIID);
-      setName(selectedNoData && selectedNoData.KNAME);
-      setPhone(selectedNoData && selectedNoData.MOBNUM);
-      setSannidhi(selectedNoData && selectedNoData.SANNIDHIID);
-      setSeva(selectedNoData && selectedNoData.SVAID);
-      // setSeralNo(selectedNoData && selectedNoData.SEVANO);
-    }).catch((error)=>console.log(error)
-    )
+    GetSevaById()
+      .then((r) => {
+        setGothra(selectedNoData && selectedNoData.GOTHRAID);
+        setNakshatra(selectedNoData && selectedNoData.NAKSHATRAID);
+        setRashi(selectedNoData && selectedNoData.RASHIID);
+        setName(selectedNoData && selectedNoData.KNAME);
+        setPhone(selectedNoData && selectedNoData.MOBNUM);
+        setSannidhi(selectedNoData && selectedNoData.SANNIDHIID);
+        setSeva(selectedNoData && selectedNoData.SVAID);
+        // setSeralNo(selectedNoData && selectedNoData.SEVANO);
+      })
+      .catch((error) => console.log(error));
   }, [selectedNo]);
 
   const convertAmountToWords = (amount) => {
@@ -273,19 +272,19 @@ const GetSevaById = async ()=>{
   };
   const HandleSavePrint = async () => {
     let hasError = false;
-  
+
     // Check if 'name' is empty
     if (!name) {
       setError({ type: "name", msg: "Name is required" });
       hasError = true;
     }
-  
+
     // Check if 'sannidhi' is empty
     if (sannidhi === "") {
       setError({ type: "sannidhi", msg: "Sannidhi is required" });
       hasError = true;
     }
-  
+
     // Check if 'seva' is empty
     if (seva === "") {
       setError({ type: "seva", msg: "Seva is required" });
@@ -294,7 +293,7 @@ const GetSevaById = async ()=>{
     if (hasError) {
       return;
     }
-  
+
     // If there are no errors, submit the form
     const sevaAmt = await GetSevaAmt(seva);
     const sevaData = {
@@ -345,15 +344,14 @@ const GetSevaById = async ()=>{
       RASHIID: rashi,
       Synced: false,
     };
-  
+
     try {
       setLoadingContent("Saving Data");
       setLoading(true);
       await insertTrnHdrSEVA(sevaData);
       console.log("data inserted successfully");
       await updateSerialNo();
-     
-  
+
       // Fetch receipt details and update state
       const receiptDetails = await GetReciptDetails();
       setReceiptDetails(receiptDetails);
@@ -363,7 +361,7 @@ const GetSevaById = async ()=>{
     } catch (err) {
       console.log(err);
     }
-  
+
     HandelClear();
   };
 
@@ -590,7 +588,7 @@ const GetSevaById = async ()=>{
                 fontFamily: "Roboto-Regular",
               }}
             >
-              <FontAwesome6 name="save" size={24} color="white" /> Save / Update
+              <FontAwesome6 name="save" size={24} color="white" /> Save
             </Text>
           </TouchableOpacity>
           <TouchableOpacity onPress={HandleSavePrint} style={{ top: -130 }}>
@@ -628,33 +626,41 @@ const GetSevaById = async ()=>{
               Clear
             </Text>
           </TouchableOpacity>
-          <TouchableOpacity onPress={()=>{
-            setShowReceiptDetails(true);
-          }} style={{ top: -110 }}>
-  <View
-    style={{
-      flexDirection: 'row',
-      alignItems: 'center',
-      justifyContent: 'center',
-      backgroundColor: '#4287f5',
-      paddingBottom: 10,
-      paddingTop: 10,
-    }}
-  >
-    <FontAwesome name="list-ul" size={22} color="white" style={{marginTop:0,marginBottom:"auto"}} />
-    <Text
-      style={{
-        color: 'white',
-        fontSize: 18,
-        textAlign: 'center',
-        marginLeft: 10, // Add some margin to separate the icon and text
-        fontFamily: 'Roboto-Regular',
-      }}
-    >
-      List
-    </Text>
-  </View>
-</TouchableOpacity>
+          <TouchableOpacity
+            onPress={() => {
+              setShowReceiptDetails(true);
+            }}
+            style={{ top: -110 }}
+          >
+            <View
+              style={{
+                flexDirection: "row",
+                alignItems: "center",
+                justifyContent: "center",
+                backgroundColor: "#4287f5",
+                paddingBottom: 10,
+                paddingTop: 10,
+              }}
+            >
+              <FontAwesome
+                name="list-ul"
+                size={22}
+                color="white"
+                style={{ marginTop: 0, marginBottom: "auto" }}
+              />
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 18,
+                  textAlign: "center",
+                  marginLeft: 10, // Add some margin to separate the icon and text
+                  fontFamily: "Roboto-Regular",
+                }}
+              >
+                List
+              </Text>
+            </View>
+          </TouchableOpacity>
         </ScrollView>
         <View
           style={{
@@ -751,7 +757,11 @@ const GetSevaById = async ()=>{
         </View>
       </SafeAreaView>
       {showReceiptDetails && (
-        <Showrreciept setShowReceiptDetails={setShowReceiptDetails} setSelectedNo={setSelectedNo} setLoading={setLoading} />
+        <Showrreciept
+          setShowReceiptDetails={setShowReceiptDetails}
+          setSelectedNo={setSelectedNo}
+          setLoading={setLoading}
+        />
       )}
       {showGetSeva && <Getseva setShowGetSeva={setShowGetSeva} />}
       {showSevaList && <Getsevalist setShowSevaList={setShowSevaList} />}
