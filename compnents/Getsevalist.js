@@ -11,7 +11,6 @@ import {
 import DateTimePicker from "@react-native-community/datetimepicker";
 import axios from "axios";
 import CardWithShowMore from "./CardWithShowMore";
-import * as Location from "expo-location";
 
 const Getsevalist = ({ setShowSevaList }) => {
   const [fromDate, setFromDate] = useState(new Date());
@@ -19,8 +18,6 @@ const Getsevalist = ({ setShowSevaList }) => {
   const [showFrom, setShowFrom] = useState(false);
   const [showTo, setShowTo] = useState(false);
   const [SevaDataList, setSevaDataList] = useState();
-  const [location, setLocation] = useState(null);
-  const [errorMsg, setErrorMsg] = useState(null);
 
   const onChangeFrom = (event, selectedDate) => {
     const currentDate = selectedDate || fromDate;
@@ -50,11 +47,7 @@ const Getsevalist = ({ setShowSevaList }) => {
   }
 
   const HandeleGetsevaList = () => {
-    console.log(
-      formatDate(fromDate),
-      formatDate(toDate),
-      "Fetching Seva List"
-    );
+    console.log(formatDate(fromDate), formatDate(toDate), "Fetching Seva List");
 
     axios
       .get(
@@ -71,28 +64,6 @@ const Getsevalist = ({ setShowSevaList }) => {
       .catch((err) => {
         console.error("Error fetching Seva List:", err);
       });
-  };
-
-  const HandelGetCurrentLocation = async () => {
-    try {
-      // Request location permissions
-      let { status } = await Location.requestForegroundPermissionsAsync();
-      if (status !== "granted") {
-        setErrorMsg("Permission to access location was denied");
-        return;
-      }
-
-      // Try to get the current location
-      let location = await Location.getCurrentPositionAsync({
-        accuracy: Location.Accuracy.High,
-        // timeout: 5000, // Optionally set a timeout
-      });
-      setLocation(location);
-      console.log("Current Location:", location);
-    } catch (error) {
-      console.error("Error getting current location:", error);
-      setErrorMsg("Error fetching location. Make sure GPS is enabled.");
-    }
   };
 
   return (
@@ -139,17 +110,6 @@ const Getsevalist = ({ setShowSevaList }) => {
           </Text>
           {SevaDataList ? <CardWithShowMore data={SevaDataList} /> : null}
         </View>
-        {location && (
-          <View style={{ padding: 10 }}>
-            <Text>Latitude: {location.coords.latitude}</Text>
-            <Text>Longitude: {location.coords.longitude}</Text>
-          </View>
-        )}
-        {errorMsg && (
-          <View style={{ padding: 10 }}>
-            <Text>{errorMsg}</Text>
-          </View>
-        )}
       </ScrollView>
       <View
         style={{
@@ -159,11 +119,6 @@ const Getsevalist = ({ setShowSevaList }) => {
           padding: 10,
         }}
       >
-        <Button
-          title="Get Current Location"
-          color={"green"}
-          onPress={HandelGetCurrentLocation}
-        />
         <TouchableOpacity style={{ marginBottom: 10 }}>
           <Button
             title="Get Seva"
