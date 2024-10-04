@@ -1201,7 +1201,7 @@ export const insertDeviceID = async () => {
 
     // Make the network request to get the device ID
     const response = await axios.get(
-      "http://192.168.1.146:4000/api/getdeviceid"
+      "https://react-native-v-temple-b.onrender.com/api/getdeviceid"
     );
     console.log("Device ID response:", response.data);
 
