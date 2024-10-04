@@ -30,7 +30,7 @@ import Getseva from "../compnents/Getseva";
 import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
-import { format, set } from "date-fns";
+import { format } from "date-fns";
 import {
   getDeviceID,
   GetReciptDetails,
@@ -39,11 +39,9 @@ import {
   insertDeviceID,
   insertTrnHdrSEVA,
   syncData,
-  truncateTrnHdrSEVA,
 } from "../db/database";
 import { ToWords } from "to-words";
 import NetInfo from "@react-native-community/netinfo";
-import axios from "axios";
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [error, setError] = useState({ type: "", msg: "" });
   const [name, setName] = useState("");
@@ -142,6 +140,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     const date = new Date();
     const currentDate = date.getDate().toString().padStart(2, "0"); // Ensure date is in 'dd' format
     const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
+    const month = date.getMonth() + 1;
     const deviceID = "01";
 
     const storedData = await AsyncStorage.getItem("storedData");
@@ -163,7 +162,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     } else {
       // New day, reset the count
       const newCount = "00001";
-      const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${newCount}`;
+      const newSerialNo = `${yearLastTwoDigits}${month}${currentDate}${deviceID}${newCount}`;
       setSeralNo(newSerialNo);
       await AsyncStorage.setItem("storedData", `${currentDate}-1`);
     }
