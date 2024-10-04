@@ -32,15 +32,18 @@ import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
 import { format, set } from "date-fns";
 import {
+  getDeviceID,
   GetReciptDetails,
   GetSevaAmt,
   getTrnHdrSevaBySevaId,
+  insertDeviceID,
   insertTrnHdrSEVA,
   syncData,
   truncateTrnHdrSEVA,
 } from "../db/database";
 import { ToWords } from "to-words";
 import NetInfo from "@react-native-community/netinfo";
+import axios from "axios";
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [error, setError] = useState({ type: "", msg: "" });
   const [name, setName] = useState("");
@@ -61,6 +64,42 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [loadingContent, setLoadingContent] = useState("Loading");
   const [selectedNo, setSelectedNo] = useState(null);
   const [selectedNoData, setSelectedNoData] = useState();
+  const [DeviceID, setDeviceID] = useState();
+  useEffect(() => {
+    (async () => {
+      let devID = await insertDeviceID();
+      if (devID && devID.DevID) {
+        const devIDStr = String(devID.DevID).padStart(2, "0"); // Ensure it's a string and pad with leading zero if necessary
+        await AsyncStorage.setItem("deviceID", devIDStr);
+        console.log("====================================");
+        console.log(devIDStr, "From HomeScreen");
+        console.log("====================================");
+        setDeviceID(devIDStr);
+      } else {
+        console.log(
+          "Failed to fetch Device ID from insertDeviceID, trying getDeviceID"
+        );
+        devID = await getDeviceID();
+        if (devID) {
+          const devIDStr = String(devID).padStart(2, "0"); // Ensure it's a string and pad with leading zero if necessary
+          await AsyncStorage.setItem("deviceID", devIDStr);
+          setDeviceID(devIDStr);
+          console.log("====================================");
+          console.log(devIDStr, "From HomeScreen via getDeviceID");
+          console.log("====================================");
+        } else {
+          console.log(
+            "Failed to fetch Device ID from both insertDeviceID and getDeviceID"
+          );
+          Alert.alert(
+            "Error",
+            "Failed to fetch Device ID. Please try again later.",
+            [{ text: "OK" }]
+          );
+        }
+      }
+    })();
+  }, []);
 
   // loading fonts
   const [loaded] = useFonts({
@@ -75,7 +114,8 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     const date = new Date();
     const currentDate = date.getDate().toString().padStart(2, "0"); // Ensure date is in 'dd' format
     const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
-    const deviceID = "01";
+    const month = date.getMonth() + 1;
+    const deviceID = (await AsyncStorage.getItem("deviceID")) || "00"; // Default to "01" if not found
 
     const storedData = await AsyncStorage.getItem("storedData");
     let storedDate, storedCount;
@@ -87,12 +127,12 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     if (storedDate === parseInt(currentDate)) {
       // Same day, use the stored count
       const currentCount = storedCount.toString().padStart(5, "0");
-      const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${currentCount}`;
+      const newSerialNo = `${yearLastTwoDigits}${month}${currentDate}${deviceID}${currentCount}`;
       setSeralNo(newSerialNo);
     } else {
       // New day, reset the count
       const newCount = "00001";
-      const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${newCount}`;
+      const newSerialNo = `${yearLastTwoDigits}${month}${currentDate}${deviceID}${newCount}`;
       setSeralNo(newSerialNo);
       await AsyncStorage.setItem("storedData", `${currentDate}-1`);
     }
@@ -151,6 +191,15 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
       })
       .catch((error) => console.log(error));
   }, [selectedNo]);
+
+  useEffect(() => {
+    getDeviceID().then((res) => {
+      console.log("Device ID from HomeScreen");
+      console.log(res);
+      console.log("====================================");
+    });
+  }, []);
+
   const convertAmountToWords = (amount) => {
     const toWords = new ToWords();
 
@@ -169,19 +218,23 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     if (name === "") {
       setError({ type: "name", msg: "Name is required" });
       hasError = true;
+      return;
     }
 
     // Check if 'sannidhi' is empty
     if (sannidhi === "") {
       setError({ type: "sannidhi", msg: "Sannidhi is required" });
       hasError = true;
+      return;
     }
 
     // Check if 'seva' is empty
     if (seva === "") {
       setError({ type: "seva", msg: "Seva is required" });
       hasError = true;
+      return;
     }
+
     // If there are errors, disable the button and set the errors
     console.log(
       sannidhi,
@@ -198,66 +251,74 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
       return;
     }
 
-    const sevaAmt = await GetSevaAmt(seva);
-    const sevaData = {
-      SEVANO: SeralNo,
-      Prefix: "",
-      PrintSEVANO: SeralNo,
-      SEVADate: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
-      SEVADateYear: new Date().getFullYear(),
-      SEVADateMonth: new Date().getMonth() + 1,
-      Authorised: "Y",
-      AuthBy: "",
-      AuthOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
-      ChangedBy: "",
-      ChangedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
-      Cancelled: "N",
-      AddedBy: "Admin",
-      AddedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
-      SANNIDHIID: sannidhi,
-      RMKS: "",
-      CHQNO: "",
-      CHQDATE: "",
-      SevaRate: sevaAmt, // need to fetch from the seva table
-      NoOfdays: 1,
-      TotalAmt: sevaAmt, // need to fetch from the seva table
-      Add1: "",
-      Add2: "",
-      Add3: "",
-      Add4: "",
-      AMTINWRDS: convertAmountToWords(sevaAmt), // need to convert the amount in words
-      RegularD: "N",
-      DaysPrintText: "",
-      KNAME: name,
-      SECKNAME: "",
-      NAKSHATRAID: nakshatra,
-      SECNAKSHATRAID: "",
-      GOTHRAID: gothra,
-      BANKNAME: "",
-      PAYMENT: "",
-      SVAID: seva,
-      MOBNUM: phone,
-      REFNO: "",
-      ADDRES: "",
-      ISSUEDBY: "Admin",
-      GRPSEVAID: "",
-      NAMEINKAN: "",
-      MOBNO: phone,
-      PRASADA: "No",
-      RASHIID: rashi,
-      Synced: false,
-    };
+    try {
+      const sevaAmt = await GetSevaAmt(seva);
+      if (!sevaAmt) {
+        throw new Error("Invalid SevaAmt response");
+      }
 
-    insertTrnHdrSEVA(sevaData)
-      .then((res) => {
-        console.log("data inserted successfully");
-        updateSerialNo();
-        alert("Data Seaved successfully");
-      })
-      .catch((err) => {
-        console.log(err);
-      });
-    HandelClear();
+      const sevaData = {
+        SEVANO: SeralNo,
+        Prefix: "",
+        PrintSEVANO: SeralNo,
+        SEVADate: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+        SEVADateYear: new Date().getFullYear(),
+        SEVADateMonth: new Date().getMonth() + 1,
+        Authorised: "Y",
+        AuthBy: "",
+        AuthOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+        ChangedBy: "",
+        ChangedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+        Cancelled: "N",
+        AddedBy: "Admin",
+        AddedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"),
+        SANNIDHIID: sannidhi,
+        RMKS: "",
+        CHQNO: "",
+        CHQDATE: "",
+        SevaRate: sevaAmt, // need to fetch from the seva table
+        NoOfdays: 1,
+        TotalAmt: sevaAmt, // need to fetch from the seva table
+        Add1: "",
+        Add2: "",
+        Add3: "",
+        Add4: "",
+        AMTINWRDS: convertAmountToWords(sevaAmt), // need to convert the amount in words
+        RegularD: "N",
+        DaysPrintText: "",
+        KNAME: name,
+        SECKNAME: "",
+        NAKSHATRAID: nakshatra || "",
+        SECNAKSHATRAID: "",
+        GOTHRAID: gothra || "",
+        BANKNAME: "",
+        PAYMENT: "",
+        SVAID: seva,
+        MOBNUM: phone,
+        REFNO: "",
+        ADDRES: "",
+        ISSUEDBY: "Admin",
+        GRPSEVAID: "",
+        NAMEINKAN: "",
+        MOBNO: phone,
+        PRASADA: "No",
+        RASHIID: rashi || "",
+        Synced: false,
+      };
+
+      insertTrnHdrSEVA(sevaData)
+        .then((res) => {
+          console.log("data inserted successfully");
+          updateSerialNo();
+          alert("Data Saved successfully");
+        })
+        .catch((err) => {
+          console.log(err);
+        });
+      HandelClear();
+    } catch (error) {
+      console.log("Error fetching SevaAmt:", error);
+    }
     // submit the form with the data on url first time
   };
 
@@ -371,6 +432,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const HandelSyncClick = async () => {
     // Check internet connection
     setLoadingContent("Syncing Data");
+    setLoading(true);
     const state = await NetInfo.fetch();
     if (!state.isConnected) {
       Alert.alert(
@@ -389,6 +451,9 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     } catch (err) {
       console.log(err, "error from sync");
       Alert.alert("Sync Failed", `${err.message}`);
+    } finally {
+      setLoading(false);
+      setLoadingContent("Loading");
     }
   };
 
@@ -464,9 +529,20 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
               paddingBottom: 5,
             }}
           >
+            <View
+              style={{
+                width: "100%",
+                justifyContent: "center",
+                paddingHorizontal: 15,
+              }}
+            >
+              <Text style={{ fontSize: 16 }}>
+                Device ID: <Text style={{ color: "" }}>{DeviceID || ""}</Text>
+              </Text>
+            </View>
             <TouchableOpacity
               style={{
-                marginTop: -15,
+                marginTop: -27,
                 width: "25%",
                 borderRadius: 10,
                 alignItems: "center",
@@ -585,150 +661,116 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
           {/* Button Container */}
           <View
             style={{
-              top: -90,
+              top: -130,
               flex: 1,
               flexDirection: "column",
             }}
           >
-            <TouchableOpacity
-              onPress={handleSubmit}
-              style={{ marginBottom: 10 }}
-            >
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 18,
-                  textAlign: "center",
-                  backgroundColor: "#4287f5",
-                  paddingBottom: 10,
-                  paddingTop: 10,
-                  fontFamily: "Roboto-Regular",
-                  borderRadius: 10,
-                }}
-              >
-                <FontAwesome6 name="save" size={24} color="white" /> Save
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={HandleSavePrint}
-              style={{ marginBottom: 10 }}
-            >
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 18,
-                  textAlign: "center",
-                  backgroundColor: "#4287f5",
-                  paddingBottom: 10,
-                  paddingTop: 10,
-                  fontFamily: "Roboto-Regular",
-                }}
-              >
-                <FontAwesome6 name="print" size={24} color="white" /> Save &
-                Print
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={HandelClear}
-              style={{ marginBottom: 10 }}
-            >
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 18,
-                  textAlign: "center",
-                  backgroundColor: "#4287f5",
-                  paddingBottom: 10,
-                  paddingTop: 10,
-                  alignContent: "center",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  fontFamily: "Roboto-Regular",
-                }}
-              >
-                <Feather name="minus-circle" size={24} color="white" />{" "}
-                <Text></Text>
-                Clear
-              </Text>
-            </TouchableOpacity>
-            <TouchableOpacity
-              onPress={() => {
-                setShowReceiptDetails(true);
+            <View
+              style={{
+                flexDirection: "row",
+                flexWrap: "wrap",
+                justifyContent: "space-between",
               }}
-              style={{ marginBottom: 10 }}
             >
-              <View
-                style={{
-                  flexDirection: "row",
-                  alignItems: "center",
-                  justifyContent: "center",
-                  backgroundColor: "#4287f5",
-                  paddingBottom: 10,
-                  paddingTop: 10,
-                }}
+              <TouchableOpacity
+                onPress={handleSubmit}
+                style={{ marginBottom: 10, flexBasis: "48%" }}
               >
-                <FontAwesome
-                  name="list-ul"
-                  size={22}
-                  color="white"
-                  style={{ marginTop: 0, marginBottom: "auto" }}
-                />
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: 16,
+                    textAlign: "center",
+                    backgroundColor: "#4287f5",
+                    paddingBottom: 5,
+                    paddingTop: 5,
+                    fontFamily: "Roboto-Regular",
+                    borderRadius: 10,
+                  }}
+                >
+                  <FontAwesome6 name="save" size={20} color="white" /> Save
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={HandleSavePrint}
+                style={{ marginBottom: 10, flexBasis: "48%" }}
+              >
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: 16,
+                    textAlign: "center",
+                    backgroundColor: "#4287f5",
+                    paddingBottom: 5,
+                    paddingTop: 5,
+                    fontFamily: "Roboto-Regular",
+                    borderRadius: 10,
+                  }}
+                >
+                  <FontAwesome6 name="print" size={20} color="white" /> Save &
+                  Print
+                </Text>
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={HandelClear}
+                style={{ marginBottom: 10, flexBasis: "48%" }}
+              >
                 <Text
                   style={{
                     color: "white",
                     fontSize: 18,
                     textAlign: "center",
-                    marginLeft: 10, // Add some margin to separate the icon and text
+                    backgroundColor: "#4287f5",
+                    paddingBottom: 5,
+                    paddingTop: 5,
+                    alignContent: "center",
+                    alignItems: "center",
+                    justifyContent: "center",
                     fontFamily: "Roboto-Regular",
+                    borderRadius: 10,
                   }}
                 >
-                  List
+                  <Feather name="minus-circle" size={20} color="white" /> Clear
                 </Text>
-              </View>
-            </TouchableOpacity>
-            {/* <TouchableOpacity
-            onPress={() => {
-              truncateTrnHdrSEVA()
-                .then((res) => {
-                  console.log("data from truncate");
-                  console.log(res);
-                  console.log("====================================");
-                })
-                .catch((err) => {
-                  console.log(err, "error from truncate");
-                });
-            }}
-            style={{ top: -90 }}
-          >
-            <View
-              style={{
-                flexDirection: "row",
-                alignItems: "center",
-                justifyContent: "center",
-                backgroundColor: "#4287f5",
-                paddingBottom: 10,
-                paddingTop: 10,
-              }}
-            >
-              <FontAwesome
-                name="list-ul"
-                size={22}
-                color="white"
-                style={{ marginTop: 0, marginBottom: "auto" }}
-              />
-              <Text
-                style={{
-                  color: "white",
-                  fontSize: 18,
-                  textAlign: "center",
-                  marginLeft: 10, // Add some margin to separate the icon and text
-                  fontFamily: "Roboto-Regular",
+              </TouchableOpacity>
+              <TouchableOpacity
+                onPress={() => {
+                  setShowReceiptDetails(true);
                 }}
+                style={{ marginBottom: 10, flexBasis: "48%" }}
               >
-                Delete the SqllitData
-              </Text>
+                <View
+                  style={{
+                    flexDirection: "row",
+                    alignItems: "center",
+                    justifyContent: "center",
+                    backgroundColor: "#4287f5",
+                    paddingBottom: 5,
+                    paddingTop: 5,
+                    borderRadius: 10,
+                  }}
+                >
+                  <FontAwesome
+                    name="list-ul"
+                    size={20}
+                    color="white"
+                    style={{ marginTop: 3, marginBottom: "auto" }}
+                  />
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: 18,
+                      textAlign: "center",
+                      marginLeft: 10, // Add some margin to separate the icon and text
+                      fontFamily: "Roboto-Regular",
+                    }}
+                  >
+                    List
+                  </Text>
+                </View>
+              </TouchableOpacity>
             </View>
-          </TouchableOpacity> */}
           </View>
         </ScrollView>
         {/* Menu Section */}

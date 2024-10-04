@@ -6,6 +6,7 @@ import sqlDataGothra from "../assets/gothra.json";
 import sqlDataSeva from "../assets/seva.json";
 import sqlDataSannidhi from "../assets/sannidhi.json";
 import sqlDataMstComp from "../assets/mstcom.json";
+import NetInfo from "@react-native-community/netinfo";
 import axios from "axios";
 
 var db;
@@ -183,6 +184,10 @@ const initializeDatabase = async () => {
         TELNO VARCHAR(50) NOT NULL,
         DashBoardLink VARCHAR(500) NOT NULL
       );
+        CREATE TABLE IF NOT EXISTS MstDevice (
+        DevID INTEGER,
+        DevName VARCHAR(250)
+      );
     `);
   }
 };
@@ -223,9 +228,9 @@ export const getAllGothras = async () => {
   const query = "SELECT * FROM MstGOTHRA";
   try {
     const result = await db.getAllAsync(query);
-    console.log("====================================");
-    console.log("Gothras: From Database.js");
-    console.log("====================================");
+    // console.log("====================================");
+    // console.log("Gothras: From Database.js");
+    // console.log("====================================");
     return result;
   } catch (error) {
     console.error("Error fetching Gothras:", error);
@@ -253,9 +258,9 @@ export const GetAllSannidhi = async () => {
   const query = "SELECT * FROM MstSANNIDHI";
   try {
     const result = await db.getAllAsync(query);
-    console.log("====================================");
-    console.log("Sannidhi: From Database.js");
-    console.log("====================================");
+    // console.log("====================================");
+    // console.log("Sannidhi: From Database.js");
+    // console.log("====================================");
     return result;
   } catch (error) {
     console.error("Error fetching Sannidhi:", error);
@@ -365,9 +370,9 @@ export const getAllTrnHdrSEVA = async () => {
   const query = "SELECT * FROM TrnHdrSEVA";
   try {
     const result = await db.getAllAsync(query);
-    console.log("====================================");
-    console.log("TrnHdrSEVA: From Database.js");
-    console.log("====================================");
+    // console.log("====================================");
+    // console.log("TrnHdrSEVA: From Database.js");
+    // console.log("====================================");
     return result;
   } catch (error) {
     console.error("Error fetching TrnHdrSEVA:", error);
@@ -376,13 +381,19 @@ export const getAllTrnHdrSEVA = async () => {
 };
 
 export const GetSevaAmt = async (SVAID) => {
+  console.log("====================================");
+  console.log(SVAID, "SVAID from GetSevaAmt");
+  console.log("====================================");
   db = await SQLite.openDatabaseAsync("vTempleVARADA");
   const query = "SELECT AMT FROM MstSVA WHERE SVAID = ?";
   try {
     const result = await db.getFirstAsync(query, [SVAID]);
     console.log("====================================");
-    console.log("SevaAmt: From Database.js");
+    console.log("SevaAmt: From Database.js", result);
     console.log("====================================");
+    if (!result || !result.AMT) {
+      throw new Error("Invalid SevaAmt response");
+    }
     return result.AMT;
   } catch (error) {
     console.error("Error fetching SevaAmt:", error);
@@ -1138,5 +1149,110 @@ export const truncateTrnHdrSEVA = async () => {
     console.log("====================================");
     console.log("Error truncating TrnHdrSEVA:", error);
     console.log("====================================");
+  }
+};
+
+export const insertDeviceID = async () => {
+  try {
+    // Check AsyncStorage for the flag
+    const isDevIDInserted = await AsyncStorage.getItem("isDevIDInserted");
+    if (isDevIDInserted === "true") {
+      console.log("Device ID already exists. Skipping insertion.");
+      return;
+    }
+
+    // Open the database
+    const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+
+    // Create the MstDevice table if it doesn't exist
+    await db.execAsync(`
+      CREATE TABLE IF NOT EXISTS MstDevice (
+        DevID VARCHAR(50),
+        DevName VARCHAR(50)
+      )
+    `);
+
+    // Check if a row exists in the MstDevice table
+    const result = await db.getAllAsync(`
+      SELECT COUNT(*) as count FROM MstDevice
+    `);
+
+    if (result[0].count > 0) {
+      console.log(
+        "Device ID already exists in the database. Skipping insertion."
+      );
+      await AsyncStorage.setItem("isDevIDInserted", "true");
+      return;
+    }
+
+    // Check internet connectivity
+    const state = await NetInfo.fetch();
+    if (!state.isConnected) {
+      alert(
+        "No internet connection. Please connect to the internet and try again."
+      );
+      return;
+    }
+
+    // Make the network request to get the device ID
+    const response = await axios.get(
+      "http://192.168.1.146:4000/api/getdeviceid"
+    );
+    console.log("Device ID response:", response.data);
+
+    // Ensure the response contains the devID
+    const devID = response.data.devID || response.data.data || null; // Adjust based on actual response structure
+    if (!devID || devID === "null") {
+      console.log("Device ID is null. Skipping insertion.");
+      return;
+    }
+
+    console.log("====================================");
+    console.log("Device ID:", devID);
+    console.log("====================================");
+
+    // Insert DevID and leave DevName blank
+    await db.execAsync(
+      `
+      INSERT INTO MstDevice (DevID)
+      VALUES ('${devID}')
+      `
+    );
+    console.log("Device ID inserted successfully.");
+
+    // Set the flag in AsyncStorage
+    await AsyncStorage.setItem("isDevIDInserted", "true");
+
+    // Fetch and return the latest inserted row
+    const latestRow = await db.getAllAsync(
+      `
+      SELECT * FROM MstDevice WHERE DevID = ?
+    `,
+      [devID]
+    );
+
+    console.log("Latest row:", latestRow);
+
+    return latestRow[0];
+  } catch (error) {
+    console.log("====================================");
+    console.log("Error inserting Device ID:", error);
+    console.log("====================================");
+  }
+};
+
+export const getDeviceID = async () => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  const query = "SELECT DevID FROM MstDevice";
+
+  try {
+    const result = await db.getFirstAsync(query);
+    console.log("====================================");
+    console.log("Device ID:", result.DevID);
+    console.log("====================================");
+    return result.DevID;
+  } catch (error) {
+    console.error("Error fetching Device ID:", error);
+    throw error;
   }
 };
