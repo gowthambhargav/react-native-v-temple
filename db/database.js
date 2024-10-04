@@ -1053,13 +1053,18 @@ export const syncData = async () => {
       { data: result }
     );
     console.log("====================================");
-    console.log("SyncData:"); //syncPost.data
+    console.log("SyncData:", syncPost.data);
     console.log("====================================");
 
     // Update the Synced column from 0 to 1
     const updateQuery = "UPDATE TrnHdrSEVA SET Synced = 1 WHERE Synced = 0";
     await db.runAsync(updateQuery);
     console.log("Synced column updated successfully.");
+
+    // Truncate the TrnHdrSEVA table
+    const truncateQuery = "DELETE FROM TrnHdrSEVA";
+    await db.runAsync(truncateQuery);
+    console.log("TrnHdrSEVA table truncated successfully.");
 
     return syncPost.data;
   } catch (error) {
