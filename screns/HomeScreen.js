@@ -112,8 +112,8 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     const date = new Date();
     const currentDate = date.getDate().toString().padStart(2, "0"); // Ensure date is in 'dd' format
     const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
-    const month = date.getMonth() + 1;
-    const deviceID = (await AsyncStorage.getItem("deviceID")) || "00"; // Default to "01" if not found
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Ensure month is in 'MM' format
+    const deviceID = (await AsyncStorage.getItem("deviceID")) || "00"; // Default to "00" if not found
 
     const storedData = await AsyncStorage.getItem("storedData");
     let storedDate, storedCount;
@@ -140,8 +140,8 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     const date = new Date();
     const currentDate = date.getDate().toString().padStart(2, "0"); // Ensure date is in 'dd' format
     const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
-    const month = date.getMonth() + 1;
-    const deviceID = "01";
+    const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Ensure month is in 'MM' format
+    const deviceID = (await AsyncStorage.getItem("deviceID")) || "00"; // Default to "00" if not found
 
     const storedData = await AsyncStorage.getItem("storedData");
     let storedDate, storedCount;
@@ -153,7 +153,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     if (storedDate === parseInt(currentDate)) {
       // Same day, increment the count
       const currentCount = (storedCount + 1).toString().padStart(5, "0");
-      const newSerialNo = `${yearLastTwoDigits}${currentDate}${deviceID}${currentCount}`;
+      const newSerialNo = `${yearLastTwoDigits}${month}${currentDate}${deviceID}${currentCount}`;
       setSeralNo(newSerialNo);
       await AsyncStorage.setItem(
         "storedData",
