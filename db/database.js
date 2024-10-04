@@ -1038,7 +1038,7 @@ export const syncData = async () => {
     }
 
     const syncPost = await axios.post(
-      "https://react-native-v-temple-b.onrender.com/api/sevareceiptsql/sync",
+      "http://192.168.1.146:4000/api/sevareceiptsql/sync",
       { data: result }
     );
     console.log("====================================");
@@ -1082,15 +1082,13 @@ export const getSevaDetails = async () => {
     FROM 
       trnhdrseva
     JOIN 
-      mstsva ON trnhdrseva.SVAID = mstsva.SVAID;
+      mstsva ON trnhdrseva.SVAID = mstsva.SVAID
+    WHERE 
+      DATE(trnhdrseva.SEVADate) = DATE('now');
   `;
 
   try {
     const result = await db.getAllAsync(query);
-    // console.log("Seva details retrieved successfully.");
-    // console.log('====================================');
-    // console.log(result, "From the database");
-    // console.log('====================================');
     return result.map((row) => ({
       no: row.no,
       sevaName: row.sevaName,
@@ -1123,5 +1121,22 @@ export const getTrnHdrSevaBySevaId = async (sevaId) => {
   } catch (error) {
     console.error("Error retrieving TrnHdrSEVA records:", error);
     throw error;
+  }
+};
+
+export const truncateTrnHdrSEVA = async () => {
+  const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+  const query = "DELETE FROM TrnHdrSEVA";
+
+  try {
+    const result = await db.runAsync(query);
+    console.log("====================================");
+    console.log("TrnHdrSEVA truncated successfully.");
+    console.log("====================================");
+    return result;
+  } catch (error) {
+    console.log("====================================");
+    console.log("Error truncating TrnHdrSEVA:", error);
+    console.log("====================================");
   }
 };

@@ -30,13 +30,14 @@ import Getseva from "../compnents/Getseva";
 import Getsevalist from "../compnents/Getsevalist";
 import LoadingComponent from "../compnents/Loading";
 import { useFonts } from "expo-font";
-import { format } from "date-fns";
+import { format, set } from "date-fns";
 import {
   GetReciptDetails,
   GetSevaAmt,
   getTrnHdrSevaBySevaId,
   insertTrnHdrSEVA,
   syncData,
+  truncateTrnHdrSEVA,
 } from "../db/database";
 import { ToWords } from "to-words";
 import NetInfo from "@react-native-community/netinfo";
@@ -132,25 +133,24 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     const test = await getTrnHdrSevaBySevaId(selectedNo);
     console.log("====================================");
     console.log(test, "test from HomeScreen");
-    setSelectedNoData(test);
     console.log("====================================");
+    return test; // Return the fetched data
   };
   useEffect(() => {
     initializeSerialNo();
     GetSevaById()
-      .then((r) => {
-        setGothra(selectedNoData && selectedNoData.GOTHRAID);
-        setNakshatra(selectedNoData && selectedNoData.NAKSHATRAID);
-        setRashi(selectedNoData && selectedNoData.RASHIID);
-        setName(selectedNoData && selectedNoData.KNAME);
-        setPhone(selectedNoData && selectedNoData.MOBNUM);
-        setSannidhi(selectedNoData && selectedNoData.SANNIDHIID);
-        setSeva(selectedNoData && selectedNoData.SVAID);
-        // setSeralNo(selectedNoData && selectedNoData.SEVANO);
+      .then((data) => {
+        setGothra(data && data.GOTHRAID);
+        setNakshatra(data && data.NAKSHATRAID);
+        setRashi(data && data.RASHIID);
+        setName(data && data.KNAME);
+        setPhone(data && data.MOBNUM);
+        setSannidhi(data && data.SANNIDHIID);
+        setSeva(data && data.SVAID);
+        // setSeralNo(data && data.SEVANO);
       })
       .catch((error) => console.log(error));
   }, [selectedNo]);
-
   const convertAmountToWords = (amount) => {
     const toWords = new ToWords();
 
@@ -269,6 +269,9 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     setGothra("");
     setNakshatra("");
     setRashi("");
+    setSelectedNoData("");
+    setSelectedNo(null);
+    setError({ type: "", msg: "" });
   };
   const HandleSavePrint = async () => {
     let hasError = false;
@@ -367,6 +370,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
 
   const HandelSyncClick = async () => {
     // Check internet connection
+    setLoadingContent("Syncing Data");
     const state = await NetInfo.fetch();
     if (!state.isConnected) {
       Alert.alert(
@@ -378,9 +382,9 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
 
     try {
       const res = await syncData();
-      console.log("data from sync");
-      console.log(res);
-      console.log("====================================");
+      // console.log("data from sync");
+      // console.log(res);
+      // console.log("====================================");
       Alert.alert("Sync Complete", `${res.message}`);
     } catch (err) {
       console.log(err, "error from sync");
@@ -546,7 +550,9 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
                 key={2313}
               />
               {error.type === "name" ? (
-                <Text style={{ color: "red" }}>Name is required</Text>
+                <Text style={{ color: "red", marginBottom: 10 }}>
+                  Name is required
+                </Text>
               ) : null}
               <LabeledTextInputPhone
                 setPhone={setPhone}
@@ -576,61 +582,123 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
               />
             </View>
           </SafeAreaView>
-          <TouchableOpacity onPress={handleSubmit} style={{ top: -140 }}>
-            <Text
-              style={{
-                color: "white",
-                fontSize: 18,
-                textAlign: "center",
-                backgroundColor: "#4287f5",
-                paddingBottom: 10,
-                paddingTop: 10,
-                fontFamily: "Roboto-Regular",
-              }}
-            >
-              <FontAwesome6 name="save" size={24} color="white" /> Save
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={HandleSavePrint} style={{ top: -130 }}>
-            <Text
-              style={{
-                color: "white",
-                fontSize: 18,
-                textAlign: "center",
-                backgroundColor: "#4287f5",
-                paddingBottom: 10,
-                paddingTop: 10,
-                fontFamily: "Roboto-Regular",
-              }}
-            >
-              <FontAwesome6 name="print" size={24} color="white" /> Save & Print
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity onPress={HandelClear} style={{ top: -120 }}>
-            <Text
-              style={{
-                color: "white",
-                fontSize: 18,
-                textAlign: "center",
-                backgroundColor: "#4287f5",
-                paddingBottom: 10,
-                paddingTop: 10,
-                alignContent: "center",
-                alignItems: "center",
-                justifyContent: "center",
-                fontFamily: "Roboto-Regular",
-              }}
-            >
-              <Feather name="minus-circle" size={24} color="white" />{" "}
-              <Text></Text>
-              Clear
-            </Text>
-          </TouchableOpacity>
-          <TouchableOpacity
-            onPress={() => {
-              setShowReceiptDetails(true);
+          {/* Button Container */}
+          <View
+            style={{
+              top: -90,
+              flex: 1,
+              flexDirection: "column",
             }}
-            style={{ top: -110 }}
+          >
+            <TouchableOpacity
+              onPress={handleSubmit}
+              style={{ marginBottom: 10 }}
+            >
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 18,
+                  textAlign: "center",
+                  backgroundColor: "#4287f5",
+                  paddingBottom: 10,
+                  paddingTop: 10,
+                  fontFamily: "Roboto-Regular",
+                  borderRadius: 10,
+                }}
+              >
+                <FontAwesome6 name="save" size={24} color="white" /> Save
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={HandleSavePrint}
+              style={{ marginBottom: 10 }}
+            >
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 18,
+                  textAlign: "center",
+                  backgroundColor: "#4287f5",
+                  paddingBottom: 10,
+                  paddingTop: 10,
+                  fontFamily: "Roboto-Regular",
+                }}
+              >
+                <FontAwesome6 name="print" size={24} color="white" /> Save &
+                Print
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={HandelClear}
+              style={{ marginBottom: 10 }}
+            >
+              <Text
+                style={{
+                  color: "white",
+                  fontSize: 18,
+                  textAlign: "center",
+                  backgroundColor: "#4287f5",
+                  paddingBottom: 10,
+                  paddingTop: 10,
+                  alignContent: "center",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  fontFamily: "Roboto-Regular",
+                }}
+              >
+                <Feather name="minus-circle" size={24} color="white" />{" "}
+                <Text></Text>
+                Clear
+              </Text>
+            </TouchableOpacity>
+            <TouchableOpacity
+              onPress={() => {
+                setShowReceiptDetails(true);
+              }}
+              style={{ marginBottom: 10 }}
+            >
+              <View
+                style={{
+                  flexDirection: "row",
+                  alignItems: "center",
+                  justifyContent: "center",
+                  backgroundColor: "#4287f5",
+                  paddingBottom: 10,
+                  paddingTop: 10,
+                }}
+              >
+                <FontAwesome
+                  name="list-ul"
+                  size={22}
+                  color="white"
+                  style={{ marginTop: 0, marginBottom: "auto" }}
+                />
+                <Text
+                  style={{
+                    color: "white",
+                    fontSize: 18,
+                    textAlign: "center",
+                    marginLeft: 10, // Add some margin to separate the icon and text
+                    fontFamily: "Roboto-Regular",
+                  }}
+                >
+                  List
+                </Text>
+              </View>
+            </TouchableOpacity>
+            {/* <TouchableOpacity
+            onPress={() => {
+              truncateTrnHdrSEVA()
+                .then((res) => {
+                  console.log("data from truncate");
+                  console.log(res);
+                  console.log("====================================");
+                })
+                .catch((err) => {
+                  console.log(err, "error from truncate");
+                });
+            }}
+            style={{ top: -90 }}
           >
             <View
               style={{
@@ -657,11 +725,13 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
                   fontFamily: "Roboto-Regular",
                 }}
               >
-                List
+                Delete the SqllitData
               </Text>
             </View>
-          </TouchableOpacity>
+          </TouchableOpacity> */}
+          </View>
         </ScrollView>
+        {/* Menu Section */}
         <View
           style={{
             position: "absolute",
@@ -730,9 +800,10 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
                 />
               </TouchableOpacity>
               <Button
-                title="Show Receipt"
+                title="List"
                 onPress={() => {
                   setLoading(true);
+                  setLoadingContent("Loading Receipts");
                   setTimeout(() => {
                     setLoading(false);
                   }, 1000);

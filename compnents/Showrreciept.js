@@ -40,14 +40,15 @@ function Showrreciept({ setShowReceiptDetails, setSelectedNo, setLoading }) {
         backgroundColor: "#8a8a8a",
         flex: 1,
         justifyContent: "center",
+        alignContent: "center",
         width: "100%",
         height: "100%",
       }}
     >
       <ScrollView style={{ height: "auto" }}>
-        <View style={{ padding: 10 }}>
+        <View style={{ padding: 5 }}>
           {/* Current Date */}
-          <Text style={{ fontSize: 13, marginBottom: 10 }}>
+          <Text style={{ fontSize: 13, marginBottom: 5, padding: 10 }}>
             Date: {currentDate}
           </Text>
 
@@ -56,8 +57,11 @@ function Showrreciept({ setShowReceiptDetails, setSelectedNo, setLoading }) {
             style={{
               flexDirection: "row",
               justifyContent: "space-between",
-              padding: 10,
+              paddingVertical: 4,
+              alignItems: "center",
+              paddingHorizontal: 2,
               backgroundColor: "#4287f5",
+              width: "auto",
             }}
           >
             <Text style={{ color: "white", fontWeight: "bold", flex: 1.8 }}>
@@ -66,7 +70,13 @@ function Showrreciept({ setShowReceiptDetails, setSelectedNo, setLoading }) {
             <Text style={{ color: "white", fontWeight: "bold", flex: 4 }}>
               Seva Name
             </Text>
-            <Text style={{ color: "white", fontWeight: "bold", flex: 1 }}>
+            <Text
+              style={{
+                color: "white",
+                fontWeight: "bold",
+                flex: 1,
+              }}
+            >
               Amount
             </Text>
           </View>
@@ -77,10 +87,10 @@ function Showrreciept({ setShowReceiptDetails, setSelectedNo, setLoading }) {
               <TouchableOpacity
                 key={data.no}
                 onPress={() => {
-                  // setSelectedNo(data.no);
-                  // setShowReceiptDetails(false);
+                  setSelectedNo(data.no);
+                  setShowReceiptDetails(false);
                   // setLoading(true);
-                  //  console.log(data.no,"From the Showrreciept")
+                  console.log(data.no, "From the Showrreciept");
                 }}
               >
                 <View
