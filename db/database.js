@@ -1261,3 +1261,120 @@ export const getDeviceID = async () => {
     throw error;
   }
 };
+
+export const UpdateTrahdrsevaBySevaNo = async (sevaData, SEVANO) => {
+  try {
+    await initializeDatabase();
+    const db = await SQLite.openDatabaseAsync("vTempleVARADA");
+    if (!SEVANO) {
+      return { message: "No SEVANO provided" };
+    }
+    const query = `
+      UPDATE TrnHdrSEVA
+      SET
+        Prefix = ?,
+        PrintSEVANO = ?,
+        SEVADate = ?,
+        SEVADateYear = ?,
+        SEVADateMonth = ?,
+        Authorised = ?,
+        AuthBy = ?,
+        AuthOn = ?,
+        ChangedBy = ?,
+        ChangedOn = ?,
+        Cancelled = ?,
+        AddedBy = ?,
+        AddedOn = ?,
+        SANNIDHIID = ?,
+        RMKS = ?,
+        CHQNO = ?,
+        CHQDATE = ?,
+        SevaRate = ?,
+        NoOfdays = ?,
+        TotalAmt = ?,
+        Add1 = ?,
+        Add2 = ?,
+        Add3 = ?,
+        Add4 = ?,
+        AMTINWRDS = ?,
+        RegularD = ?,
+        DaysPrintText = ?,
+        KNAME = ?,
+        SECKNAME = ?,
+        NAKSHATRAID = ?,
+        SECNAKSHATRAID = ?,
+        GOTHRAID = ?,
+        BANKNAME = ?,
+        PAYMENT = ?,
+        SVAID = ?,
+        MOBNUM = ?,
+        REFNO = ?,
+        ADDRES = ?,
+        ISSUEDBY = ?,
+        GRPSEVAID = ?,
+        NAMEINKAN = ?,
+        MOBNO = ?,
+        PRASADA = ?,
+        RASHIID = ?,
+        Synced = ?
+      WHERE SEVANO = ?
+    `;
+
+    const result = await db.runAsync(query, [
+      sevaData.Prefix,
+      sevaData.PrintSEVANO,
+      sevaData.SEVADate,
+      sevaData.SEVADateYear,
+      sevaData.SEVADateMonth,
+      sevaData.Authorised,
+      sevaData.AuthBy,
+      sevaData.AuthOn,
+      sevaData.ChangedBy,
+      sevaData.ChangedOn,
+      sevaData.Cancelled,
+      sevaData.AddedBy,
+      sevaData.AddedOn,
+      sevaData.SANNIDHIID,
+      sevaData.RMKS,
+      sevaData.CHQNO,
+      sevaData.CHQDATE,
+      sevaData.SevaRate,
+      sevaData.NoOfdays,
+      sevaData.TotalAmt,
+      sevaData.Add1,
+      sevaData.Add2,
+      sevaData.Add3,
+      sevaData.Add4,
+      sevaData.AMTINWRDS,
+      sevaData.RegularD,
+      sevaData.DaysPrintText,
+      sevaData.KNAME,
+      sevaData.SECKNAME,
+      sevaData.NAKSHATRAID,
+      sevaData.SECNAKSHATRAID,
+      sevaData.GOTHRAID,
+      sevaData.BANKNAME,
+      sevaData.PAYMENT,
+      sevaData.SVAID,
+      sevaData.MOBNUM,
+      sevaData.REFNO,
+      sevaData.ADDRES,
+      sevaData.ISSUEDBY,
+      sevaData.GRPSEVAID,
+      sevaData.NAMEINKAN,
+      sevaData.MOBNO,
+      sevaData.PRASADA,
+      sevaData.RASHIID,
+      sevaData.Synced ? 1 : 0, // Convert boolean to integer
+      SEVANO, // This is the identifier for the record to update
+    ]);
+
+    console.log("Record updated successfully:");
+    return result;
+  } catch (error) {
+    console.log("====================================");
+    console.log("Error updating TrnHdrSEVA:", error);
+    console.log("====================================");
+    throw error;
+  }
+};

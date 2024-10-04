@@ -39,9 +39,11 @@ import {
   insertDeviceID,
   insertTrnHdrSEVA,
   syncData,
+  UpdateTrahdrsevaBySevaNo,
 } from "../db/database";
 import { ToWords } from "to-words";
 import NetInfo from "@react-native-community/netinfo";
+import MaterialCommunityIcons from "@expo/vector-icons/MaterialCommunityIcons";
 const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [error, setError] = useState({ type: "", msg: "" });
   const [name, setName] = useState("");
@@ -463,6 +465,78 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     return <LoadingComponent name="Loading" />;
   }
 
+  const HandleUpdateClick = async () => {
+    try {
+      // Fetch the current data
+      const currentData = await GetSevaById();
+
+      if (!currentData) {
+        console.log("No data found for the selected SEVANO");
+        return;
+      }
+
+      // Update the data with the new values from the form
+      const updatedData = {
+        ...currentData,
+        Prefix: "", // Replace with actual value
+        PrintSEVANO: SeralNo, // Replace with actual value
+        SEVADate: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), // Replace with actual value
+        SEVADateYear: new Date().getFullYear(), // Replace with actual value
+        SEVADateMonth: new Date().getMonth() + 1, // Replace with actual value
+        Authorised: "Y", // Replace with actual value
+        AuthBy: "", // Replace with actual value
+        AuthOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), // Replace with actual value
+        ChangedBy: "", // Replace with actual value
+        ChangedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), // Replace with actual value
+        Cancelled: "N", // Replace with actual value
+        AddedBy: "Admin", // Replace with actual value
+        AddedOn: format(new Date(), "yyyy-MM-dd HH:mm:ss.SSS"), // Replace with actual value
+        SANNIDHIID: sannidhi, // Replace with actual value
+        RMKS: "", // Replace with actual value
+        CHQNO: "", // Replace with actual value
+        CHQDATE: "", // Replace with actual value
+        SevaRate: currentData.SevaRate, // Replace with actual value
+        NoOfdays: 1, // Replace with actual value
+        TotalAmt: currentData.TotalAmt, // Replace with actual value
+        Add1: "", // Replace with actual value
+        Add2: "", // Replace with actual value
+        Add3: "", // Replace with actual value
+        Add4: "", // Replace with actual value
+        AMTINWRDS: convertAmountToWords(currentData.TotalAmt), // Replace with actual value
+        RegularD: "N", // Replace with actual value
+        DaysPrintText: "", // Replace with actual value
+        KNAME: name, // Replace with actual value
+        SECKNAME: "", // Replace with actual value
+        NAKSHATRAID: nakshatra || "", // Replace with actual value
+        SECNAKSHATRAID: "", // Replace with actual value
+        GOTHRAID: gothra || "", // Replace with actual value
+        BANKNAME: "", // Replace with actual value
+        PAYMENT: "", // Replace with actual value
+        SVAID: seva, // Replace with actual value
+        MOBNUM: phone, // Replace with actual value
+        REFNO: "", // Replace with actual value
+        ADDRES: "", // Replace with actual value
+        ISSUEDBY: "Admin", // Replace with actual value
+        GRPSEVAID: "", // Replace with actual value
+        NAMEINKAN: "", // Replace with actual value
+        MOBNO: phone, // Replace with actual value
+        PRASADA: "No", // Replace with actual value
+        RASHIID: rashi || "", // Replace with actual value
+        Synced: false, // Set to false as it's a new update
+      };
+
+      // Save the updated data back to the database
+      await UpdateTrahdrsevaBySevaNo(updatedData, selectedNo);
+
+      console.log("Record updated successfully");
+      alert("Data updated successfully");
+    } catch (error) {
+      console.log("====================================");
+      console.log("Error from HandleUpdateClick", error);
+      console.log("====================================");
+    }
+  };
+
   return (
     <SafeAreaView>
       <SafeAreaView style={{ top: 0, flex: 1 }}>
@@ -675,25 +749,59 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
                 justifyContent: "space-between",
               }}
             >
-              <TouchableOpacity
-                onPress={handleSubmit}
-                style={{ marginBottom: 10, flexBasis: "48%" }}
-              >
-                <Text
-                  style={{
-                    color: "white",
-                    fontSize: 16,
-                    textAlign: "center",
-                    backgroundColor: "#4287f5",
-                    paddingBottom: 5,
-                    paddingTop: 5,
-                    fontFamily: "Roboto-Regular",
-                    borderRadius: 10,
+              {selectedNo ? (
+                <TouchableOpacity
+                  onPress={() => {
+                    console.log("====================================");
+                    console.log("Update button pressed");
+                    console.log("====================================");
+                    HandleUpdateClick();
                   }}
+                  style={{ marginBottom: 10, flexBasis: "48%" }}
                 >
-                  <FontAwesome6 name="save" size={20} color="white" /> Save
-                </Text>
-              </TouchableOpacity>
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: 16,
+                      textAlign: "center",
+                      backgroundColor: "#4287f5",
+                      paddingBottom: 5,
+                      paddingTop: 5,
+                      fontFamily: "Roboto-Regular",
+                      borderRadius: 10,
+                      alignItems: "center",
+                    }}
+                  >
+                    <MaterialCommunityIcons
+                      name="update"
+                      size={22}
+                      style={{ marginBottom: 10 }}
+                      color="white"
+                    />{" "}
+                    Update
+                  </Text>
+                </TouchableOpacity>
+              ) : (
+                <TouchableOpacity
+                  onPress={handleSubmit}
+                  style={{ marginBottom: 10, flexBasis: "48%" }}
+                >
+                  <Text
+                    style={{
+                      color: "white",
+                      fontSize: 16,
+                      textAlign: "center",
+                      backgroundColor: "#4287f5",
+                      paddingBottom: 5,
+                      paddingTop: 5,
+                      fontFamily: "Roboto-Regular",
+                      borderRadius: 10,
+                    }}
+                  >
+                    <FontAwesome6 name="save" size={20} color="white" /> Save
+                  </Text>
+                </TouchableOpacity>
+              )}
               <TouchableOpacity
                 onPress={HandleSavePrint}
                 style={{ marginBottom: 10, flexBasis: "48%" }}
