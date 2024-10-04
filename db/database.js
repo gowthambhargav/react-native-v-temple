@@ -1038,7 +1038,7 @@ export const syncData = async () => {
     }
 
     const syncPost = await axios.post(
-      "http://192.168.1.146:4000/api/sevareceiptsql/sync",
+      "https://react-native-v-temple-b.onrender.com/api/sevareceiptsql/sync",
       { data: result }
     );
     console.log("====================================");
