@@ -213,7 +213,10 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
 
   const handleSubmit = async () => {
     let hasError = false;
-
+    if (!DeviceID) {
+      Alert.alert("Device ID not found", "Please try again later");
+      return;
+    }
     // Check if 'name' is empty
     if (name === "") {
       setError({ type: "name", msg: "Name is required" });
