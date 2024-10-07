@@ -20,7 +20,9 @@ export default function Login() {
   const validateUserNameAndPassword = () => {
     const trimmedUserName = userName.trim();
     const trimmedUserPassword = userPassward.trim();
-
+    console.log("====================================");
+    console.log(trimmedUserName, trimmedUserPassword);
+    console.log("====================================");
     if (trimmedUserName !== "admin" || trimmedUserPassword !== "svt123") {
       Alert.alert("Invalid Credentials");
     } else {
