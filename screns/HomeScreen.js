@@ -10,6 +10,8 @@ import {
   Image,
   TouchableOpacity,
   Alert,
+  BackHandler,
+  Linking,
 } from "react-native";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
@@ -98,6 +100,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
           );
         }
       }
+      HandelClear();
     })();
   }, []);
 
@@ -111,11 +114,24 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const scrollViewRef = useRef();
 
   const initializeSerialNo = async () => {
+    const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
+
     const date = new Date();
     const currentDate = date.getDate().toString().padStart(2, "0"); // Ensure date is in 'dd' format
     const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
     const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Ensure month is in 'MM' format
-    const deviceID = await AsyncStorage.getItem("deviceID"); // Default to "00" if not found
+
+    // Introduce a delay of 2 seconds
+    await delay(2000);
+
+    const deviceID = await AsyncStorage.getItem("deviceID");
+
+    if (!deviceID) {
+      Alert.alert("Device ID not found", "Please restart the app", [
+        { text: "OK", onPress: () => BackHandler.exitApp() },
+      ]);
+      return;
+    }
 
     const storedData = await AsyncStorage.getItem("storedData");
     let storedDate, storedCount;
@@ -143,7 +159,14 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     const currentDate = date.getDate().toString().padStart(2, "0"); // Ensure date is in 'dd' format
     const yearLastTwoDigits = date.getFullYear().toString().slice(-2);
     const month = (date.getMonth() + 1).toString().padStart(2, "0"); // Ensure month is in 'MM' format
-    const deviceID = await AsyncStorage.getItem("deviceID"); // Default to "00" if not found
+    const deviceID = await AsyncStorage.getItem("deviceID");
+
+    if (!deviceID) {
+      Alert.alert("Device ID not found", "Please restart the app", [
+        { text: "OK", onPress: () => BackHandler.exitApp() },
+      ]);
+      return;
+    }
 
     const storedData = await AsyncStorage.getItem("storedData");
     let storedDate, storedCount;
@@ -169,12 +192,12 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
       await AsyncStorage.setItem("storedData", `${currentDate}-1`);
     }
   };
-  console.log(selectedNo, "from the HomeScreen.js");
+  // console.log(selectedNo, "from the HomeScreen.js");
   const GetSevaById = async () => {
     const test = await getTrnHdrSevaBySevaId(selectedNo);
-    console.log("====================================");
-    console.log(test, "test from HomeScreen");
-    console.log("====================================");
+    // console.log("====================================");
+    // console.log(test, "test from HomeScreen");
+    // console.log("====================================");
     return test; // Return the fetched data
   };
   useEffect(() => {
@@ -201,6 +224,10 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     });
   }, []);
 
+  useEffect(() => {
+    setError({ type: "", msg: "" });
+  }, [name, sannidhi, seva, phone, gothra, nakshatra, rashi]);
+
   const convertAmountToWords = (amount) => {
     const toWords = new ToWords();
 
@@ -214,10 +241,18 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
 
   const handleSubmit = async () => {
     let hasError = false;
+    const deviceID = await AsyncStorage.getItem("deviceID");
+
+    if (!deviceID) {
+      Alert.alert("Device ID not found", "Please restart the app");
+      return;
+    }
+
     if (!DeviceID) {
       Alert.alert("Device ID not found", "Please try again later");
       return;
     }
+
     // Check if 'name' is empty
     if (name === "") {
       setError({ type: "name", msg: "Name is required" });
@@ -254,7 +289,11 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     if (hasError) {
       return;
     }
-
+    if (SeralNo === 0) {
+      alert("Please wait for the Serial No to generate");
+      Linking.openURL("myapp://");
+      return;
+    }
     try {
       const sevaAmt = await GetSevaAmt(seva);
       if (!sevaAmt) {
@@ -999,11 +1038,6 @@ const styles = StyleSheet.create({
     padding: 20,
     top: 10,
     fontFamily: "Roboto-Regular",
-    // height: 700,
-    // backgroundColor: "#000",
-    // flex:1,
-    // justifyContent:'center',
-    // alignItems:"center"
   },
   buttonStyle: {
     textAlign: "center",

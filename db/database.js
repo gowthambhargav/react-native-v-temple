@@ -1250,7 +1250,10 @@ export const getDeviceID = async () => {
   const db = await SQLite.openDatabaseAsync("vTempleVARADA");
   const query = "SELECT DevID FROM MstDevice";
 
+  const delay = (ms) => new Promise((resolve) => setTimeout(resolve, ms));
   try {
+    // Wait for 1 second before fetching the Device ID
+    await delay(1000);
     const result = await db.getFirstAsync(query);
     console.log("====================================");
     console.log("Device ID:", result.DevID);
