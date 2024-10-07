@@ -10,8 +10,6 @@ import {
   Image,
   TouchableOpacity,
   Alert,
-  BackHandler,
-  Linking,
 } from "react-native";
 import { FontAwesome, FontAwesome6 } from "@expo/vector-icons";
 import { AntDesign } from "@expo/vector-icons";
@@ -69,6 +67,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
   const [DeviceID, setDeviceID] = useState();
   useEffect(() => {
     (async () => {
+      HandelClear();
       let devID = await insertDeviceID();
       if (devID && devID.DevID) {
         const devIDStr = String(devID.DevID).padStart(2, "0"); // Ensure it's a string and pad with leading zero if necessary
@@ -100,7 +99,6 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
           );
         }
       }
-      HandelClear();
     })();
   }, []);
 
@@ -128,7 +126,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
 
     if (!deviceID) {
       Alert.alert("Device ID not found", "Please restart the app", [
-        { text: "OK", onPress: () => BackHandler.exitApp() },
+        { text: "OK" },
       ]);
       return;
     }
@@ -163,7 +161,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
 
     if (!deviceID) {
       Alert.alert("Device ID not found", "Please restart the app", [
-        { text: "OK", onPress: () => BackHandler.exitApp() },
+        { text: "OK" },
       ]);
       return;
     }
@@ -214,7 +212,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
         // setSeralNo(data && data.SEVANO);
       })
       .catch((error) => console.log(error));
-  }, [selectedNo]);
+  }, [selectedNo, DeviceID]);
 
   useEffect(() => {
     getDeviceID().then((res) => {
@@ -291,7 +289,6 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     }
     if (SeralNo === 0) {
       alert("Please wait for the Serial No to generate");
-      Linking.openURL("myapp://");
       return;
     }
     try {
