@@ -1015,6 +1015,7 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
     </SafeAreaView>
   );
 };
+
 const styles = StyleSheet.create({
   container: {
     marginHorizontal: 20,
