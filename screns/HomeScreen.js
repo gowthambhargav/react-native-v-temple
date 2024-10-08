@@ -759,8 +759,8 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
               <Dnakshara
                 nakshatra={nakshatra}
                 setNakshatra={setNakshatra}
-                dplable={"Nakshara"}
-                lable={"Nakshara"}
+                dplable={"Nakshatra"}
+                lable={"Nakshatra"}
               />
               <Drashi
                 rashi={rashi}
@@ -987,19 +987,6 @@ const FormScreen = ({ setUserName, setUserPassword, setLoggedIn }) => {
                   }}
                 />
               </TouchableOpacity>
-              <Button
-                title="List"
-                onPress={() => {
-                  setLoading(true);
-                  setLoadingContent("Loading Receipts");
-                  setTimeout(() => {
-                    setLoading(false);
-                  }, 1000);
-                  setShowReceiptDetails(true);
-                  setTranslateMenu(-290);
-                  console.log("close button pressed");
-                }}
-              />
 
               <Text
                 onPress={() => {

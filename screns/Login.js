@@ -9,19 +9,24 @@ import {
   ImageBackground,
   View,
   Image,
+  TouchableOpacity,
 } from "react-native";
 
 export default function Login() {
   const [userName, onUserNameChange] = React.useState("");
   const [userPassward, onUserPasswardChange] = React.useState("");
   const [btn, setBtn] = React.useState(false);
+
   //-----------------------------------------------------------------
   // functions
   const validateUserNameAndPassword = () => {
     const trimmedUserName = userName.trim();
     const trimmedUserPassword = userPassward.trim();
     console.log("====================================");
-    console.log(trimmedUserName, trimmedUserPassword);
+    console.log("Trimmed UserName:", trimmedUserName);
+    console.log("Trimmed UserPassword:", trimmedUserPassword);
+    console.log("Expected UserName: admin");
+    console.log("Expected UserPassword: svt123");
     console.log("====================================");
     if (trimmedUserName !== "admin" || trimmedUserPassword !== "svt123") {
       Alert.alert("Invalid Credentials");
@@ -30,7 +35,9 @@ export default function Login() {
     }
   };
 
-  console.log(userName, userPassward);
+  console.log("Current UserName:", userName);
+  console.log("Current UserPassword:", userPassward);
+
   return (
     <SafeAreaView style={styles.container}>
       <ImageBackground
@@ -56,20 +63,21 @@ export default function Login() {
           style={styles.input}
           autoCapitalize="none"
           placeholder="User name"
-          onChangeText={onUserNameChange}
+          onChangeText={(text) => onUserNameChange(text)}
         />
         <TextInput
           style={styles.input}
           placeholder="Passward"
-          onChangeText={onUserPasswardChange}
+          onChangeText={(text) => onUserPasswardChange(text)}
         />
-        <View style={[styles.buttonCss]}>
-          <Button
-            title="Login"
-            disabled={btn}
-            onPress={validateUserNameAndPassword}
-          />
-        </View>
+        <TouchableOpacity
+          onPress={() => {
+            validateUserNameAndPassword();
+          }}
+          style={[styles.buttonCss]}
+        >
+          <Button title="Login" disabled={btn} />
+        </TouchableOpacity>
       </ImageBackground>
     </SafeAreaView>
   );
